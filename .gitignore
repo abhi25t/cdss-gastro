@@ -31,6 +31,15 @@ serviceAccountKey.json
 *-service-account*.json
 .env
 
+# Firebase Hosting — local project binding (keep .firebaserc.example tracked)
+.firebaserc
+
+# Firebase CLI local cache (created by `firebase deploy`)
+.firebase/
+
+# Generated waiting-room poster (contains only the public app URL)
+webapp/poster.*
+
 # Reference textbooks / large binaries — copyrighted, not for distribution
 *.pdf
 

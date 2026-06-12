@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "public": "webapp/patient",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "firebase-config.example.js"
+    ],
+    "headers": [
+      {
+        "source": "/@(index.html|kg-data.js|kg-data.json|app.js)",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, max-age=0" }
+        ]
+      }
+    ]
+  }
+}

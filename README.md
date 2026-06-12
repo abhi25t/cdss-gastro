@@ -122,7 +122,9 @@ Pipelines are loaded and validated once per version and cached.
 
 ### 3. Patient questionnaire web app
 
-Export a knowledge graph's questionnaire for the browser, then serve it:
+In production the app is served from **Firebase Hosting** (a public HTTPS URL — see
+*Going live* below), which is how patients reach it from their own phones. For local
+development, export a knowledge graph's questionnaire for the browser and serve it:
 
 ```bash
 python3 webapp/build_kg_json.py --kg-version v1
@@ -137,6 +139,18 @@ with optional camera barcode scan, and submits to Firestore.
 To enable cloud submission, follow **[webapp/SETUP_FIREBASE.md](webapp/SETUP_FIREBASE.md)**
 and copy `firebase-config.example.js` → `firebase-config.js`. Without it, the app
 still runs and logs submissions locally.
+
+**Going live (public URL + poster).** Patients on cellular can't reach a laptop's
+`http.server`, so publish the static app to **Firebase Hosting** (free, same project)
+and print a waiting-room QR poster (SETUP_FIREBASE.md Part E):
+
+```bash
+firebase deploy --only hosting                          # → https://<project>.web.app
+python3 webapp/make_poster.py --url https://<project>.web.app   # writes webapp/poster.png
+```
+
+The web config in `firebase-config.js` is public by design (every Firebase web app
+ships it); data is protected by the create-only Firestore rules, not by hiding it.
 
 ### 4. Doctor triage dashboard
 
@@ -184,10 +198,11 @@ python3 examples/run_cases.py
 ## Status & roadmap
 
 **Working:** engine, explainable scoring, REST API, patient web app, Firestore
-submission, and the risk-ranked doctor dashboard — the full loop is live-tested.
+submission, the risk-ranked doctor dashboard, and **public Firebase Hosting + a
+waiting-room QR poster** — the full loop is live-tested.
 
-**Next:** public hosting of the patient app (+ waiting-room QR poster), expanded
-clinical content (a real `v3` ontology), and optionally an AI consultation summary.
+**Next:** PHI hardening (end-of-day auto-delete, App Check), expanded clinical
+content (a real `v3` ontology), and optionally an AI consultation summary.
 
 ## License / disclaimer
 

@@ -105,6 +105,76 @@ Anonymous sign-in (Part C step 9).
 
 ---
 
+## Part E — Publish the patient app + print the waiting-room poster
+
+So far the app only runs on your own laptop (`http.server`). Patients in the waiting
+room are on **cellular** and can't reach your laptop, so we publish the app to
+**Firebase Hosting** — same project, free, gives you a public HTTPS address like
+`https://cdss-triage.web.app`. Because it's the same Firebase project, that address
+is *automatically* allowed to sign in (no extra Auth step).
+
+> **Is it safe to put the app on the public internet?** Yes. The values in
+> `firebase-config.js` are *meant* to be public — every Firebase web app ships them
+> to the browser. Your data is protected by the create-only rules from Part C (a
+> phone can only drop off a submission; it can't read anyone's data), not by hiding
+> that file. The secret `serviceAccountKey.json` is **not** part of the app and is
+> never published.
+
+**1. Install the Firebase command-line tool** (this machine has no Node, so use the
+standalone installer):
+
+```bash
+curl -sL https://firebase.tools | bash      # may ask for your password (sudo)
+firebase --version                           # confirm it installed
+```
+
+**2. Log in to Google** (opens a browser sign-in). Run this yourself; on this
+terminal type it with a leading `!` so the output shows up here:
+
+```bash
+firebase login --no-localhost      # prints a link + code to paste back
+```
+
+**3. Point the project at your Firebase project** — copy the example and set your id
+(this file is git-ignored, like `firebase-config.js`):
+
+```bash
+cp .firebaserc.example .firebaserc
+# edit .firebaserc and set "default" to your project id, e.g. cdss-triage
+# (or run: firebase use --add  and pick it from the list)
+```
+
+**4. Build the questionnaire data and deploy:**
+
+```bash
+/home/ai/pyenv/cdss/bin/python webapp/build_kg_json.py --kg-version v1
+firebase deploy --only hosting
+```
+
+When it finishes it prints your **Hosting URL** (e.g. `https://cdss-triage.web.app`).
+Open it in any browser to confirm the app loads, then open it on a phone **using
+mobile data** (not hospital wifi) and submit a test questionnaire — it should appear
+in Firestore and on the dashboard exactly as before.
+
+> If anonymous sign-in is ever rejected on the live URL, add the domain manually:
+> Firebase console → **Authentication → Settings → Authorized domains → Add domain**
+> → `cdss-triage.web.app`. (It's normally added for you automatically.)
+
+**5. Print the waiting-room poster.** This makes a printable sheet with a big QR code
+that opens the app when a patient points their phone camera at it:
+
+```bash
+/home/ai/pyenv/cdss/bin/pip install "qrcode[pil]"      # one time
+/home/ai/pyenv/cdss/bin/python webapp/make_poster.py --url https://cdss-triage.web.app
+# writes webapp/poster.png — open and print it (A4). Use --out poster.pdf for a PDF.
+# customise the wording with --title and --subtitle
+```
+
+Stick the printed poster up in the waiting room. (This QR holds the *app address* —
+it is not the same as the UHID barcode the app itself scans on each patient.)
+
+---
+
 ## Notes / for later
 
 - **App Check** (extra protection against abuse from outside the app) is optional
