@@ -1,0 +1,21 @@
+conditions:
+  ruq_pain:
+    expression: q_location == 'ruq'
+
+  fatty_food_trigger:
+    expression: q_fatty_food == 'yes'
+
+  jaundice_present:
+    expression: q_jaundice == 'yes'
+
+  fever_present:
+    expression: q_fever == 'yes'
+
+  heartburn_present:
+    expression: q_heartburn == 'yes'
+
+  black_stool_present:
+    expression: q_black_stool == 'yes'
+
+  weight_loss_present:
+    expression: q_weight_loss == 'yes'

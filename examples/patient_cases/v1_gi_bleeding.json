@@ -1,0 +1,52 @@
+{
+  "id": "v1_gi_bleeding",
+  "name": "v1 black stool red flag",
+  "kg_version": "v1",
+  "answers": {
+    "q_main_complaint": "abdominal_pain",
+    "q_location": "epigastric",
+    "q_heartburn": "no",
+    "q_black_stool": "yes",
+    "q_weight_loss": "no"
+  },
+  "flow": [
+    {
+      "question_id": "q_main_complaint",
+      "answer": "abdominal_pain"
+    },
+    {
+      "question_id": "q_location",
+      "answer": "epigastric",
+      "flow_id": "abdominal_pain"
+    },
+    {
+      "question_id": "q_heartburn",
+      "answer": "no",
+      "flow_id": "abdominal_pain"
+    }
+  ],
+  "expected": {
+    "top_diagnosis": "Peptic Ulcer Disease",
+    "min_top_score": 80,
+    "true_conditions": [
+      "black_stool_present"
+    ],
+    "red_flags": [
+      {
+        "flag": "GI Bleeding",
+        "urgency": "immediate"
+      }
+    ],
+    "investigations": {
+      "Peptic Ulcer Disease": [
+        "Upper GI Endoscopy",
+        "CBC"
+      ]
+    },
+    "treatments": {
+      "Peptic Ulcer Disease": [
+        "Proton pump inhibitor"
+      ]
+    }
+  }
+}

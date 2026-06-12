@@ -1,0 +1,22 @@
+treatment_recommendations:
+  gerd:
+    - Lifestyle modification
+    - Proton pump inhibitor
+
+  acute_cholecystitis:
+    - Surgical consultation
+    - IV fluids
+    - Antibiotics
+
+  acute_pancreatitis:
+    - Hospital admission
+    - IV fluids
+    - Pain control
+
+  ulcerative_colitis:
+    - Gastroenterology referral
+    - Anti-inflammatory therapy per specialist
+
+  cirrhosis:
+    - Hepatology referral
+    - Variceal screening

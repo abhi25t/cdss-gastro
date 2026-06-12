@@ -1,0 +1,27 @@
+treatment_recommendations:
+  GERD:
+  - Lifestyle modification
+  - PPI trial
+  Gastritis:
+  - PPI
+  - Avoid NSAIDs
+  Peptic Ulcer Disease:
+  - PPI
+  - H. pylori eradication if positive
+  Acute Cholecystitis:
+  - IV fluids
+  - Antibiotics
+  - Surgical evaluation
+  Acute Pancreatitis:
+  - Hospital admission
+  - IV fluids
+  - Pain control
+  Ulcerative Colitis:
+  - GI referral
+  - Disease-specific therapy
+  Crohn Disease:
+  - GI referral
+  - Disease-specific therapy
+  Cirrhosis:
+  - Hepatology referral
+  - Variceal screening

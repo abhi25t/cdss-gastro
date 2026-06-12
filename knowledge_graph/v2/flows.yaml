@@ -1,0 +1,9 @@
+flows:
+  abdominal_pain:
+    start: q_location
+  diarrhea:
+    start: q_diarrhea_duration
+  jaundice:
+    start: q_jaundice
+  reflux:
+    start: q_heartburn

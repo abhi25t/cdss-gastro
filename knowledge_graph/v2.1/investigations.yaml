@@ -1,0 +1,23 @@
+investigations:
+  baseline:
+  - CBC
+  - ESR
+  - CRP
+  - LFT
+  - RFT
+  - HbA1c
+  upper_gi:
+  - Upper GI Endoscopy
+  - H. pylori Testing
+  lower_gi:
+  - Colonoscopy
+  - Fecal Calprotectin
+  - Stool Occult Blood
+  hepatobiliary:
+  - Ultrasound Abdomen
+  - MRCP
+  - Hepatitis Panel
+  pancreatic:
+  - Serum Lipase
+  - Serum Amylase
+  - CT Abdomen

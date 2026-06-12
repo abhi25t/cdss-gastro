@@ -1,0 +1,23 @@
+diagnoses:
+  acute_cholecystitis:
+    supporting_conditions:
+      - ruq_pain
+      - fatty_food_trigger
+      - fever_present
+
+  gallstones:
+    supporting_conditions:
+      - ruq_pain
+      - fatty_food_trigger
+
+  gerd:
+    supporting_conditions:
+      - heartburn_present
+
+  peptic_ulcer_disease:
+    supporting_conditions:
+      - black_stool_present
+
+  colorectal_cancer_red_flag:
+    supporting_conditions:
+      - weight_loss_present

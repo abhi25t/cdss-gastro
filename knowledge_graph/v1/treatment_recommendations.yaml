@@ -1,0 +1,19 @@
+treatment_recommendations:
+  acute_cholecystitis:
+    - Urgent surgical evaluation
+    - IV fluids
+    - Antibiotics as clinically indicated
+
+  gallstones:
+    - Surgical consultation for cholecystectomy
+
+  gerd:
+    - Lifestyle modification
+    - Proton pump inhibitor trial
+
+  peptic_ulcer_disease:
+    - Proton pump inhibitor
+    - Test for H. pylori
+
+  colorectal_cancer_red_flag:
+    - Expedite specialist referral

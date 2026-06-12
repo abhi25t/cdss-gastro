@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDSS Triage Dashboard</title>
+  <link rel="stylesheet" href="/dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand__dot"></span>
+      <div>
+        <h1>Triage Dashboard</h1>
+        <p class="brand__sub">Patients ranked by risk · decision support for physician review</p>
+      </div>
+    </div>
+    <div class="controls">
+      <span id="status" class="status">Loading…</span>
+      <label class="toggle"><input type="checkbox" id="showSeen" /> Show seen</label>
+      <button id="refreshBtn" class="btn">Refresh</button>
+      <button id="cleanupBtn" class="btn btn--ghost" title="Delete patients already marked seen">End-of-day cleanup</button>
+    </div>
+  </header>
+
+  <main id="board" class="board">
+    <p class="empty">Loading patients…</p>
+  </main>
+
+  <footer class="foot">
+    <span id="sourceLabel"></span> · auto-refreshes every 5s ·
+    not a substitute for clinical judgement
+  </footer>
+
+  <script src="/dashboard.js"></script>
+</body>
+</html>

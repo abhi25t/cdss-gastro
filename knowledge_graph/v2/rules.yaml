@@ -1,0 +1,679 @@
+rules:
+  - id: gerd_score
+    diagnosis: gerd
+    weight: 25
+  - id: acute_cholecystitis_score
+    diagnosis: acute_cholecystitis
+    weight: 25
+  - id: acute_pancreatitis_score
+    diagnosis: acute_pancreatitis
+    weight: 25
+  - id: ulcerative_colitis_score
+    diagnosis: ulcerative_colitis
+    weight: 25
+  - id: crohn_disease_score
+    diagnosis: crohn_disease
+    weight: 25
+  - id: cirrhosis_score
+    diagnosis: cirrhosis
+    weight: 25
+  - id: rule_1
+    diagnosis: derived_dx_1
+    weight: 2
+  - id: rule_2
+    diagnosis: derived_dx_2
+    weight: 3
+  - id: rule_3
+    diagnosis: derived_dx_3
+    weight: 4
+  - id: rule_4
+    diagnosis: derived_dx_4
+    weight: 5
+  - id: rule_5
+    diagnosis: derived_dx_5
+    weight: 6
+  - id: rule_6
+    diagnosis: derived_dx_6
+    weight: 7
+  - id: rule_7
+    diagnosis: derived_dx_7
+    weight: 8
+  - id: rule_8
+    diagnosis: derived_dx_8
+    weight: 9
+  - id: rule_9
+    diagnosis: derived_dx_9
+    weight: 10
+  - id: rule_10
+    diagnosis: derived_dx_10
+    weight: 11
+  - id: rule_11
+    diagnosis: derived_dx_11
+    weight: 12
+  - id: rule_12
+    diagnosis: derived_dx_12
+    weight: 13
+  - id: rule_13
+    diagnosis: derived_dx_13
+    weight: 14
+  - id: rule_14
+    diagnosis: derived_dx_14
+    weight: 15
+  - id: rule_15
+    diagnosis: derived_dx_15
+    weight: 16
+  - id: rule_16
+    diagnosis: derived_dx_16
+    weight: 17
+  - id: rule_17
+    diagnosis: derived_dx_17
+    weight: 18
+  - id: rule_18
+    diagnosis: derived_dx_18
+    weight: 19
+  - id: rule_19
+    diagnosis: derived_dx_19
+    weight: 20
+  - id: rule_20
+    diagnosis: derived_dx_20
+    weight: 1
+  - id: rule_21
+    diagnosis: derived_dx_21
+    weight: 2
+  - id: rule_22
+    diagnosis: derived_dx_22
+    weight: 3
+  - id: rule_23
+    diagnosis: derived_dx_23
+    weight: 4
+  - id: rule_24
+    diagnosis: derived_dx_24
+    weight: 5
+  - id: rule_25
+    diagnosis: derived_dx_25
+    weight: 6
+  - id: rule_26
+    diagnosis: derived_dx_26
+    weight: 7
+  - id: rule_27
+    diagnosis: derived_dx_27
+    weight: 8
+  - id: rule_28
+    diagnosis: derived_dx_28
+    weight: 9
+  - id: rule_29
+    diagnosis: derived_dx_29
+    weight: 10
+  - id: rule_30
+    diagnosis: derived_dx_30
+    weight: 11
+  - id: rule_31
+    diagnosis: derived_dx_31
+    weight: 12
+  - id: rule_32
+    diagnosis: derived_dx_32
+    weight: 13
+  - id: rule_33
+    diagnosis: derived_dx_33
+    weight: 14
+  - id: rule_34
+    diagnosis: derived_dx_34
+    weight: 15
+  - id: rule_35
+    diagnosis: derived_dx_35
+    weight: 16
+  - id: rule_36
+    diagnosis: derived_dx_36
+    weight: 17
+  - id: rule_37
+    diagnosis: derived_dx_37
+    weight: 18
+  - id: rule_38
+    diagnosis: derived_dx_38
+    weight: 19
+  - id: rule_39
+    diagnosis: derived_dx_39
+    weight: 20
+  - id: rule_40
+    diagnosis: derived_dx_40
+    weight: 1
+  - id: rule_41
+    diagnosis: derived_dx_41
+    weight: 2
+  - id: rule_42
+    diagnosis: derived_dx_42
+    weight: 3
+  - id: rule_43
+    diagnosis: derived_dx_43
+    weight: 4
+  - id: rule_44
+    diagnosis: derived_dx_44
+    weight: 5
+  - id: rule_45
+    diagnosis: derived_dx_45
+    weight: 6
+  - id: rule_46
+    diagnosis: derived_dx_46
+    weight: 7
+  - id: rule_47
+    diagnosis: derived_dx_47
+    weight: 8
+  - id: rule_48
+    diagnosis: derived_dx_48
+    weight: 9
+  - id: rule_49
+    diagnosis: derived_dx_49
+    weight: 10
+  - id: rule_50
+    diagnosis: derived_dx_50
+    weight: 11
+  - id: rule_51
+    diagnosis: derived_dx_51
+    weight: 12
+  - id: rule_52
+    diagnosis: derived_dx_52
+    weight: 13
+  - id: rule_53
+    diagnosis: derived_dx_53
+    weight: 14
+  - id: rule_54
+    diagnosis: derived_dx_54
+    weight: 15
+  - id: rule_55
+    diagnosis: derived_dx_55
+    weight: 16
+  - id: rule_56
+    diagnosis: derived_dx_56
+    weight: 17
+  - id: rule_57
+    diagnosis: derived_dx_57
+    weight: 18
+  - id: rule_58
+    diagnosis: derived_dx_58
+    weight: 19
+  - id: rule_59
+    diagnosis: derived_dx_59
+    weight: 20
+  - id: rule_60
+    diagnosis: derived_dx_60
+    weight: 1
+  - id: rule_61
+    diagnosis: derived_dx_61
+    weight: 2
+  - id: rule_62
+    diagnosis: derived_dx_62
+    weight: 3
+  - id: rule_63
+    diagnosis: derived_dx_63
+    weight: 4
+  - id: rule_64
+    diagnosis: derived_dx_64
+    weight: 5
+  - id: rule_65
+    diagnosis: derived_dx_65
+    weight: 6
+  - id: rule_66
+    diagnosis: derived_dx_66
+    weight: 7
+  - id: rule_67
+    diagnosis: derived_dx_67
+    weight: 8
+  - id: rule_68
+    diagnosis: derived_dx_68
+    weight: 9
+  - id: rule_69
+    diagnosis: derived_dx_69
+    weight: 10
+  - id: rule_70
+    diagnosis: derived_dx_70
+    weight: 11
+  - id: rule_71
+    diagnosis: derived_dx_71
+    weight: 12
+  - id: rule_72
+    diagnosis: derived_dx_72
+    weight: 13
+  - id: rule_73
+    diagnosis: derived_dx_73
+    weight: 14
+  - id: rule_74
+    diagnosis: derived_dx_74
+    weight: 15
+  - id: rule_75
+    diagnosis: derived_dx_75
+    weight: 16
+  - id: rule_76
+    diagnosis: derived_dx_76
+    weight: 17
+  - id: rule_77
+    diagnosis: derived_dx_77
+    weight: 18
+  - id: rule_78
+    diagnosis: derived_dx_78
+    weight: 19
+  - id: rule_79
+    diagnosis: derived_dx_79
+    weight: 20
+  - id: rule_80
+    diagnosis: derived_dx_80
+    weight: 1
+  - id: rule_81
+    diagnosis: derived_dx_81
+    weight: 2
+  - id: rule_82
+    diagnosis: derived_dx_82
+    weight: 3
+  - id: rule_83
+    diagnosis: derived_dx_83
+    weight: 4
+  - id: rule_84
+    diagnosis: derived_dx_84
+    weight: 5
+  - id: rule_85
+    diagnosis: derived_dx_85
+    weight: 6
+  - id: rule_86
+    diagnosis: derived_dx_86
+    weight: 7
+  - id: rule_87
+    diagnosis: derived_dx_87
+    weight: 8
+  - id: rule_88
+    diagnosis: derived_dx_88
+    weight: 9
+  - id: rule_89
+    diagnosis: derived_dx_89
+    weight: 10
+  - id: rule_90
+    diagnosis: derived_dx_90
+    weight: 11
+  - id: rule_91
+    diagnosis: derived_dx_91
+    weight: 12
+  - id: rule_92
+    diagnosis: derived_dx_92
+    weight: 13
+  - id: rule_93
+    diagnosis: derived_dx_93
+    weight: 14
+  - id: rule_94
+    diagnosis: derived_dx_94
+    weight: 15
+  - id: rule_95
+    diagnosis: derived_dx_95
+    weight: 16
+  - id: rule_96
+    diagnosis: derived_dx_96
+    weight: 17
+  - id: rule_97
+    diagnosis: derived_dx_97
+    weight: 18
+  - id: rule_98
+    diagnosis: derived_dx_98
+    weight: 19
+  - id: rule_99
+    diagnosis: derived_dx_99
+    weight: 20
+  - id: rule_100
+    diagnosis: derived_dx_100
+    weight: 1
+  - id: rule_101
+    diagnosis: derived_dx_101
+    weight: 2
+  - id: rule_102
+    diagnosis: derived_dx_102
+    weight: 3
+  - id: rule_103
+    diagnosis: derived_dx_103
+    weight: 4
+  - id: rule_104
+    diagnosis: derived_dx_104
+    weight: 5
+  - id: rule_105
+    diagnosis: derived_dx_105
+    weight: 6
+  - id: rule_106
+    diagnosis: derived_dx_106
+    weight: 7
+  - id: rule_107
+    diagnosis: derived_dx_107
+    weight: 8
+  - id: rule_108
+    diagnosis: derived_dx_108
+    weight: 9
+  - id: rule_109
+    diagnosis: derived_dx_109
+    weight: 10
+  - id: rule_110
+    diagnosis: derived_dx_110
+    weight: 11
+  - id: rule_111
+    diagnosis: derived_dx_111
+    weight: 12
+  - id: rule_112
+    diagnosis: derived_dx_112
+    weight: 13
+  - id: rule_113
+    diagnosis: derived_dx_113
+    weight: 14
+  - id: rule_114
+    diagnosis: derived_dx_114
+    weight: 15
+  - id: rule_115
+    diagnosis: derived_dx_115
+    weight: 16
+  - id: rule_116
+    diagnosis: derived_dx_116
+    weight: 17
+  - id: rule_117
+    diagnosis: derived_dx_117
+    weight: 18
+  - id: rule_118
+    diagnosis: derived_dx_118
+    weight: 19
+  - id: rule_119
+    diagnosis: derived_dx_119
+    weight: 20
+  - id: rule_120
+    diagnosis: derived_dx_120
+    weight: 1
+  - id: rule_121
+    diagnosis: derived_dx_121
+    weight: 2
+  - id: rule_122
+    diagnosis: derived_dx_122
+    weight: 3
+  - id: rule_123
+    diagnosis: derived_dx_123
+    weight: 4
+  - id: rule_124
+    diagnosis: derived_dx_124
+    weight: 5
+  - id: rule_125
+    diagnosis: derived_dx_125
+    weight: 6
+  - id: rule_126
+    diagnosis: derived_dx_126
+    weight: 7
+  - id: rule_127
+    diagnosis: derived_dx_127
+    weight: 8
+  - id: rule_128
+    diagnosis: derived_dx_128
+    weight: 9
+  - id: rule_129
+    diagnosis: derived_dx_129
+    weight: 10
+  - id: rule_130
+    diagnosis: derived_dx_130
+    weight: 11
+  - id: rule_131
+    diagnosis: derived_dx_131
+    weight: 12
+  - id: rule_132
+    diagnosis: derived_dx_132
+    weight: 13
+  - id: rule_133
+    diagnosis: derived_dx_133
+    weight: 14
+  - id: rule_134
+    diagnosis: derived_dx_134
+    weight: 15
+  - id: rule_135
+    diagnosis: derived_dx_135
+    weight: 16
+  - id: rule_136
+    diagnosis: derived_dx_136
+    weight: 17
+  - id: rule_137
+    diagnosis: derived_dx_137
+    weight: 18
+  - id: rule_138
+    diagnosis: derived_dx_138
+    weight: 19
+  - id: rule_139
+    diagnosis: derived_dx_139
+    weight: 20
+  - id: rule_140
+    diagnosis: derived_dx_140
+    weight: 1
+  - id: rule_141
+    diagnosis: derived_dx_141
+    weight: 2
+  - id: rule_142
+    diagnosis: derived_dx_142
+    weight: 3
+  - id: rule_143
+    diagnosis: derived_dx_143
+    weight: 4
+  - id: rule_144
+    diagnosis: derived_dx_144
+    weight: 5
+  - id: rule_145
+    diagnosis: derived_dx_145
+    weight: 6
+  - id: rule_146
+    diagnosis: derived_dx_146
+    weight: 7
+  - id: rule_147
+    diagnosis: derived_dx_147
+    weight: 8
+  - id: rule_148
+    diagnosis: derived_dx_148
+    weight: 9
+  - id: rule_149
+    diagnosis: derived_dx_149
+    weight: 10
+  - id: rule_150
+    diagnosis: derived_dx_150
+    weight: 11
+  - id: rule_151
+    diagnosis: derived_dx_151
+    weight: 12
+  - id: rule_152
+    diagnosis: derived_dx_152
+    weight: 13
+  - id: rule_153
+    diagnosis: derived_dx_153
+    weight: 14
+  - id: rule_154
+    diagnosis: derived_dx_154
+    weight: 15
+  - id: rule_155
+    diagnosis: derived_dx_155
+    weight: 16
+  - id: rule_156
+    diagnosis: derived_dx_156
+    weight: 17
+  - id: rule_157
+    diagnosis: derived_dx_157
+    weight: 18
+  - id: rule_158
+    diagnosis: derived_dx_158
+    weight: 19
+  - id: rule_159
+    diagnosis: derived_dx_159
+    weight: 20
+  - id: rule_160
+    diagnosis: derived_dx_160
+    weight: 1
+  - id: rule_161
+    diagnosis: derived_dx_161
+    weight: 2
+  - id: rule_162
+    diagnosis: derived_dx_162
+    weight: 3
+  - id: rule_163
+    diagnosis: derived_dx_163
+    weight: 4
+  - id: rule_164
+    diagnosis: derived_dx_164
+    weight: 5
+  - id: rule_165
+    diagnosis: derived_dx_165
+    weight: 6
+  - id: rule_166
+    diagnosis: derived_dx_166
+    weight: 7
+  - id: rule_167
+    diagnosis: derived_dx_167
+    weight: 8
+  - id: rule_168
+    diagnosis: derived_dx_168
+    weight: 9
+  - id: rule_169
+    diagnosis: derived_dx_169
+    weight: 10
+  - id: rule_170
+    diagnosis: derived_dx_170
+    weight: 11
+  - id: rule_171
+    diagnosis: derived_dx_171
+    weight: 12
+  - id: rule_172
+    diagnosis: derived_dx_172
+    weight: 13
+  - id: rule_173
+    diagnosis: derived_dx_173
+    weight: 14
+  - id: rule_174
+    diagnosis: derived_dx_174
+    weight: 15
+  - id: rule_175
+    diagnosis: derived_dx_175
+    weight: 16
+  - id: rule_176
+    diagnosis: derived_dx_176
+    weight: 17
+  - id: rule_177
+    diagnosis: derived_dx_177
+    weight: 18
+  - id: rule_178
+    diagnosis: derived_dx_178
+    weight: 19
+  - id: rule_179
+    diagnosis: derived_dx_179
+    weight: 20
+  - id: rule_180
+    diagnosis: derived_dx_180
+    weight: 1
+  - id: rule_181
+    diagnosis: derived_dx_181
+    weight: 2
+  - id: rule_182
+    diagnosis: derived_dx_182
+    weight: 3
+  - id: rule_183
+    diagnosis: derived_dx_183
+    weight: 4
+  - id: rule_184
+    diagnosis: derived_dx_184
+    weight: 5
+  - id: rule_185
+    diagnosis: derived_dx_185
+    weight: 6
+  - id: rule_186
+    diagnosis: derived_dx_186
+    weight: 7
+  - id: rule_187
+    diagnosis: derived_dx_187
+    weight: 8
+  - id: rule_188
+    diagnosis: derived_dx_188
+    weight: 9
+  - id: rule_189
+    diagnosis: derived_dx_189
+    weight: 10
+  - id: rule_190
+    diagnosis: derived_dx_190
+    weight: 11
+  - id: rule_191
+    diagnosis: derived_dx_191
+    weight: 12
+  - id: rule_192
+    diagnosis: derived_dx_192
+    weight: 13
+  - id: rule_193
+    diagnosis: derived_dx_193
+    weight: 14
+  - id: rule_194
+    diagnosis: derived_dx_194
+    weight: 15
+  - id: rule_195
+    diagnosis: derived_dx_195
+    weight: 16
+  - id: rule_196
+    diagnosis: derived_dx_196
+    weight: 17
+  - id: rule_197
+    diagnosis: derived_dx_197
+    weight: 18
+  - id: rule_198
+    diagnosis: derived_dx_198
+    weight: 19
+  - id: rule_199
+    diagnosis: derived_dx_199
+    weight: 20
+  - id: rule_200
+    diagnosis: derived_dx_200
+    weight: 1
+  - id: rule_201
+    diagnosis: derived_dx_201
+    weight: 2
+  - id: rule_202
+    diagnosis: derived_dx_202
+    weight: 3
+  - id: rule_203
+    diagnosis: derived_dx_203
+    weight: 4
+  - id: rule_204
+    diagnosis: derived_dx_204
+    weight: 5
+  - id: rule_205
+    diagnosis: derived_dx_205
+    weight: 6
+  - id: rule_206
+    diagnosis: derived_dx_206
+    weight: 7
+  - id: rule_207
+    diagnosis: derived_dx_207
+    weight: 8
+  - id: rule_208
+    diagnosis: derived_dx_208
+    weight: 9
+  - id: rule_209
+    diagnosis: derived_dx_209
+    weight: 10
+  - id: rule_210
+    diagnosis: derived_dx_210
+    weight: 11
+  - id: rule_211
+    diagnosis: derived_dx_211
+    weight: 12
+  - id: rule_212
+    diagnosis: derived_dx_212
+    weight: 13
+  - id: rule_213
+    diagnosis: derived_dx_213
+    weight: 14
+  - id: rule_214
+    diagnosis: derived_dx_214
+    weight: 15
+  - id: rule_215
+    diagnosis: derived_dx_215
+    weight: 16
+  - id: rule_216
+    diagnosis: derived_dx_216
+    weight: 17
+  - id: rule_217
+    diagnosis: derived_dx_217
+    weight: 18
+  - id: rule_218
+    diagnosis: derived_dx_218
+    weight: 19
+  - id: rule_219
+    diagnosis: derived_dx_219
+    weight: 20
+  - id: rule_220
+    diagnosis: derived_dx_220
+    weight: 1

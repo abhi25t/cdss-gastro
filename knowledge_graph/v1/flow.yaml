@@ -1,0 +1,26 @@
+flows:
+  abdominal_pain:
+    start: q_location
+
+    transitions:
+      q_location:
+        ruq: q_fatty_food
+        epigastric: q_heartburn
+        rlq: q_fever
+        diffuse: q_diarrhea
+
+      q_fatty_food:
+        yes: q_jaundice
+        no: q_fever
+
+      q_jaundice:
+        yes: q_fever
+        no: q_fever
+
+      q_heartburn:
+        yes: q_weight_loss
+        no: q_black_stool
+
+      q_diarrhea:
+        yes: q_weight_loss
+        no: q_constipation

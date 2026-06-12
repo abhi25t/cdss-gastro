@@ -1,0 +1,6 @@
+symptom_groups:
+  upper_gi: [heartburn, dysphagia, odynophagia, nausea, vomiting, epigastric_pain]
+  lower_gi: [diarrhea, constipation, rectal_bleeding, melena, abdominal_cramps]
+  hepatobiliary: [jaundice, ruq_pain, dark_urine, pale_stools, pruritus]
+  pancreatic: [epigastric_pain, back_radiation, vomiting, weight_loss]
+  ibd: [chronic_diarrhea, blood_in_stool, weight_loss, fever]

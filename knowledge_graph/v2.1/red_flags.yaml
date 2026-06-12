@@ -1,0 +1,25 @@
+red_flags:
+- id: hematemesis
+  urgency: immediate
+- id: melena
+  urgency: immediate
+- id: jaundice_fever
+  urgency: immediate
+- id: peritonitis
+  urgency: immediate
+- id: shock
+  urgency: immediate
+- id: severe_dehydration
+  urgency: immediate
+- id: unintentional_weight_loss
+  urgency: urgent
+- id: progressive_dysphagia
+  urgency: urgent
+- id: iron_deficiency_anemia
+  urgency: urgent
+- id: persistent_vomiting
+  urgency: urgent
+- id: family_history_gi_cancer
+  urgency: urgent
+- id: new_onset_symptoms_age_gt_60
+  urgency: urgent

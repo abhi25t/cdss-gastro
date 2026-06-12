@@ -1,0 +1,535 @@
+conditions:
+  ruq_pain:
+    expression: ruq_pain
+  epigastric_pain:
+    expression: epigastric_pain
+  rlq_pain:
+    expression: rlq_pain
+  heartburn_present:
+    expression: heartburn_present
+  dysphagia_present:
+    expression: dysphagia_present
+  vomiting_present:
+    expression: vomiting_present
+  melena_present:
+    expression: melena_present
+  hematemesis_present:
+    expression: hematemesis_present
+  weight_loss_present:
+    expression: weight_loss_present
+  jaundice_present:
+    expression: jaundice_present
+  dark_urine_present:
+    expression: dark_urine_present
+  pale_stool_present:
+    expression: pale_stool_present
+  fever_present:
+    expression: fever_present
+  bloody_diarrhea:
+    expression: bloody_diarrhea
+  nocturnal_diarrhea:
+    expression: nocturnal_diarrhea
+  back_radiation:
+    expression: back_radiation
+  fatty_food_trigger:
+    expression: fatty_food_trigger
+  derived_condition_1:
+    expression: synthetic_condition_1
+  derived_condition_2:
+    expression: synthetic_condition_2
+  derived_condition_3:
+    expression: synthetic_condition_3
+  derived_condition_4:
+    expression: synthetic_condition_4
+  derived_condition_5:
+    expression: synthetic_condition_5
+  derived_condition_6:
+    expression: synthetic_condition_6
+  derived_condition_7:
+    expression: synthetic_condition_7
+  derived_condition_8:
+    expression: synthetic_condition_8
+  derived_condition_9:
+    expression: synthetic_condition_9
+  derived_condition_10:
+    expression: synthetic_condition_10
+  derived_condition_11:
+    expression: synthetic_condition_11
+  derived_condition_12:
+    expression: synthetic_condition_12
+  derived_condition_13:
+    expression: synthetic_condition_13
+  derived_condition_14:
+    expression: synthetic_condition_14
+  derived_condition_15:
+    expression: synthetic_condition_15
+  derived_condition_16:
+    expression: synthetic_condition_16
+  derived_condition_17:
+    expression: synthetic_condition_17
+  derived_condition_18:
+    expression: synthetic_condition_18
+  derived_condition_19:
+    expression: synthetic_condition_19
+  derived_condition_20:
+    expression: synthetic_condition_20
+  derived_condition_21:
+    expression: synthetic_condition_21
+  derived_condition_22:
+    expression: synthetic_condition_22
+  derived_condition_23:
+    expression: synthetic_condition_23
+  derived_condition_24:
+    expression: synthetic_condition_24
+  derived_condition_25:
+    expression: synthetic_condition_25
+  derived_condition_26:
+    expression: synthetic_condition_26
+  derived_condition_27:
+    expression: synthetic_condition_27
+  derived_condition_28:
+    expression: synthetic_condition_28
+  derived_condition_29:
+    expression: synthetic_condition_29
+  derived_condition_30:
+    expression: synthetic_condition_30
+  derived_condition_31:
+    expression: synthetic_condition_31
+  derived_condition_32:
+    expression: synthetic_condition_32
+  derived_condition_33:
+    expression: synthetic_condition_33
+  derived_condition_34:
+    expression: synthetic_condition_34
+  derived_condition_35:
+    expression: synthetic_condition_35
+  derived_condition_36:
+    expression: synthetic_condition_36
+  derived_condition_37:
+    expression: synthetic_condition_37
+  derived_condition_38:
+    expression: synthetic_condition_38
+  derived_condition_39:
+    expression: synthetic_condition_39
+  derived_condition_40:
+    expression: synthetic_condition_40
+  derived_condition_41:
+    expression: synthetic_condition_41
+  derived_condition_42:
+    expression: synthetic_condition_42
+  derived_condition_43:
+    expression: synthetic_condition_43
+  derived_condition_44:
+    expression: synthetic_condition_44
+  derived_condition_45:
+    expression: synthetic_condition_45
+  derived_condition_46:
+    expression: synthetic_condition_46
+  derived_condition_47:
+    expression: synthetic_condition_47
+  derived_condition_48:
+    expression: synthetic_condition_48
+  derived_condition_49:
+    expression: synthetic_condition_49
+  derived_condition_50:
+    expression: synthetic_condition_50
+  derived_condition_51:
+    expression: synthetic_condition_51
+  derived_condition_52:
+    expression: synthetic_condition_52
+  derived_condition_53:
+    expression: synthetic_condition_53
+  derived_condition_54:
+    expression: synthetic_condition_54
+  derived_condition_55:
+    expression: synthetic_condition_55
+  derived_condition_56:
+    expression: synthetic_condition_56
+  derived_condition_57:
+    expression: synthetic_condition_57
+  derived_condition_58:
+    expression: synthetic_condition_58
+  derived_condition_59:
+    expression: synthetic_condition_59
+  derived_condition_60:
+    expression: synthetic_condition_60
+  derived_condition_61:
+    expression: synthetic_condition_61
+  derived_condition_62:
+    expression: synthetic_condition_62
+  derived_condition_63:
+    expression: synthetic_condition_63
+  derived_condition_64:
+    expression: synthetic_condition_64
+  derived_condition_65:
+    expression: synthetic_condition_65
+  derived_condition_66:
+    expression: synthetic_condition_66
+  derived_condition_67:
+    expression: synthetic_condition_67
+  derived_condition_68:
+    expression: synthetic_condition_68
+  derived_condition_69:
+    expression: synthetic_condition_69
+  derived_condition_70:
+    expression: synthetic_condition_70
+  derived_condition_71:
+    expression: synthetic_condition_71
+  derived_condition_72:
+    expression: synthetic_condition_72
+  derived_condition_73:
+    expression: synthetic_condition_73
+  derived_condition_74:
+    expression: synthetic_condition_74
+  derived_condition_75:
+    expression: synthetic_condition_75
+  derived_condition_76:
+    expression: synthetic_condition_76
+  derived_condition_77:
+    expression: synthetic_condition_77
+  derived_condition_78:
+    expression: synthetic_condition_78
+  derived_condition_79:
+    expression: synthetic_condition_79
+  derived_condition_80:
+    expression: synthetic_condition_80
+  derived_condition_81:
+    expression: synthetic_condition_81
+  derived_condition_82:
+    expression: synthetic_condition_82
+  derived_condition_83:
+    expression: synthetic_condition_83
+  derived_condition_84:
+    expression: synthetic_condition_84
+  derived_condition_85:
+    expression: synthetic_condition_85
+  derived_condition_86:
+    expression: synthetic_condition_86
+  derived_condition_87:
+    expression: synthetic_condition_87
+  derived_condition_88:
+    expression: synthetic_condition_88
+  derived_condition_89:
+    expression: synthetic_condition_89
+  derived_condition_90:
+    expression: synthetic_condition_90
+  derived_condition_91:
+    expression: synthetic_condition_91
+  derived_condition_92:
+    expression: synthetic_condition_92
+  derived_condition_93:
+    expression: synthetic_condition_93
+  derived_condition_94:
+    expression: synthetic_condition_94
+  derived_condition_95:
+    expression: synthetic_condition_95
+  derived_condition_96:
+    expression: synthetic_condition_96
+  derived_condition_97:
+    expression: synthetic_condition_97
+  derived_condition_98:
+    expression: synthetic_condition_98
+  derived_condition_99:
+    expression: synthetic_condition_99
+  derived_condition_100:
+    expression: synthetic_condition_100
+  derived_condition_101:
+    expression: synthetic_condition_101
+  derived_condition_102:
+    expression: synthetic_condition_102
+  derived_condition_103:
+    expression: synthetic_condition_103
+  derived_condition_104:
+    expression: synthetic_condition_104
+  derived_condition_105:
+    expression: synthetic_condition_105
+  derived_condition_106:
+    expression: synthetic_condition_106
+  derived_condition_107:
+    expression: synthetic_condition_107
+  derived_condition_108:
+    expression: synthetic_condition_108
+  derived_condition_109:
+    expression: synthetic_condition_109
+  derived_condition_110:
+    expression: synthetic_condition_110
+  derived_condition_111:
+    expression: synthetic_condition_111
+  derived_condition_112:
+    expression: synthetic_condition_112
+  derived_condition_113:
+    expression: synthetic_condition_113
+  derived_condition_114:
+    expression: synthetic_condition_114
+  derived_condition_115:
+    expression: synthetic_condition_115
+  derived_condition_116:
+    expression: synthetic_condition_116
+  derived_condition_117:
+    expression: synthetic_condition_117
+  derived_condition_118:
+    expression: synthetic_condition_118
+  derived_condition_119:
+    expression: synthetic_condition_119
+  derived_condition_120:
+    expression: synthetic_condition_120
+  derived_condition_121:
+    expression: synthetic_condition_121
+  derived_condition_122:
+    expression: synthetic_condition_122
+  derived_condition_123:
+    expression: synthetic_condition_123
+  derived_condition_124:
+    expression: synthetic_condition_124
+  derived_condition_125:
+    expression: synthetic_condition_125
+  derived_condition_126:
+    expression: synthetic_condition_126
+  derived_condition_127:
+    expression: synthetic_condition_127
+  derived_condition_128:
+    expression: synthetic_condition_128
+  derived_condition_129:
+    expression: synthetic_condition_129
+  derived_condition_130:
+    expression: synthetic_condition_130
+  derived_condition_131:
+    expression: synthetic_condition_131
+  derived_condition_132:
+    expression: synthetic_condition_132
+  derived_condition_133:
+    expression: synthetic_condition_133
+  derived_condition_134:
+    expression: synthetic_condition_134
+  derived_condition_135:
+    expression: synthetic_condition_135
+  derived_condition_136:
+    expression: synthetic_condition_136
+  derived_condition_137:
+    expression: synthetic_condition_137
+  derived_condition_138:
+    expression: synthetic_condition_138
+  derived_condition_139:
+    expression: synthetic_condition_139
+  derived_condition_140:
+    expression: synthetic_condition_140
+  derived_condition_141:
+    expression: synthetic_condition_141
+  derived_condition_142:
+    expression: synthetic_condition_142
+  derived_condition_143:
+    expression: synthetic_condition_143
+  derived_condition_144:
+    expression: synthetic_condition_144
+  derived_condition_145:
+    expression: synthetic_condition_145
+  derived_condition_146:
+    expression: synthetic_condition_146
+  derived_condition_147:
+    expression: synthetic_condition_147
+  derived_condition_148:
+    expression: synthetic_condition_148
+  derived_condition_149:
+    expression: synthetic_condition_149
+  derived_condition_150:
+    expression: synthetic_condition_150
+  derived_condition_151:
+    expression: synthetic_condition_151
+  derived_condition_152:
+    expression: synthetic_condition_152
+  derived_condition_153:
+    expression: synthetic_condition_153
+  derived_condition_154:
+    expression: synthetic_condition_154
+  derived_condition_155:
+    expression: synthetic_condition_155
+  derived_condition_156:
+    expression: synthetic_condition_156
+  derived_condition_157:
+    expression: synthetic_condition_157
+  derived_condition_158:
+    expression: synthetic_condition_158
+  derived_condition_159:
+    expression: synthetic_condition_159
+  derived_condition_160:
+    expression: synthetic_condition_160
+  derived_condition_161:
+    expression: synthetic_condition_161
+  derived_condition_162:
+    expression: synthetic_condition_162
+  derived_condition_163:
+    expression: synthetic_condition_163
+  derived_condition_164:
+    expression: synthetic_condition_164
+  derived_condition_165:
+    expression: synthetic_condition_165
+  derived_condition_166:
+    expression: synthetic_condition_166
+  derived_condition_167:
+    expression: synthetic_condition_167
+  derived_condition_168:
+    expression: synthetic_condition_168
+  derived_condition_169:
+    expression: synthetic_condition_169
+  derived_condition_170:
+    expression: synthetic_condition_170
+  derived_condition_171:
+    expression: synthetic_condition_171
+  derived_condition_172:
+    expression: synthetic_condition_172
+  derived_condition_173:
+    expression: synthetic_condition_173
+  derived_condition_174:
+    expression: synthetic_condition_174
+  derived_condition_175:
+    expression: synthetic_condition_175
+  derived_condition_176:
+    expression: synthetic_condition_176
+  derived_condition_177:
+    expression: synthetic_condition_177
+  derived_condition_178:
+    expression: synthetic_condition_178
+  derived_condition_179:
+    expression: synthetic_condition_179
+  derived_condition_180:
+    expression: synthetic_condition_180
+  derived_condition_181:
+    expression: synthetic_condition_181
+  derived_condition_182:
+    expression: synthetic_condition_182
+  derived_condition_183:
+    expression: synthetic_condition_183
+  derived_condition_184:
+    expression: synthetic_condition_184
+  derived_condition_185:
+    expression: synthetic_condition_185
+  derived_condition_186:
+    expression: synthetic_condition_186
+  derived_condition_187:
+    expression: synthetic_condition_187
+  derived_condition_188:
+    expression: synthetic_condition_188
+  derived_condition_189:
+    expression: synthetic_condition_189
+  derived_condition_190:
+    expression: synthetic_condition_190
+  derived_condition_191:
+    expression: synthetic_condition_191
+  derived_condition_192:
+    expression: synthetic_condition_192
+  derived_condition_193:
+    expression: synthetic_condition_193
+  derived_condition_194:
+    expression: synthetic_condition_194
+  derived_condition_195:
+    expression: synthetic_condition_195
+  derived_condition_196:
+    expression: synthetic_condition_196
+  derived_condition_197:
+    expression: synthetic_condition_197
+  derived_condition_198:
+    expression: synthetic_condition_198
+  derived_condition_199:
+    expression: synthetic_condition_199
+  derived_condition_200:
+    expression: synthetic_condition_200
+  derived_condition_201:
+    expression: synthetic_condition_201
+  derived_condition_202:
+    expression: synthetic_condition_202
+  derived_condition_203:
+    expression: synthetic_condition_203
+  derived_condition_204:
+    expression: synthetic_condition_204
+  derived_condition_205:
+    expression: synthetic_condition_205
+  derived_condition_206:
+    expression: synthetic_condition_206
+  derived_condition_207:
+    expression: synthetic_condition_207
+  derived_condition_208:
+    expression: synthetic_condition_208
+  derived_condition_209:
+    expression: synthetic_condition_209
+  derived_condition_210:
+    expression: synthetic_condition_210
+  derived_condition_211:
+    expression: synthetic_condition_211
+  derived_condition_212:
+    expression: synthetic_condition_212
+  derived_condition_213:
+    expression: synthetic_condition_213
+  derived_condition_214:
+    expression: synthetic_condition_214
+  derived_condition_215:
+    expression: synthetic_condition_215
+  derived_condition_216:
+    expression: synthetic_condition_216
+  derived_condition_217:
+    expression: synthetic_condition_217
+  derived_condition_218:
+    expression: synthetic_condition_218
+  derived_condition_219:
+    expression: synthetic_condition_219
+  derived_condition_220:
+    expression: synthetic_condition_220
+  derived_condition_221:
+    expression: synthetic_condition_221
+  derived_condition_222:
+    expression: synthetic_condition_222
+  derived_condition_223:
+    expression: synthetic_condition_223
+  derived_condition_224:
+    expression: synthetic_condition_224
+  derived_condition_225:
+    expression: synthetic_condition_225
+  derived_condition_226:
+    expression: synthetic_condition_226
+  derived_condition_227:
+    expression: synthetic_condition_227
+  derived_condition_228:
+    expression: synthetic_condition_228
+  derived_condition_229:
+    expression: synthetic_condition_229
+  derived_condition_230:
+    expression: synthetic_condition_230
+  derived_condition_231:
+    expression: synthetic_condition_231
+  derived_condition_232:
+    expression: synthetic_condition_232
+  derived_condition_233:
+    expression: synthetic_condition_233
+  derived_condition_234:
+    expression: synthetic_condition_234
+  derived_condition_235:
+    expression: synthetic_condition_235
+  derived_condition_236:
+    expression: synthetic_condition_236
+  derived_condition_237:
+    expression: synthetic_condition_237
+  derived_condition_238:
+    expression: synthetic_condition_238
+  derived_condition_239:
+    expression: synthetic_condition_239
+  derived_condition_240:
+    expression: synthetic_condition_240
+  derived_condition_241:
+    expression: synthetic_condition_241
+  derived_condition_242:
+    expression: synthetic_condition_242
+  derived_condition_243:
+    expression: synthetic_condition_243
+  derived_condition_244:
+    expression: synthetic_condition_244
+  derived_condition_245:
+    expression: synthetic_condition_245
+  derived_condition_246:
+    expression: synthetic_condition_246
+  derived_condition_247:
+    expression: synthetic_condition_247
+  derived_condition_248:
+    expression: synthetic_condition_248
+  derived_condition_249:
+    expression: synthetic_condition_249
+  derived_condition_250:
+    expression: synthetic_condition_250

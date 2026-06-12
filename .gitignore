@@ -1,0 +1,35 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Virtual environments (project venv lives at /home/ai/pyenv/cdss, outside the repo)
+.venv/
+venv/
+env/
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Packaging
+*.egg-info/
+build/
+dist/
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Firebase — project-specific config and secret service-account keys
+webapp/patient/firebase-config.js
+serviceAccountKey.json
+*-service-account*.json
+.env
+
+# Reference textbooks / large binaries — copyrighted, not for distribution
+*.pdf

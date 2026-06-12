@@ -1,0 +1,45 @@
+{
+  "id": "v1_biliary_pain",
+  "name": "v1 biliary pain with fever",
+  "kg_version": "v1",
+  "answers": {
+    "q_main_complaint": "abdominal_pain",
+    "q_location": "ruq",
+    "q_fatty_food": "yes",
+    "q_jaundice": "no",
+    "q_fever": "yes"
+  },
+  "flow": [
+    {
+      "question_id": "q_main_complaint",
+      "answer": "abdominal_pain"
+    },
+    {
+      "question_id": "q_location",
+      "answer": "ruq",
+      "flow_id": "abdominal_pain"
+    }
+  ],
+  "expected": {
+    "top_diagnosis": "Acute Cholecystitis",
+    "min_top_score": 85,
+    "true_conditions": [
+      "ruq_pain",
+      "fatty_food_trigger",
+      "fever_present"
+    ],
+    "red_flags": [],
+    "investigations": {
+      "Acute Cholecystitis": [
+        "CBC",
+        "Liver Function Tests",
+        "Ultrasound Abdomen"
+      ]
+    },
+    "treatments": {
+      "Acute Cholecystitis": [
+        "Urgent surgical evaluation"
+      ]
+    }
+  }
+}

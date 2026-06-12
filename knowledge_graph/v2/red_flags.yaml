@@ -1,0 +1,19 @@
+red_flags:
+  - id: hematemesis
+    urgency: immediate
+  - id: melena
+    urgency: immediate
+  - id: jaundice_with_fever
+    urgency: immediate
+  - id: severe_dehydration
+    urgency: immediate
+  - id: peritonitis
+    urgency: immediate
+  - id: dysphagia
+    urgency: urgent
+  - id: unexplained_weight_loss
+    urgency: urgent
+  - id: persistent_vomiting
+    urgency: urgent
+  - id: iron_deficiency_anemia
+    urgency: urgent

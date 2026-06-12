@@ -1,0 +1,20 @@
+investigations:
+  acute_cholecystitis:
+    - CBC
+    - Liver Function Tests
+    - Ultrasound Abdomen
+
+  gallstones:
+    - Ultrasound Abdomen
+    - Liver Function Tests
+
+  gerd:
+    - Upper GI Endoscopy
+
+  peptic_ulcer_disease:
+    - Upper GI Endoscopy
+    - CBC
+
+  colorectal_cancer_red_flag:
+    - Colonoscopy
+    - CT Abdomen

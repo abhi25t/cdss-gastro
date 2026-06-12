@@ -1,0 +1,391 @@
+questions:
+  - id: q_main_complaint
+    text: What is your main problem today?
+    type: yes_no
+  - id: q_location
+    text: Where is the pain located?
+    type: yes_no
+  - id: q_duration
+    text: How long have you had the symptom?
+    type: yes_no
+  - id: q_severity
+    text: Rate severity from 0-10
+    type: yes_no
+  - id: q_character
+    text: What best describes the pain?
+    type: yes_no
+  - id: q_radiation
+    text: Does the pain radiate anywhere?
+    type: yes_no
+  - id: q_heartburn
+    text: Do you experience heartburn?
+    type: yes_no
+  - id: q_dysphagia
+    text: Difficulty swallowing?
+    type: yes_no
+  - id: q_odynophagia
+    text: Pain while swallowing?
+    type: yes_no
+  - id: q_nausea
+    text: Do you have nausea?
+    type: yes_no
+  - id: q_vomiting
+    text: Do you have vomiting?
+    type: yes_no
+  - id: q_diarrhea_duration
+    text: How long have you had diarrhea?
+    type: yes_no
+  - id: q_blood_in_stool
+    text: Blood in stool?
+    type: yes_no
+  - id: q_nocturnal_diarrhea
+    text: Diarrhea waking you at night?
+    type: yes_no
+  - id: q_recent_antibiotics
+    text: Recent antibiotic use?
+    type: yes_no
+  - id: q_jaundice
+    text: Yellowing of eyes/skin?
+    type: yes_no
+  - id: q_dark_urine
+    text: Dark urine?
+    type: yes_no
+  - id: q_pale_stools
+    text: Pale stools?
+    type: yes_no
+  - id: q_pruritus
+    text: Generalized itching?
+    type: yes_no
+  - id: q_weight_loss
+    text: Unintentional weight loss?
+    type: yes_no
+  - id: q_extra_21
+    text: Supplemental GI assessment question 21
+    type: yes_no
+  - id: q_extra_22
+    text: Supplemental GI assessment question 22
+    type: yes_no
+  - id: q_extra_23
+    text: Supplemental GI assessment question 23
+    type: yes_no
+  - id: q_extra_24
+    text: Supplemental GI assessment question 24
+    type: yes_no
+  - id: q_extra_25
+    text: Supplemental GI assessment question 25
+    type: yes_no
+  - id: q_extra_26
+    text: Supplemental GI assessment question 26
+    type: yes_no
+  - id: q_extra_27
+    text: Supplemental GI assessment question 27
+    type: yes_no
+  - id: q_extra_28
+    text: Supplemental GI assessment question 28
+    type: yes_no
+  - id: q_extra_29
+    text: Supplemental GI assessment question 29
+    type: yes_no
+  - id: q_extra_30
+    text: Supplemental GI assessment question 30
+    type: yes_no
+  - id: q_extra_31
+    text: Supplemental GI assessment question 31
+    type: yes_no
+  - id: q_extra_32
+    text: Supplemental GI assessment question 32
+    type: yes_no
+  - id: q_extra_33
+    text: Supplemental GI assessment question 33
+    type: yes_no
+  - id: q_extra_34
+    text: Supplemental GI assessment question 34
+    type: yes_no
+  - id: q_extra_35
+    text: Supplemental GI assessment question 35
+    type: yes_no
+  - id: q_extra_36
+    text: Supplemental GI assessment question 36
+    type: yes_no
+  - id: q_extra_37
+    text: Supplemental GI assessment question 37
+    type: yes_no
+  - id: q_extra_38
+    text: Supplemental GI assessment question 38
+    type: yes_no
+  - id: q_extra_39
+    text: Supplemental GI assessment question 39
+    type: yes_no
+  - id: q_extra_40
+    text: Supplemental GI assessment question 40
+    type: yes_no
+  - id: q_extra_41
+    text: Supplemental GI assessment question 41
+    type: yes_no
+  - id: q_extra_42
+    text: Supplemental GI assessment question 42
+    type: yes_no
+  - id: q_extra_43
+    text: Supplemental GI assessment question 43
+    type: yes_no
+  - id: q_extra_44
+    text: Supplemental GI assessment question 44
+    type: yes_no
+  - id: q_extra_45
+    text: Supplemental GI assessment question 45
+    type: yes_no
+  - id: q_extra_46
+    text: Supplemental GI assessment question 46
+    type: yes_no
+  - id: q_extra_47
+    text: Supplemental GI assessment question 47
+    type: yes_no
+  - id: q_extra_48
+    text: Supplemental GI assessment question 48
+    type: yes_no
+  - id: q_extra_49
+    text: Supplemental GI assessment question 49
+    type: yes_no
+  - id: q_extra_50
+    text: Supplemental GI assessment question 50
+    type: yes_no
+  - id: q_extra_51
+    text: Supplemental GI assessment question 51
+    type: yes_no
+  - id: q_extra_52
+    text: Supplemental GI assessment question 52
+    type: yes_no
+  - id: q_extra_53
+    text: Supplemental GI assessment question 53
+    type: yes_no
+  - id: q_extra_54
+    text: Supplemental GI assessment question 54
+    type: yes_no
+  - id: q_extra_55
+    text: Supplemental GI assessment question 55
+    type: yes_no
+  - id: q_extra_56
+    text: Supplemental GI assessment question 56
+    type: yes_no
+  - id: q_extra_57
+    text: Supplemental GI assessment question 57
+    type: yes_no
+  - id: q_extra_58
+    text: Supplemental GI assessment question 58
+    type: yes_no
+  - id: q_extra_59
+    text: Supplemental GI assessment question 59
+    type: yes_no
+  - id: q_extra_60
+    text: Supplemental GI assessment question 60
+    type: yes_no
+  - id: q_extra_61
+    text: Supplemental GI assessment question 61
+    type: yes_no
+  - id: q_extra_62
+    text: Supplemental GI assessment question 62
+    type: yes_no
+  - id: q_extra_63
+    text: Supplemental GI assessment question 63
+    type: yes_no
+  - id: q_extra_64
+    text: Supplemental GI assessment question 64
+    type: yes_no
+  - id: q_extra_65
+    text: Supplemental GI assessment question 65
+    type: yes_no
+  - id: q_extra_66
+    text: Supplemental GI assessment question 66
+    type: yes_no
+  - id: q_extra_67
+    text: Supplemental GI assessment question 67
+    type: yes_no
+  - id: q_extra_68
+    text: Supplemental GI assessment question 68
+    type: yes_no
+  - id: q_extra_69
+    text: Supplemental GI assessment question 69
+    type: yes_no
+  - id: q_extra_70
+    text: Supplemental GI assessment question 70
+    type: yes_no
+  - id: q_extra_71
+    text: Supplemental GI assessment question 71
+    type: yes_no
+  - id: q_extra_72
+    text: Supplemental GI assessment question 72
+    type: yes_no
+  - id: q_extra_73
+    text: Supplemental GI assessment question 73
+    type: yes_no
+  - id: q_extra_74
+    text: Supplemental GI assessment question 74
+    type: yes_no
+  - id: q_extra_75
+    text: Supplemental GI assessment question 75
+    type: yes_no
+  - id: q_extra_76
+    text: Supplemental GI assessment question 76
+    type: yes_no
+  - id: q_extra_77
+    text: Supplemental GI assessment question 77
+    type: yes_no
+  - id: q_extra_78
+    text: Supplemental GI assessment question 78
+    type: yes_no
+  - id: q_extra_79
+    text: Supplemental GI assessment question 79
+    type: yes_no
+  - id: q_extra_80
+    text: Supplemental GI assessment question 80
+    type: yes_no
+  - id: q_extra_81
+    text: Supplemental GI assessment question 81
+    type: yes_no
+  - id: q_extra_82
+    text: Supplemental GI assessment question 82
+    type: yes_no
+  - id: q_extra_83
+    text: Supplemental GI assessment question 83
+    type: yes_no
+  - id: q_extra_84
+    text: Supplemental GI assessment question 84
+    type: yes_no
+  - id: q_extra_85
+    text: Supplemental GI assessment question 85
+    type: yes_no
+  - id: q_extra_86
+    text: Supplemental GI assessment question 86
+    type: yes_no
+  - id: q_extra_87
+    text: Supplemental GI assessment question 87
+    type: yes_no
+  - id: q_extra_88
+    text: Supplemental GI assessment question 88
+    type: yes_no
+  - id: q_extra_89
+    text: Supplemental GI assessment question 89
+    type: yes_no
+  - id: q_extra_90
+    text: Supplemental GI assessment question 90
+    type: yes_no
+  - id: q_extra_91
+    text: Supplemental GI assessment question 91
+    type: yes_no
+  - id: q_extra_92
+    text: Supplemental GI assessment question 92
+    type: yes_no
+  - id: q_extra_93
+    text: Supplemental GI assessment question 93
+    type: yes_no
+  - id: q_extra_94
+    text: Supplemental GI assessment question 94
+    type: yes_no
+  - id: q_extra_95
+    text: Supplemental GI assessment question 95
+    type: yes_no
+  - id: q_extra_96
+    text: Supplemental GI assessment question 96
+    type: yes_no
+  - id: q_extra_97
+    text: Supplemental GI assessment question 97
+    type: yes_no
+  - id: q_extra_98
+    text: Supplemental GI assessment question 98
+    type: yes_no
+  - id: q_extra_99
+    text: Supplemental GI assessment question 99
+    type: yes_no
+  - id: q_extra_100
+    text: Supplemental GI assessment question 100
+    type: yes_no
+  - id: q_extra_101
+    text: Supplemental GI assessment question 101
+    type: yes_no
+  - id: q_extra_102
+    text: Supplemental GI assessment question 102
+    type: yes_no
+  - id: q_extra_103
+    text: Supplemental GI assessment question 103
+    type: yes_no
+  - id: q_extra_104
+    text: Supplemental GI assessment question 104
+    type: yes_no
+  - id: q_extra_105
+    text: Supplemental GI assessment question 105
+    type: yes_no
+  - id: q_extra_106
+    text: Supplemental GI assessment question 106
+    type: yes_no
+  - id: q_extra_107
+    text: Supplemental GI assessment question 107
+    type: yes_no
+  - id: q_extra_108
+    text: Supplemental GI assessment question 108
+    type: yes_no
+  - id: q_extra_109
+    text: Supplemental GI assessment question 109
+    type: yes_no
+  - id: q_extra_110
+    text: Supplemental GI assessment question 110
+    type: yes_no
+  - id: q_extra_111
+    text: Supplemental GI assessment question 111
+    type: yes_no
+  - id: q_extra_112
+    text: Supplemental GI assessment question 112
+    type: yes_no
+  - id: q_extra_113
+    text: Supplemental GI assessment question 113
+    type: yes_no
+  - id: q_extra_114
+    text: Supplemental GI assessment question 114
+    type: yes_no
+  - id: q_extra_115
+    text: Supplemental GI assessment question 115
+    type: yes_no
+  - id: q_extra_116
+    text: Supplemental GI assessment question 116
+    type: yes_no
+  - id: q_extra_117
+    text: Supplemental GI assessment question 117
+    type: yes_no
+  - id: q_extra_118
+    text: Supplemental GI assessment question 118
+    type: yes_no
+  - id: q_extra_119
+    text: Supplemental GI assessment question 119
+    type: yes_no
+  - id: q_extra_120
+    text: Supplemental GI assessment question 120
+    type: yes_no
+  - id: q_extra_121
+    text: Supplemental GI assessment question 121
+    type: yes_no
+  - id: q_extra_122
+    text: Supplemental GI assessment question 122
+    type: yes_no
+  - id: q_extra_123
+    text: Supplemental GI assessment question 123
+    type: yes_no
+  - id: q_extra_124
+    text: Supplemental GI assessment question 124
+    type: yes_no
+  - id: q_extra_125
+    text: Supplemental GI assessment question 125
+    type: yes_no
+  - id: q_extra_126
+    text: Supplemental GI assessment question 126
+    type: yes_no
+  - id: q_extra_127
+    text: Supplemental GI assessment question 127
+    type: yes_no
+  - id: q_extra_128
+    text: Supplemental GI assessment question 128
+    type: yes_no
+  - id: q_extra_129
+    text: Supplemental GI assessment question 129
+    type: yes_no
+  - id: q_extra_130
+    text: Supplemental GI assessment question 130
+    type: yes_no

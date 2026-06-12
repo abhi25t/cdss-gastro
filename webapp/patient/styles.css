@@ -1,0 +1,173 @@
+:root {
+  --teal: #0f766e;
+  --teal-dark: #115e59;
+  --bg: #f1f5f9;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --ok: #16a34a;
+  --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 4px 16px rgba(15, 23, 42, 0.06);
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, system-ui, sans-serif;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 20px 18px calc(24px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+}
+
+.progress {
+  height: 6px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+.progress__bar {
+  height: 100%;
+  background: var(--teal);
+  width: 0;
+  transition: width 0.3s ease;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 24px 20px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin: 0 0 6px;
+}
+
+h1 { font-size: 1.5rem; margin: 0 0 8px; }
+.question-text { font-size: 1.35rem; font-weight: 600; margin: 0 0 22px; }
+.subtle { color: var(--muted); font-size: 0.95rem; }
+
+.options { display: flex; flex-direction: column; gap: 12px; }
+
+.btn {
+  appearance: none;
+  border: 1.5px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 18px 18px;
+  border-radius: 12px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.05s;
+  width: 100%;
+}
+.btn:active { transform: scale(0.99); }
+.btn:hover { border-color: var(--teal); }
+
+.btn--yesno { text-align: center; font-weight: 600; }
+.yesno-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.btn--primary {
+  background: var(--teal);
+  border-color: var(--teal);
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
+}
+.btn--primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
+.btn--primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn--ghost {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  width: auto;
+}
+
+.field { margin: 18px 0; }
+.field label { display: block; font-weight: 600; margin-bottom: 8px; }
+.input {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  letter-spacing: 0.04em;
+}
+.input:focus { outline: none; border-color: var(--teal); }
+
+.scan-row { display: flex; gap: 10px; margin-top: 10px; }
+.scan-row .btn { flex: 1; }
+
+#scanner {
+  margin-top: 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+  display: none;
+}
+#scanner.active { display: block; }
+#scanner video { width: 100%; display: block; }
+
+.footer-actions { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+
+.review-list { list-style: none; padding: 0; margin: 8px 0 0; }
+.review-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.review-list li:last-child { border-bottom: none; }
+.review-q { color: var(--muted); font-size: 0.95rem; }
+.review-a { font-weight: 600; text-align: right; }
+
+.done-icon {
+  width: 72px; height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: var(--ok);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.4rem;
+}
+.center { text-align: center; }
+
+.note {
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  color: var(--teal-dark);
+  margin-top: 16px;
+}
+
+.spacer { flex: 1; }
+.appfoot { text-align: center; color: var(--muted); font-size: 0.78rem; margin-top: 18px; }

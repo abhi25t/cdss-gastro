@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f766e" />
+  <title>Patient Check-In</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="app" class="app">
+    <!-- Screens are rendered into here by app.js -->
+  </main>
+
+  <!-- Generated questionnaire data: window.KG_DATA -->
+  <script src="kg-data.js"></script>
+
+  <!-- Firebase: copy firebase-config.example.js to firebase-config.js and fill in
+       your console values (see SETUP_FIREBASE.md). If absent, the app still runs
+       and logs submissions locally instead of sending them. -->
+  <script src="firebase-config.js"></script>
+  <script type="module" src="firebase-submit.js"></script>
+
+  <script src="app.js"></script>
+</body>
+</html>

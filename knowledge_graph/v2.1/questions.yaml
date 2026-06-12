@@ -1,0 +1,641 @@
+questions:
+- id: q1
+  group: pain
+  text: Location of pain
+  type: yes_no
+- id: q2
+  group: pain
+  text: Duration of pain
+  type: yes_no
+- id: q3
+  group: pain
+  text: Severity of pain
+  type: yes_no
+- id: q4
+  group: pain
+  text: Character of pain
+  type: yes_no
+- id: q5
+  group: pain
+  text: Radiation to back
+  type: yes_no
+- id: q6
+  group: pain
+  text: Radiation to shoulder
+  type: yes_no
+- id: q7
+  group: pain
+  text: Relation to meals
+  type: yes_no
+- id: q8
+  group: pain
+  text: Relation to bowel movements
+  type: yes_no
+- id: q9
+  group: pain
+  text: Night-time pain
+  type: yes_no
+- id: q10
+  group: pain
+  text: Sudden onset
+  type: yes_no
+- id: q11
+  group: pain
+  text: Progressive worsening
+  type: yes_no
+- id: q12
+  group: pain
+  text: Relieved by antacids
+  type: yes_no
+- id: q13
+  group: gerd
+  text: Heartburn
+  type: yes_no
+- id: q14
+  group: gerd
+  text: Regurgitation
+  type: yes_no
+- id: q15
+  group: gerd
+  text: Sour taste
+  type: yes_no
+- id: q16
+  group: gerd
+  text: Difficulty swallowing
+  type: yes_no
+- id: q17
+  group: gerd
+  text: Pain swallowing
+  type: yes_no
+- id: q18
+  group: gerd
+  text: Symptoms worse lying down
+  type: yes_no
+- id: q19
+  group: gerd
+  text: Symptoms after meals
+  type: yes_no
+- id: q20
+  group: gerd
+  text: Chronic cough
+  type: yes_no
+- id: q21
+  group: gerd
+  text: Hoarseness
+  type: yes_no
+- id: q22
+  group: gerd
+  text: Chest burning
+  type: yes_no
+- id: q23
+  group: bowel
+  text: Diarrhea
+  type: yes_no
+- id: q24
+  group: bowel
+  text: Constipation
+  type: yes_no
+- id: q25
+  group: bowel
+  text: Alternating bowel habits
+  type: yes_no
+- id: q26
+  group: bowel
+  text: Blood in stool
+  type: yes_no
+- id: q27
+  group: bowel
+  text: Black stool
+  type: yes_no
+- id: q28
+  group: bowel
+  text: Mucus in stool
+  type: yes_no
+- id: q29
+  group: bowel
+  text: Nocturnal diarrhea
+  type: yes_no
+- id: q30
+  group: bowel
+  text: Urgency
+  type: yes_no
+- id: q31
+  group: bowel
+  text: Tenesmus
+  type: yes_no
+- id: q32
+  group: bowel
+  text: Incomplete evacuation
+  type: yes_no
+- id: q33
+  group: liver
+  text: Jaundice
+  type: yes_no
+- id: q34
+  group: liver
+  text: Dark urine
+  type: yes_no
+- id: q35
+  group: liver
+  text: Pale stools
+  type: yes_no
+- id: q36
+  group: liver
+  text: Itching
+  type: yes_no
+- id: q37
+  group: liver
+  text: Abdominal swelling
+  type: yes_no
+- id: q38
+  group: liver
+  text: Leg swelling
+  type: yes_no
+- id: q39
+  group: liver
+  text: Easy bruising
+  type: yes_no
+- id: q40
+  group: liver
+  text: Confusion
+  type: yes_no
+- id: q41
+  group: liver
+  text: Alcohol use
+  type: yes_no
+- id: q42
+  group: liver
+  text: Hepatitis history
+  type: yes_no
+- id: q43
+  group: systemic
+  text: Weight loss
+  type: yes_no
+- id: q44
+  group: systemic
+  text: Fever
+  type: yes_no
+- id: q45
+  group: systemic
+  text: Loss of appetite
+  type: yes_no
+- id: q46
+  group: systemic
+  text: Fatigue
+  type: yes_no
+- id: q47
+  group: systemic
+  text: Anemia history
+  type: yes_no
+- id: q48
+  group: extended
+  text: Extended GI assessment question 48
+  type: yes_no
+- id: q49
+  group: extended
+  text: Extended GI assessment question 49
+  type: yes_no
+- id: q50
+  group: extended
+  text: Extended GI assessment question 50
+  type: yes_no
+- id: q51
+  group: extended
+  text: Extended GI assessment question 51
+  type: yes_no
+- id: q52
+  group: extended
+  text: Extended GI assessment question 52
+  type: yes_no
+- id: q53
+  group: extended
+  text: Extended GI assessment question 53
+  type: yes_no
+- id: q54
+  group: extended
+  text: Extended GI assessment question 54
+  type: yes_no
+- id: q55
+  group: extended
+  text: Extended GI assessment question 55
+  type: yes_no
+- id: q56
+  group: extended
+  text: Extended GI assessment question 56
+  type: yes_no
+- id: q57
+  group: extended
+  text: Extended GI assessment question 57
+  type: yes_no
+- id: q58
+  group: extended
+  text: Extended GI assessment question 58
+  type: yes_no
+- id: q59
+  group: extended
+  text: Extended GI assessment question 59
+  type: yes_no
+- id: q60
+  group: extended
+  text: Extended GI assessment question 60
+  type: yes_no
+- id: q61
+  group: extended
+  text: Extended GI assessment question 61
+  type: yes_no
+- id: q62
+  group: extended
+  text: Extended GI assessment question 62
+  type: yes_no
+- id: q63
+  group: extended
+  text: Extended GI assessment question 63
+  type: yes_no
+- id: q64
+  group: extended
+  text: Extended GI assessment question 64
+  type: yes_no
+- id: q65
+  group: extended
+  text: Extended GI assessment question 65
+  type: yes_no
+- id: q66
+  group: extended
+  text: Extended GI assessment question 66
+  type: yes_no
+- id: q67
+  group: extended
+  text: Extended GI assessment question 67
+  type: yes_no
+- id: q68
+  group: extended
+  text: Extended GI assessment question 68
+  type: yes_no
+- id: q69
+  group: extended
+  text: Extended GI assessment question 69
+  type: yes_no
+- id: q70
+  group: extended
+  text: Extended GI assessment question 70
+  type: yes_no
+- id: q71
+  group: extended
+  text: Extended GI assessment question 71
+  type: yes_no
+- id: q72
+  group: extended
+  text: Extended GI assessment question 72
+  type: yes_no
+- id: q73
+  group: extended
+  text: Extended GI assessment question 73
+  type: yes_no
+- id: q74
+  group: extended
+  text: Extended GI assessment question 74
+  type: yes_no
+- id: q75
+  group: extended
+  text: Extended GI assessment question 75
+  type: yes_no
+- id: q76
+  group: extended
+  text: Extended GI assessment question 76
+  type: yes_no
+- id: q77
+  group: extended
+  text: Extended GI assessment question 77
+  type: yes_no
+- id: q78
+  group: extended
+  text: Extended GI assessment question 78
+  type: yes_no
+- id: q79
+  group: extended
+  text: Extended GI assessment question 79
+  type: yes_no
+- id: q80
+  group: extended
+  text: Extended GI assessment question 80
+  type: yes_no
+- id: q81
+  group: extended
+  text: Extended GI assessment question 81
+  type: yes_no
+- id: q82
+  group: extended
+  text: Extended GI assessment question 82
+  type: yes_no
+- id: q83
+  group: extended
+  text: Extended GI assessment question 83
+  type: yes_no
+- id: q84
+  group: extended
+  text: Extended GI assessment question 84
+  type: yes_no
+- id: q85
+  group: extended
+  text: Extended GI assessment question 85
+  type: yes_no
+- id: q86
+  group: extended
+  text: Extended GI assessment question 86
+  type: yes_no
+- id: q87
+  group: extended
+  text: Extended GI assessment question 87
+  type: yes_no
+- id: q88
+  group: extended
+  text: Extended GI assessment question 88
+  type: yes_no
+- id: q89
+  group: extended
+  text: Extended GI assessment question 89
+  type: yes_no
+- id: q90
+  group: extended
+  text: Extended GI assessment question 90
+  type: yes_no
+- id: q91
+  group: extended
+  text: Extended GI assessment question 91
+  type: yes_no
+- id: q92
+  group: extended
+  text: Extended GI assessment question 92
+  type: yes_no
+- id: q93
+  group: extended
+  text: Extended GI assessment question 93
+  type: yes_no
+- id: q94
+  group: extended
+  text: Extended GI assessment question 94
+  type: yes_no
+- id: q95
+  group: extended
+  text: Extended GI assessment question 95
+  type: yes_no
+- id: q96
+  group: extended
+  text: Extended GI assessment question 96
+  type: yes_no
+- id: q97
+  group: extended
+  text: Extended GI assessment question 97
+  type: yes_no
+- id: q98
+  group: extended
+  text: Extended GI assessment question 98
+  type: yes_no
+- id: q99
+  group: extended
+  text: Extended GI assessment question 99
+  type: yes_no
+- id: q100
+  group: extended
+  text: Extended GI assessment question 100
+  type: yes_no
+- id: q101
+  group: extended
+  text: Extended GI assessment question 101
+  type: yes_no
+- id: q102
+  group: extended
+  text: Extended GI assessment question 102
+  type: yes_no
+- id: q103
+  group: extended
+  text: Extended GI assessment question 103
+  type: yes_no
+- id: q104
+  group: extended
+  text: Extended GI assessment question 104
+  type: yes_no
+- id: q105
+  group: extended
+  text: Extended GI assessment question 105
+  type: yes_no
+- id: q106
+  group: extended
+  text: Extended GI assessment question 106
+  type: yes_no
+- id: q107
+  group: extended
+  text: Extended GI assessment question 107
+  type: yes_no
+- id: q108
+  group: extended
+  text: Extended GI assessment question 108
+  type: yes_no
+- id: q109
+  group: extended
+  text: Extended GI assessment question 109
+  type: yes_no
+- id: q110
+  group: extended
+  text: Extended GI assessment question 110
+  type: yes_no
+- id: q111
+  group: extended
+  text: Extended GI assessment question 111
+  type: yes_no
+- id: q112
+  group: extended
+  text: Extended GI assessment question 112
+  type: yes_no
+- id: q113
+  group: extended
+  text: Extended GI assessment question 113
+  type: yes_no
+- id: q114
+  group: extended
+  text: Extended GI assessment question 114
+  type: yes_no
+- id: q115
+  group: extended
+  text: Extended GI assessment question 115
+  type: yes_no
+- id: q116
+  group: extended
+  text: Extended GI assessment question 116
+  type: yes_no
+- id: q117
+  group: extended
+  text: Extended GI assessment question 117
+  type: yes_no
+- id: q118
+  group: extended
+  text: Extended GI assessment question 118
+  type: yes_no
+- id: q119
+  group: extended
+  text: Extended GI assessment question 119
+  type: yes_no
+- id: q120
+  group: extended
+  text: Extended GI assessment question 120
+  type: yes_no
+- id: q121
+  group: extended
+  text: Extended GI assessment question 121
+  type: yes_no
+- id: q122
+  group: extended
+  text: Extended GI assessment question 122
+  type: yes_no
+- id: q123
+  group: extended
+  text: Extended GI assessment question 123
+  type: yes_no
+- id: q124
+  group: extended
+  text: Extended GI assessment question 124
+  type: yes_no
+- id: q125
+  group: extended
+  text: Extended GI assessment question 125
+  type: yes_no
+- id: q126
+  group: extended
+  text: Extended GI assessment question 126
+  type: yes_no
+- id: q127
+  group: extended
+  text: Extended GI assessment question 127
+  type: yes_no
+- id: q128
+  group: extended
+  text: Extended GI assessment question 128
+  type: yes_no
+- id: q129
+  group: extended
+  text: Extended GI assessment question 129
+  type: yes_no
+- id: q130
+  group: extended
+  text: Extended GI assessment question 130
+  type: yes_no
+- id: q131
+  group: extended
+  text: Extended GI assessment question 131
+  type: yes_no
+- id: q132
+  group: extended
+  text: Extended GI assessment question 132
+  type: yes_no
+- id: q133
+  group: extended
+  text: Extended GI assessment question 133
+  type: yes_no
+- id: q134
+  group: extended
+  text: Extended GI assessment question 134
+  type: yes_no
+- id: q135
+  group: extended
+  text: Extended GI assessment question 135
+  type: yes_no
+- id: q136
+  group: extended
+  text: Extended GI assessment question 136
+  type: yes_no
+- id: q137
+  group: extended
+  text: Extended GI assessment question 137
+  type: yes_no
+- id: q138
+  group: extended
+  text: Extended GI assessment question 138
+  type: yes_no
+- id: q139
+  group: extended
+  text: Extended GI assessment question 139
+  type: yes_no
+- id: q140
+  group: extended
+  text: Extended GI assessment question 140
+  type: yes_no
+- id: q141
+  group: extended
+  text: Extended GI assessment question 141
+  type: yes_no
+- id: q142
+  group: extended
+  text: Extended GI assessment question 142
+  type: yes_no
+- id: q143
+  group: extended
+  text: Extended GI assessment question 143
+  type: yes_no
+- id: q144
+  group: extended
+  text: Extended GI assessment question 144
+  type: yes_no
+- id: q145
+  group: extended
+  text: Extended GI assessment question 145
+  type: yes_no
+- id: q146
+  group: extended
+  text: Extended GI assessment question 146
+  type: yes_no
+- id: q147
+  group: extended
+  text: Extended GI assessment question 147
+  type: yes_no
+- id: q148
+  group: extended
+  text: Extended GI assessment question 148
+  type: yes_no
+- id: q149
+  group: extended
+  text: Extended GI assessment question 149
+  type: yes_no
+- id: q150
+  group: extended
+  text: Extended GI assessment question 150
+  type: yes_no
+- id: q151
+  group: extended
+  text: Extended GI assessment question 151
+  type: yes_no
+- id: q152
+  group: extended
+  text: Extended GI assessment question 152
+  type: yes_no
+- id: q153
+  group: extended
+  text: Extended GI assessment question 153
+  type: yes_no
+- id: q154
+  group: extended
+  text: Extended GI assessment question 154
+  type: yes_no
+- id: q155
+  group: extended
+  text: Extended GI assessment question 155
+  type: yes_no
+- id: q156
+  group: extended
+  text: Extended GI assessment question 156
+  type: yes_no
+- id: q157
+  group: extended
+  text: Extended GI assessment question 157
+  type: yes_no
+- id: q158
+  group: extended
+  text: Extended GI assessment question 158
+  type: yes_no
+- id: q159
+  group: extended
+  text: Extended GI assessment question 159
+  type: yes_no
+- id: q160
+  group: extended
+  text: Extended GI assessment question 160
+  type: yes_no

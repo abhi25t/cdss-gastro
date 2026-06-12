@@ -1,0 +1,15 @@
+red_flags:
+  - id: gi_bleeding
+    urgency: immediate
+    when:
+      - black_stool_present
+
+  - id: obstructive_jaundice
+    urgency: urgent
+    when:
+      - jaundice_present
+
+  - id: unexplained_weight_loss
+    urgency: urgent
+    when:
+      - weight_loss_present

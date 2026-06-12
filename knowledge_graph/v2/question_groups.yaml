@@ -1,0 +1,19 @@
+question_groups:
+  abdominal_pain:
+    - q_location
+    - q_duration
+    - q_severity
+    - q_character
+    - q_radiation
+
+  diarrhea:
+    - q_diarrhea_duration
+    - q_blood_in_stool
+    - q_nocturnal_diarrhea
+    - q_recent_antibiotics
+
+  jaundice:
+    - q_jaundice
+    - q_dark_urine
+    - q_pale_stools
+    - q_pruritus

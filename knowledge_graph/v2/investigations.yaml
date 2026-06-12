@@ -1,0 +1,29 @@
+investigations:
+  common:
+    - CBC
+    - ESR
+    - CRP
+    - LFT
+    - RFT
+
+  gerd:
+    - Upper GI Endoscopy
+
+  acute_cholecystitis:
+    - CBC
+    - LFT
+    - Ultrasound Abdomen
+
+  acute_pancreatitis:
+    - Serum Lipase
+    - Serum Amylase
+    - CT Abdomen
+
+  ulcerative_colitis:
+    - Colonoscopy
+    - Fecal Calprotectin
+
+  cirrhosis:
+    - Ultrasound Liver
+    - INR
+    - Albumin

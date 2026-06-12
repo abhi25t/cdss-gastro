@@ -1,0 +1,6 @@
+PyYAML>=6.0
+fastapi>=0.110
+uvicorn>=0.27
+httpx>=0.27
+# Doctor dashboard only (reads Firestore on the doctor's machine):
+firebase-admin>=6.5

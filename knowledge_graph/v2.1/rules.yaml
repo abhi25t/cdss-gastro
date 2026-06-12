@@ -1,0 +1,401 @@
+rules:
+- diagnosis: GERD
+  weight: 15
+  requires:
+  - condition_272
+  - condition_100
+- diagnosis: GERD
+  weight: 20
+  requires:
+  - condition_78
+  - condition_22
+- diagnosis: GERD
+  weight: 25
+  requires:
+  - condition_35
+  - condition_123
+- diagnosis: GERD
+  weight: 30
+  requires:
+  - condition_52
+  - condition_287
+- diagnosis: Functional Dyspepsia
+  weight: 15
+  requires:
+  - condition_166
+  - condition_300
+- diagnosis: Functional Dyspepsia
+  weight: 20
+  requires:
+  - condition_172
+  - condition_7
+- diagnosis: Functional Dyspepsia
+  weight: 25
+  requires:
+  - condition_265
+  - condition_310
+- diagnosis: Functional Dyspepsia
+  weight: 30
+  requires:
+  - condition_255
+  - condition_194
+- diagnosis: Gastritis
+  weight: 15
+  requires:
+  - condition_145
+  - condition_75
+- diagnosis: Gastritis
+  weight: 20
+  requires:
+  - condition_194
+  - condition_276
+- diagnosis: Gastritis
+  weight: 25
+  requires:
+  - condition_313
+  - condition_268
+- diagnosis: Gastritis
+  weight: 30
+  requires:
+  - condition_96
+  - condition_183
+- diagnosis: Peptic Ulcer Disease
+  weight: 15
+  requires:
+  - condition_118
+  - condition_314
+- diagnosis: Peptic Ulcer Disease
+  weight: 20
+  requires:
+  - condition_212
+  - condition_320
+- diagnosis: Peptic Ulcer Disease
+  weight: 25
+  requires:
+  - condition_83
+  - condition_207
+- diagnosis: Peptic Ulcer Disease
+  weight: 30
+  requires:
+  - condition_84
+  - condition_309
+- diagnosis: Barrett Esophagus
+  weight: 15
+  requires:
+  - condition_291
+  - condition_161
+- diagnosis: Barrett Esophagus
+  weight: 20
+  requires:
+  - condition_193
+  - condition_10
+- diagnosis: Barrett Esophagus
+  weight: 25
+  requires:
+  - condition_279
+  - condition_300
+- diagnosis: Barrett Esophagus
+  weight: 30
+  requires:
+  - condition_38
+  - condition_148
+- diagnosis: Esophageal Stricture
+  weight: 15
+  requires:
+  - condition_252
+  - condition_2
+- diagnosis: Esophageal Stricture
+  weight: 20
+  requires:
+  - condition_212
+  - condition_250
+- diagnosis: Esophageal Stricture
+  weight: 25
+  requires:
+  - condition_152
+  - condition_264
+- diagnosis: Esophageal Stricture
+  weight: 30
+  requires:
+  - condition_310
+  - condition_104
+- diagnosis: Esophageal Cancer Red Flag
+  weight: 15
+  requires:
+  - condition_258
+  - condition_286
+- diagnosis: Esophageal Cancer Red Flag
+  weight: 20
+  requires:
+  - condition_7
+  - condition_201
+- diagnosis: Esophageal Cancer Red Flag
+  weight: 25
+  requires:
+  - condition_201
+  - condition_77
+- diagnosis: Esophageal Cancer Red Flag
+  weight: 30
+  requires:
+  - condition_53
+  - condition_129
+- diagnosis: Biliary Colic
+  weight: 15
+  requires:
+  - condition_300
+  - condition_104
+- diagnosis: Biliary Colic
+  weight: 20
+  requires:
+  - condition_280
+  - condition_212
+- diagnosis: Biliary Colic
+  weight: 25
+  requires:
+  - condition_259
+  - condition_286
+- diagnosis: Biliary Colic
+  weight: 30
+  requires:
+  - condition_7
+  - condition_103
+- diagnosis: Acute Cholecystitis
+  weight: 15
+  requires:
+  - condition_137
+  - condition_81
+- diagnosis: Acute Cholecystitis
+  weight: 20
+  requires:
+  - condition_116
+  - condition_289
+- diagnosis: Acute Cholecystitis
+  weight: 25
+  requires:
+  - condition_224
+  - condition_57
+- diagnosis: Acute Cholecystitis
+  weight: 30
+  requires:
+  - condition_258
+  - condition_206
+- diagnosis: Choledocholithiasis
+  weight: 15
+  requires:
+  - condition_136
+  - condition_61
+- diagnosis: Choledocholithiasis
+  weight: 20
+  requires:
+  - condition_89
+  - condition_50
+- diagnosis: Choledocholithiasis
+  weight: 25
+  requires:
+  - condition_239
+  - condition_76
+- diagnosis: Choledocholithiasis
+  weight: 30
+  requires:
+  - condition_39
+  - condition_46
+- diagnosis: Ascending Cholangitis
+  weight: 15
+  requires:
+  - condition_43
+  - condition_107
+- diagnosis: Ascending Cholangitis
+  weight: 20
+  requires:
+  - condition_23
+  - condition_310
+- diagnosis: Ascending Cholangitis
+  weight: 25
+  requires:
+  - condition_232
+  - condition_65
+- diagnosis: Ascending Cholangitis
+  weight: 30
+  requires:
+  - condition_52
+  - condition_216
+- diagnosis: Acute Pancreatitis
+  weight: 15
+  requires:
+  - condition_138
+  - condition_150
+- diagnosis: Acute Pancreatitis
+  weight: 20
+  requires:
+  - condition_11
+  - condition_29
+- diagnosis: Acute Pancreatitis
+  weight: 25
+  requires:
+  - condition_82
+  - condition_222
+- diagnosis: Acute Pancreatitis
+  weight: 30
+  requires:
+  - condition_276
+  - condition_275
+- diagnosis: Chronic Pancreatitis
+  weight: 15
+  requires:
+  - condition_230
+  - condition_159
+- diagnosis: Chronic Pancreatitis
+  weight: 20
+  requires:
+  - condition_118
+  - condition_91
+- diagnosis: Chronic Pancreatitis
+  weight: 25
+  requires:
+  - condition_203
+  - condition_308
+- diagnosis: Chronic Pancreatitis
+  weight: 30
+  requires:
+  - condition_22
+  - condition_76
+- diagnosis: Pancreatic Cancer Red Flag
+  weight: 15
+  requires:
+  - condition_31
+  - condition_231
+- diagnosis: Pancreatic Cancer Red Flag
+  weight: 20
+  requires:
+  - condition_35
+  - condition_4
+- diagnosis: Pancreatic Cancer Red Flag
+  weight: 25
+  requires:
+  - condition_9
+  - condition_233
+- diagnosis: Pancreatic Cancer Red Flag
+  weight: 30
+  requires:
+  - condition_29
+  - condition_98
+- diagnosis: IBS-C
+  weight: 15
+  requires:
+  - condition_77
+  - condition_223
+- diagnosis: IBS-C
+  weight: 20
+  requires:
+  - condition_154
+  - condition_204
+- diagnosis: IBS-C
+  weight: 25
+  requires:
+  - condition_258
+  - condition_210
+- diagnosis: IBS-C
+  weight: 30
+  requires:
+  - condition_91
+  - condition_212
+- diagnosis: IBS-D
+  weight: 15
+  requires:
+  - condition_213
+  - condition_204
+- diagnosis: IBS-D
+  weight: 20
+  requires:
+  - condition_200
+  - condition_236
+- diagnosis: IBS-D
+  weight: 25
+  requires:
+  - condition_244
+  - condition_4
+- diagnosis: IBS-D
+  weight: 30
+  requires:
+  - condition_101
+  - condition_99
+- diagnosis: IBS-M
+  weight: 15
+  requires:
+  - condition_312
+  - condition_272
+- diagnosis: IBS-M
+  weight: 20
+  requires:
+  - condition_133
+  - condition_210
+- diagnosis: IBS-M
+  weight: 25
+  requires:
+  - condition_104
+  - condition_186
+- diagnosis: IBS-M
+  weight: 30
+  requires:
+  - condition_309
+  - condition_191
+- diagnosis: Infectious Gastroenteritis
+  weight: 15
+  requires:
+  - condition_238
+  - condition_179
+- diagnosis: Infectious Gastroenteritis
+  weight: 20
+  requires:
+  - condition_109
+  - condition_272
+- diagnosis: Infectious Gastroenteritis
+  weight: 25
+  requires:
+  - condition_1
+  - condition_34
+- diagnosis: Infectious Gastroenteritis
+  weight: 30
+  requires:
+  - condition_210
+  - condition_219
+- diagnosis: Ulcerative Colitis
+  weight: 15
+  requires:
+  - condition_61
+  - condition_107
+- diagnosis: Ulcerative Colitis
+  weight: 20
+  requires:
+  - condition_131
+  - condition_232
+- diagnosis: Ulcerative Colitis
+  weight: 25
+  requires:
+  - condition_142
+  - condition_222
+- diagnosis: Ulcerative Colitis
+  weight: 30
+  requires:
+  - condition_78
+  - condition_39
+- diagnosis: Crohn Disease
+  weight: 15
+  requires:
+  - condition_320
+  - condition_305
+- diagnosis: Crohn Disease
+  weight: 20
+  requires:
+  - condition_1
+  - condition_230
+- diagnosis: Crohn Disease
+  weight: 25
+  requires:
+  - condition_260
+  - condition_3
+- diagnosis: Crohn Disease
+  weight: 30
+  requires:
+  - condition_160
+  - condition_157

@@ -1,0 +1,37 @@
+{
+  "id": "v2_1_gerd_generated",
+  "name": "v2.1 generated GERD rule",
+  "kg_version": "v2.1",
+  "answers": {
+    "feature_272": true,
+    "feature_100": true
+  },
+  "flow": [
+    {
+      "start": true,
+      "flow_id": "gerd"
+    }
+  ],
+  "expected": {
+    "top_diagnosis": "GERD",
+    "min_top_score": 15,
+    "true_conditions": [
+      "condition_100",
+      "condition_272"
+    ],
+    "red_flags": [],
+    "investigations": {
+      "baseline": [
+        "CBC",
+        "ESR",
+        "CRP"
+      ]
+    },
+    "treatments": {
+      "GERD": [
+        "Lifestyle modification",
+        "PPI trial"
+      ]
+    }
+  }
+}

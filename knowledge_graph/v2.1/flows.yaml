@@ -1,0 +1,9 @@
+flows:
+  abdominal_pain:
+    start: q1
+  gerd:
+    start: q13
+  bowel_habits:
+    start: q23
+  liver:
+    start: q33
