@@ -1,144 +1,196 @@
-# CDSS Framework
+# CDSS — Gastroenterology Clinical Decision Support
 
-Python framework for loading versioned gastroenterology CDSS knowledge graphs,
-validating references, running questionnaire flow logic, deriving conditions,
-scoring diagnoses with explainability, detecting red flags, and returning
-investigation/treatment recommendations.
+A rule-based clinical decision support system for **gastroenterology triage**. It
+standardizes patient history-taking and produces **explainable** diagnostic
+suggestions so a physician can review and prioritise patients by risk.
 
-## Structure
+> ⚠️ **Decision support only — not a substitute for clinical judgement.** Every
+> output is intended for physician review. It does not diagnose or treat patients.
+
+## What it does
+
+```
+Patient → Dynamic Questionnaire → Structured Answers → Rule Engine →
+Differential Diagnosis → Recommended Investigations → Treatment Suggestions → Physician Review
+```
+
+The motivating workflow: patients fill a questionnaire on their own phones in the
+waiting room before the doctor arrives; when the doctor sits down, they see a
+dashboard of waiting patients **ranked by risk** (red flags first, then diagnosis
+score) and call the highest-risk patients first.
+
+## End-to-end architecture (server-less)
+
+```
+Waiting-room QR poster
+        │
+        ▼
+Patient web app (browser, runs the questionnaire client-side)
+        │  submits answers
+        ▼
+Firebase Firestore  ── patients can only create; nobody can read from a browser
+        │  read via service-account key (Admin SDK)
+        ▼
+Doctor's machine: Python CDSS pipeline → risk-ranked triage dashboard
+```
+
+Clinical logic lives in **one tested place** (the Python pipeline on the doctor's
+side). The patient app only *collects* answers. There is no paid server: the
+patient app is static, Firestore's free tier is the data pipe, and the dashboard
+runs on the doctor's own (internet-connected) machine.
+
+## Repository structure
 
 ```text
 cdss/
-  pipeline.py
-  knowledge/
-    loader.py
-    models.py
-    validator.py
-  questionnaire/
-    flow_engine.py
-    session.py
-  rules/
-    condition_engine.py
-    scoring_engine.py
-    diagnosis_engine.py
-    red_flag_engine.py
-  recommendations/
-    investigation_engine.py
-    treatment_engine.py
-  api/
-    app.py
-    registry.py
-    __init__.py
-examples/
-  patient_cases/
-  run_cases.py
-  run_demo.py
-  validate_kg.py
-tests/
-  test_framework.py
+  pipeline.py              # orchestrates the engines
+  knowledge/               # loader, models, validator (versioned YAML -> dataclasses)
+  questionnaire/           # flow_engine, session (branching navigation)
+  rules/                   # condition, scoring, diagnosis, red_flag engines
+  recommendations/         # investigation, treatment engines
+  api/                     # FastAPI engine API (/run, /validate) + cached registry
+  dashboard/               # doctor triage dashboard (FastAPI + Firestore/sample source)
+knowledge_graph/
+  v1/  v2/  v2.1/          # versioned clinical knowledge (YAML)
+webapp/
+  build_kg_json.py         # exports a KG's questionnaire to the browser
+  patient/                 # static patient questionnaire app (+ Firestore submit)
+  SETUP_FIREBASE.md        # one-time Firebase console setup guide
+examples/                  # demo CLI, patient cases, validation CLI
+tests/                     # unittest suite (engine, API, dashboard)
 ```
 
-## Usage
+## Setup
 
-```python
-from cdss import CDSSPipeline
+Requires Python 3.12.
 
-KG_VERSION = "v1"
-pipeline = CDSSPipeline.from_version(KG_VERSION)
-result = pipeline.run({
-    "q_location": "ruq",
-    "q_fatty_food": "yes",
-    "q_fever": "yes",
-})
-print(result.as_dict()["diagnoses"])
+```bash
+git clone https://github.com/abhi25t/cdss-gastro.git
+cd cdss-gastro
+python3 -m venv .venv && source .venv/bin/activate   # or use your own env
+pip install -r requirements.txt
 ```
 
-Run tests:
+Run the test suite:
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-Run the end-to-end demo:
+## Components
 
-```bash
-python3 examples/run_demo.py --kg-version v1
+### 1. The engine (library)
+
+```python
+from cdss import CDSSPipeline
+
+pipeline = CDSSPipeline.from_version("v1")
+result = pipeline.run({
+    "q_location": "ruq", "q_fatty_food": "yes",
+    "q_jaundice": "no", "q_fever": "yes",
+})
+print(result.as_dict()["diagnoses"])
+# [{'diagnosis': 'Acute Cholecystitis', 'score': 85,
+#   'supporting_evidence': ['Ruq Pain', 'Fatty Food Trigger', 'Fever Present']}, ...]
 ```
 
-Run a reusable patient case:
+Every diagnosis carries `supporting_evidence` — no black-box output.
+
+### 2. REST API (engine over HTTP)
 
 ```bash
-python3 examples/run_demo.py --case v1_biliary_pain
-python3 examples/run_demo.py --case v1_gi_bleeding
-python3 examples/run_demo.py --case v2_1_gerd_generated
+python3 -m uvicorn cdss.api:app --reload    # docs at /docs
 ```
 
-Run all patient case regression checks:
+| Method | Path        | Body                          | Purpose                                  |
+|--------|-------------|-------------------------------|------------------------------------------|
+| GET    | `/health`   | —                             | Liveness check                           |
+| GET    | `/versions` | —                             | List available knowledge graph versions  |
+| POST   | `/run`      | `{ kg_version, answers }`     | Run the pipeline for a full answer set    |
+| POST   | `/validate` | `{ kg_version, profile? }`    | Validate a version (`prototype`/`clinical`) |
 
 ```bash
-python3 examples/run_cases.py
-```
-
-Validate one knowledge graph version:
-
-```bash
-python3 examples/validate_kg.py --kg-version v1
-```
-
-Use the prototype profile for structural/scalability datasets:
-
-```bash
-python3 examples/validate_kg.py --kg-version v2.1 --profile prototype
-```
-
-Use the clinical profile when the knowledge graph should be complete enough for
-clinical review:
-
-```bash
-python3 examples/validate_kg.py --kg-version v2.1 --profile clinical
-```
-
-Validate all versions:
-
-```bash
-python3 examples/validate_kg.py --all
-```
-
-## REST API
-
-A FastAPI app exposes the pipeline over HTTP. Pipelines are loaded and validated
-once per version at first use and cached (they are stateless, so the cached
-instance is shared across requests).
-
-Run the server:
-
-```bash
-python3 -m uvicorn cdss.api:app --reload
-```
-
-Endpoints:
-
-| Method | Path        | Body                                  | Purpose                              |
-|--------|-------------|---------------------------------------|--------------------------------------|
-| GET    | `/health`   | —                                     | Liveness check                       |
-| GET    | `/versions` | —                                     | List available knowledge graph versions |
-| POST   | `/run`      | `{ "kg_version", "answers" }`         | Run the pipeline for a full answer set |
-| POST   | `/validate` | `{ "kg_version", "profile"? }`        | Validate a version (`prototype`/`clinical`) |
-
-Example:
-
-```bash
-curl -X POST localhost:8000/run \
-  -H 'Content-Type: application/json' \
+curl -X POST localhost:8000/run -H 'Content-Type: application/json' \
   -d '{"kg_version":"v1","answers":{"q_location":"ruq","q_fatty_food":"yes","q_fever":"yes"}}'
 ```
 
-An unknown `kg_version` returns `404`; an unknown validation `profile` returns
-`400`; a malformed body returns `422`. Interactive OpenAPI docs are served at
-`/docs`.
+Unknown `kg_version` → `404`; unknown `profile` → `400`; malformed body → `422`.
+Pipelines are loaded and validated once per version and cached.
 
-**MVP scope:** `/run` is the *batch* path — the client submits a complete set of
-answers in one call. The stateful **dynamic questionnaire** (interactive,
-question-by-question navigation backed by the flow engine and
-`QuestionnaireSession`) is intentionally deferred to a future `/questionnaire`
-endpoint set.
+> **Scope:** `/run` is the *batch* path (a complete answer set in one call). The
+> stateful interactive questionnaire is served by the patient web app below.
+
+### 3. Patient questionnaire web app
+
+Export a knowledge graph's questionnaire for the browser, then serve it:
+
+```bash
+python3 webapp/build_kg_json.py --kg-version v1
+cd webapp/patient && python3 -m http.server 6200
+# open http://<computer-ip>:6200 on a phone on the same network
+```
+
+The app runs the branching questionnaire entirely client-side (its JS flow engine
+mirrors `cdss/questionnaire/flow_engine.py`), collects answers, supports UHID entry
+with optional camera barcode scan, and submits to Firestore.
+
+To enable cloud submission, follow **[webapp/SETUP_FIREBASE.md](webapp/SETUP_FIREBASE.md)**
+and copy `firebase-config.example.js` → `firebase-config.js`. Without it, the app
+still runs and logs submissions locally.
+
+### 4. Doctor triage dashboard
+
+```bash
+# Local sample data (no Firebase needed — uses examples/patient_cases):
+CDSS_SOURCE=sample python3 -m uvicorn cdss.dashboard.app:app --port 6300
+# open http://localhost:6300
+```
+
+With a `serviceAccountKey.json` present (see SETUP_FIREBASE.md Part D), drop
+`CDSS_SOURCE=sample` and it reads live submissions from Firestore. The board
+auto-refreshes and ranks patients by **red-flag urgency first, then diagnosis
+score** — so a red-flag patient is called before a higher-scoring but lower-risk
+one.
+
+## Knowledge graphs
+
+Clinical knowledge is versioned YAML under `knowledge_graph/<version>/`. The engine
+is version-agnostic — switching versions needs no code change.
+
+| Version | Nature | Use |
+|---------|--------|-----|
+| `v1`    | Minimal, real clinical content (biliary pain, GERD, GI bleed) | Working proof of concept |
+| `v2`    | Expanded structure + synthetic filler | Larger-graph / grouping structure |
+| `v2.1`  | Real diagnosis/investigation names, synthetic rules | Scalability / scoring tests |
+
+> **v2 and v2.1 contain synthetic placeholders — schema and engine test data, not
+> medical truth.** A future clinician-reviewed `v3` graph drops in without code
+> changes.
+
+Validation has two profiles — `prototype` (structural) and `clinical` (strict):
+
+```bash
+python3 examples/validate_kg.py --kg-version v2.1 --profile prototype
+python3 examples/validate_kg.py --all
+```
+
+Run the demo / regression cases:
+
+```bash
+python3 examples/run_demo.py --case v1_biliary_pain
+python3 examples/run_cases.py
+```
+
+## Status & roadmap
+
+**Working:** engine, explainable scoring, REST API, patient web app, Firestore
+submission, and the risk-ranked doctor dashboard — the full loop is live-tested.
+
+**Next:** public hosting of the patient app (+ waiting-room QR poster), expanded
+clinical content (a real `v3` ontology), and optionally an AI consultation summary.
+
+## License / disclaimer
+
+For research and educational use. This software is **not a medical device** and
+must not be used as the sole basis for any clinical decision. The bundled
+gastroenterology reference textbook is **not** included in this repository.
