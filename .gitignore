@@ -33,3 +33,6 @@ serviceAccountKey.json
 
 # Reference textbooks / large binaries — copyrighted, not for distribution
 *.pdf
+
+# Local-only working notes (not for the repo)
+CLAUDE.md
