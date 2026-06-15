@@ -175,9 +175,79 @@ it is not the same as the UHID barcode the app itself scans on each patient.)
 
 ---
 
+## Part F — Multiple doctors (slug URLs, login, confirmation emails)
+
+The system now serves several doctors. Each has a short **slug** (e.g. `nitin`) listed
+in `doctors/doctors.yaml`, which becomes their check-in URL (`…/nitin`) and QR poster.
+The doctor dashboard + email confirmations run on the hospital's **on-prem,
+intranet-only server** (which needs *outbound* internet to reach Firestore + send
+email). See `doctors/README.md` for the credential file format.
+
+**1. Give the public app a better address (a new Hosting site).** A Firebase project's
+name can't be renamed, so we add a second site (free, same project) called
+`aig-cdss-opd-gastro` and serve the app from there:
+
+```bash
+firebase hosting:sites:create aig-cdss-opd-gastro     # -> https://aig-cdss-opd-gastro.web.app
+```
+
+`firebase.json` is already set to deploy to this site and to rewrite every path to the
+app (so `/nitin`, `/krithi`, … all open the questionnaire). Build the data and deploy:
+
+```bash
+/home/ai/pyenv/cdss/bin/python webapp/build_kg_json.py --kg-version v1
+/home/ai/pyenv/cdss/bin/python webapp/build_doctors_js.py      # exports slug + name
+firebase deploy --only hosting
+```
+
+Open `https://aig-cdss-opd-gastro.web.app/nitin` to confirm it greets "Before you see
+Dr. Nitin Jagtap".
+
+**2. Print one poster per doctor:**
+
+```bash
+/home/ai/pyenv/cdss/bin/python webapp/make_poster.py --all     # webapp/poster_<slug>.png
+```
+
+**3. Set each doctor's dashboard password** (so they can log in and see only their own
+patients):
+
+```bash
+/home/ai/pyenv/cdss/bin/python -m cdss.dashboard.auth set-password nitin
+```
+
+**4. Configure a doctor's confirmation email (optional).** Copy the template and fill in
+the mailbox the confirmation is sent from + the receptionist address:
+
+```bash
+cp doctors/doctor.example.yaml doctors/nitin.yaml      # then edit email/password/receptionist
+cp doctors/email_params.example.yaml doctors/email_params.yaml
+```
+
+**5. Run the two server processes** on the on-prem machine (leave them running):
+
+```bash
+# Dashboard (doctors browse to http://<server-ip>:6300 and log in):
+/home/ai/pyenv/cdss/bin/python -m uvicorn cdss.dashboard.app:app --host 0.0.0.0 --port 6300
+# Email listener (sends instant confirmations as patients check in):
+/home/ai/pyenv/cdss/bin/python -m cdss.notify.listener
+```
+
+> **Adding a doctor later:** add them to `doctors/doctors.yaml`, set their password
+> (step 3), optionally add `doctors/<slug>.yaml` (step 4), then rerun
+> `build_doctors_js.py` + `firebase deploy` and print their poster. No code changes.
+
+---
+
 ## Notes / for later
 
 - **App Check** (extra protection against abuse from outside the app) is optional
   hardening we can add after the POC works.
 - **End-of-day cleanup**: submissions are only needed for that day's triage. We'll
   add automatic deletion of old records (data minimization) on the dashboard side.
+- **PHI hardening before real patients.** App Check + auto-delete + retention awareness
+  (DPDP Act) should be in place *before* any real patient data is collected. Until then
+  the system is for **dummy patients only**.
+- **Email credential hardening.** Each `doctors/<slug>.yaml` currently stores a personal
+  mailbox password. Replace this with a **no-reply clinic mailbox** or a **revocable
+  Outlook app password** so personal passwords aren't stored.

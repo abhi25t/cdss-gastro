@@ -16,10 +16,12 @@
       </div>
     </div>
     <div class="controls">
+      <span id="doctorName" class="status"></span>
       <span id="status" class="status">Loading…</span>
       <label class="toggle"><input type="checkbox" id="showSeen" /> Show seen</label>
       <button id="refreshBtn" class="btn">Refresh</button>
-      <button id="cleanupBtn" class="btn btn--ghost" title="Delete patients already marked seen">End-of-day cleanup</button>
+      <button id="cleanupBtn" class="btn btn--ghost" title="Delete patients you have already marked seen">End-of-day cleanup</button>
+      <a href="/logout" class="btn btn--ghost">Log out</a>
     </div>
   </header>
 

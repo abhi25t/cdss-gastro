@@ -29,6 +29,8 @@ def _assess(sub: dict[str, Any], registry: PipelineRegistry) -> dict[str, Any]:
     base = {
         "id": sub.get("id"),
         "uhid": sub.get("uhid"),
+        "patient_name": sub.get("patient_name"),
+        "doctor_slug": sub.get("doctor_slug"),
         "status": sub.get("status", "waiting"),
         "submitted_at": sub.get("submitted_at"),
         "kg_version": version,

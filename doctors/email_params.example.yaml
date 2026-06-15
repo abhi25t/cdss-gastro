@@ -1,0 +1,5 @@
+# Template for doctors/email_params.yaml — shared SMTP server settings used by the
+# email confirmation listener (cdss/notify/listener.py). Copy and edit.
+# Outlook / Microsoft 365 uses STARTTLS on port 587.
+smtp_server: 'smtp-mail.outlook.com'
+port: 587

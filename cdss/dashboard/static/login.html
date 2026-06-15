@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDSS Dashboard — Sign in</title>
+  <link rel="stylesheet" href="/dashboard.css" />
+  <style>
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .login-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      box-shadow: var(--shadow); padding: 32px; width: 100%; max-width: 380px;
+    }
+    .login-card h1 { margin: 0 0 4px; font-size: 1.4rem; }
+    .login-card p.sub { margin: 0 0 24px; color: var(--muted); font-size: .9rem; }
+    .login-card label { display: block; font-size: .85rem; font-weight: 600; margin: 14px 0 6px; }
+    .login-card input, .login-card select {
+      width: 100%; padding: 11px 12px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 1rem; background: #fff;
+    }
+    .login-card button {
+      margin-top: 22px; width: 100%; padding: 12px; border: 0; border-radius: 8px;
+      background: var(--bg); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+    .login-err { background: #fef2f2; color: var(--critical); border: 1px solid #fecaca;
+      border-radius: 8px; padding: 10px 12px; font-size: .9rem; margin-bottom: 16px; display: none; }
+  </style>
+</head>
+<body>
+  <div class="login-wrap">
+    <form class="login-card" method="POST" action="/login">
+      <h1>Triage Dashboard</h1>
+      <p class="sub">Sign in to see your waiting patients.</p>
+      <div id="err" class="login-err">Wrong doctor or password. Please try again.</div>
+      <label for="slug">Doctor</label>
+      <select id="slug" name="slug" required></select>
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button type="submit">Sign in</button>
+    </form>
+  </div>
+
+  <script>
+    (function () {
+      if (new URLSearchParams(location.search).get("error")) {
+        document.getElementById("err").style.display = "block";
+      }
+      var sel = document.getElementById("slug");
+      fetch("/api/doctors").then(function (r) { return r.json(); }).then(function (doctors) {
+        Object.keys(doctors).forEach(function (slug) {
+          var o = document.createElement("option");
+          o.value = slug; o.textContent = "Dr. " + doctors[slug].name;
+          sel.appendChild(o);
+        });
+      }).catch(function () { /* dropdown stays empty; user can still not guess slugs */ });
+    })();
+  </script>
+</body>
+</html>

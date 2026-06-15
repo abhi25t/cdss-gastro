@@ -12,24 +12,31 @@ requirements.txt):
 
 Usage:
 
-    /home/ai/pyenv/cdss/bin/python webapp/make_poster.py \
-        --url https://cdss-triage.web.app
+    # One poster per doctor, read from doctors/doctors.yaml (the common case):
+    /home/ai/pyenv/cdss/bin/python webapp/make_poster.py --all
 
-    # customise text / output path
-    /home/ai/pyenv/cdss/bin/python webapp/make_poster.py \
-        --url https://cdss-triage.web.app \
-        --title "City Hospital — Gastro Check-In" \
-        --subtitle "Scan with your phone camera while you wait" \
-        --out webapp/poster.png
+    # A single doctor (QR opens <base-url>/<slug>):
+    /home/ai/pyenv/cdss/bin/python webapp/make_poster.py --doctor-slug nitin
 
-Writes a PNG (default webapp/poster.png). Pass an --out ending in .pdf to also
-emit a print-ready PDF.
+    # A fully explicit URL (back-compat / non-doctor posters):
+    /home/ai/pyenv/cdss/bin/python webapp/make_poster.py \
+        --url https://cdss-triage.web.app --out webapp/poster.png
+
+The default base URL is https://aig-cdss-opd-gastro.web.app; override with --base-url.
+Writes a PNG (default webapp/poster_<slug>.png per doctor). Pass an --out / --out-dir
+ending in .pdf to emit print-ready PDFs.
 """
 from __future__ import annotations
 
 import argparse
 import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+DEFAULT_BASE_URL = "https://aig-cdss-opd-gastro.web.app"
 
 try:
     import qrcode
@@ -111,28 +118,71 @@ def build_poster(url: str, title: str, subtitle: str, footer: str) -> Image.Imag
     return page
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__,
-                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--url", required=True,
-                    help="App URL the QR opens, e.g. https://cdss-triage.web.app")
-    ap.add_argument("--title", default="Patient Check-In")
-    ap.add_argument("--subtitle", default="Scan with your phone camera to begin")
-    ap.add_argument("--footer",
-                    default="Your answers go straight to the doctor — please fill this in while you wait.")
-    ap.add_argument("--out", default="webapp/poster.png",
-                    help="Output path (.png; use .pdf to emit a PDF instead)")
-    args = ap.parse_args()
-
-    poster = build_poster(args.url, args.title, args.subtitle, args.footer)
-
-    out = Path(args.out)
+def _write(poster, out: Path) -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     if out.suffix.lower() == ".pdf":
         poster.save(out, "PDF", resolution=150.0)
     else:
         poster.save(out, "PNG")
-    print(f"Wrote {out}  ({poster.width}x{poster.height})  →  QR opens: {args.url}")
+
+
+def _doctor_url(base_url: str, slug: str) -> str:
+    return f"{base_url.rstrip('/')}/{slug}"
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+    # Pick exactly one mode: --all (every doctor), --doctor-slug (one), or --url (explicit).
+    ap.add_argument("--all", action="store_true",
+                    help="Generate one poster per doctor in doctors/doctors.yaml.")
+    ap.add_argument("--doctor-slug", help="Generate a poster for one doctor (QR opens <base-url>/<slug>).")
+    ap.add_argument("--url", help="Explicit URL the QR opens (back-compat; bypasses the registry).")
+    ap.add_argument("--base-url", default=DEFAULT_BASE_URL,
+                    help=f"Site base for per-doctor URLs (default {DEFAULT_BASE_URL}).")
+    ap.add_argument("--title", help="Override the poster title.")
+    ap.add_argument("--subtitle", default="Scan with your phone camera to begin")
+    ap.add_argument("--footer",
+                    default="Your answers go straight to the doctor — please fill this in while you wait.")
+    ap.add_argument("--out", help="Output path for a single poster (.png or .pdf).")
+    ap.add_argument("--out-dir", default="webapp",
+                    help="Directory for batch/per-doctor posters (default webapp/).")
+    ap.add_argument("--ext", default="png", choices=["png", "pdf"],
+                    help="File type for batch/per-doctor posters (default png).")
+    args = ap.parse_args()
+
+    if sum(bool(x) for x in (args.all, args.doctor_slug, args.url)) != 1:
+        ap.error("choose exactly one of --all, --doctor-slug, or --url")
+
+    # Explicit URL: single poster, registry not needed.
+    if args.url:
+        title = args.title or "Patient Check-In"
+        poster = build_poster(args.url, title, args.subtitle, args.footer)
+        out = Path(args.out or "webapp/poster.png")
+        _write(poster, out)
+        print(f"Wrote {out}  ({poster.width}x{poster.height})  →  QR opens: {args.url}")
+        return
+
+    from cdss import doctors
+    registry = doctors.load_registry()
+    if not registry:
+        ap.error("doctors/doctors.yaml is empty or missing — nothing to generate.")
+
+    if args.doctor_slug:
+        slug = doctors.canonical_slug(args.doctor_slug)
+        if slug not in registry:
+            ap.error(f"'{slug}' is not in doctors/doctors.yaml. Known: {', '.join(registry)}")
+        targets = {slug: registry[slug]}
+    else:  # --all
+        targets = registry
+
+    for slug, info in targets.items():
+        url = _doctor_url(args.base_url, slug)
+        title = args.title or f"Dr. {info['name']}"
+        poster = build_poster(url, title, args.subtitle, args.footer)
+        out = Path(args.out) if (args.out and args.doctor_slug) else Path(args.out_dir) / f"poster_{slug}.{args.ext}"
+        _write(poster, out)
+        print(f"Wrote {out}  →  QR opens: {url}")
 
 
 if __name__ == "__main__":

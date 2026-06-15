@@ -12,33 +12,41 @@ PATIENT_CASES = ROOT / "examples" / "patient_cases"
 
 class SubmissionSource(Protocol):
     """A read/update interface over patient submissions, so the dashboard works
-    against either live Firestore or local sample data."""
+    against either live Firestore or local sample data. `doctor_slug`, when given,
+    scopes results/cleanup to a single doctor (each doctor sees only their own)."""
 
-    def fetch(self, include_seen: bool = False) -> list[dict[str, Any]]: ...
+    def fetch(self, include_seen: bool = False, doctor_slug: str | None = None) -> list[dict[str, Any]]: ...
     def mark_seen(self, submission_id: str) -> None: ...
-    def cleanup(self) -> int: ...
+    def cleanup(self, doctor_slug: str | None = None) -> int: ...
 
 
 class SampleSource:
     """Local sample submissions built from examples/patient_cases/*.json.
 
     Lets the dashboard, ranking, and UI run with no Firebase connection. Marking
-    seen / cleanup operate on in-memory state only."""
+    seen / cleanup operate on in-memory state only. Sample cases are tagged with a
+    `doctor_slug` (default 'nitin') so per-doctor filtering can be exercised locally."""
 
     def __init__(self) -> None:
         self._seen: set[str] = set()
 
-    def fetch(self, include_seen: bool = False) -> list[dict[str, Any]]:
+    def fetch(self, include_seen: bool = False, doctor_slug: str | None = None) -> list[dict[str, Any]]:
+        want = doctor_slug.strip().lower() if doctor_slug else None
         out: list[dict[str, Any]] = []
         for case_file in sorted(PATIENT_CASES.glob("*.json")):
             case = json.loads(case_file.read_text(encoding="utf-8"))
             sub_id = str(case.get("id") or case_file.stem)
+            slug = str(case.get("doctor_slug") or "nitin").strip().lower()
+            if want is not None and slug != want:
+                continue
             status = "seen" if sub_id in self._seen else "waiting"
             if status == "seen" and not include_seen:
                 continue
             out.append({
                 "id": sub_id,
+                "doctor_slug": slug,
                 "uhid": f"DEMO-{sub_id.upper()}",
+                "patient_name": str(case.get("patient_name") or sub_id.replace("_", " ").title()),
                 "kg_version": str(case.get("kg_version") or "v1"),
                 "answers": dict(case.get("answers") or {}),
                 "submitted_at": "2026-06-12T08:15:00",
@@ -49,7 +57,7 @@ class SampleSource:
     def mark_seen(self, submission_id: str) -> None:
         self._seen.add(submission_id)
 
-    def cleanup(self) -> int:
+    def cleanup(self, doctor_slug: str | None = None) -> int:
         count = len(self._seen)
         self._seen.clear()
         return count

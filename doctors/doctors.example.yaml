@@ -1,0 +1,8 @@
+# Template for doctors/doctors.yaml — the doctor registry (copy, then edit).
+# `slug` is the short explicit id used in the URL path, credential filename,
+# submission tag, and dashboard login. Choose it yourself (no fuzzy matching).
+
+- slug: alice
+  name: Alice Example
+- slug: bob
+  name: Bob Example

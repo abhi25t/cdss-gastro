@@ -32,9 +32,12 @@ class FirestoreSubmissions:
     def _collection(self):
         return self._db.collection(self.COLLECTION)
 
-    def fetch(self, include_seen: bool = False) -> list[dict[str, Any]]:
+    def fetch(self, include_seen: bool = False, doctor_slug: str | None = None) -> list[dict[str, Any]]:
+        query = self._collection()
+        if doctor_slug:
+            query = query.where("doctor_slug", "==", doctor_slug.strip().lower())
         out: list[dict[str, Any]] = []
-        for doc in self._collection().stream():
+        for doc in query.stream():
             data = doc.to_dict() or {}
             data["id"] = doc.id
             if data.get("status") == "seen" and not include_seen:
@@ -46,10 +49,14 @@ class FirestoreSubmissions:
     def mark_seen(self, submission_id: str) -> None:
         self._collection().document(submission_id).update({"status": "seen"})
 
-    def cleanup(self) -> int:
-        """Delete submissions already marked seen (end-of-day data minimization)."""
+    def cleanup(self, doctor_slug: str | None = None) -> int:
+        """Delete submissions already marked seen (end-of-day data minimization).
+        Scoped to one doctor when doctor_slug is given."""
+        query = self._collection().where("status", "==", "seen")
+        if doctor_slug:
+            query = query.where("doctor_slug", "==", doctor_slug.strip().lower())
         deleted = 0
-        for doc in self._collection().where("status", "==", "seen").stream():
+        for doc in query.stream():
             doc.reference.delete()
             deleted += 1
         return deleted

@@ -26,12 +26,16 @@ if (!cfg || !cfg.apiKey || cfg.apiKey === "PASTE_API_KEY") {
     window.CDSS_submitToBackend = async function (payload) {
       await signInAnonymously(auth);
       await addDoc(collection(db, "submissions"), {
+        doctor_slug: payload.doctor_slug,    // which doctor this patient is here for
         uhid: payload.uhid,
+        patient_name: payload.patient_name,
+        patient_email: payload.patient_email || "",  // optional
         kg_version: payload.kg_version,
         answers: payload.answers,
         submitted_at: payload.submitted_at, // client clock (string)
         created_at: serverTimestamp(),       // trusted server time
         status: "waiting",                   // waiting | seen
+        confirmation_sent: false,            // email listener flips this to true
       });
     };
     console.info("[firebase-submit] Firebase ready — submissions will be sent to Firestore.");

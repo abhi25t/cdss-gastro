@@ -1,0 +1,18 @@
+# Template for doctors/<slug>.yaml — per-doctor credentials (copy to <slug>.yaml).
+# This file holds secrets and is git-ignored. A doctor without this file still works:
+# they just get no confirmation email and cannot log in to the dashboard yet.
+
+# --- Confirmation email (optional) ---
+# The mailbox the patient confirmation is sent FROM, via the shared SMTP server in
+# email_params.yaml. TODO (planned): replace this personal mailbox password with a
+# no-reply clinic mailbox or a revocable Outlook app password.
+email: 'doctor-mailbox@example.com'
+password: 'CHANGE_ME'
+# Where to notify when a patient gives no email of their own:
+receptionist: 'receptionist@example.com'
+
+# --- Dashboard login (required to view the dashboard) ---
+# Do NOT store a plaintext password. Generate the hash with:
+#   python -m cdss.dashboard.auth set-password <slug>
+# which writes the salted PBKDF2 hash below.
+dashboard_password_hash: 'pbkdf2_sha256$...'

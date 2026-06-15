@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "aig-cdss-opd-gastro",
     "public": "webapp/patient",
     "ignore": [
       "firebase.json",
@@ -7,9 +8,12 @@
       "**/node_modules/**",
       "firebase-config.example.js"
     ],
+    "rewrites": [
+      { "source": "**", "destination": "/index.html" }
+    ],
     "headers": [
       {
-        "source": "/@(index.html|kg-data.js|kg-data.json|app.js)",
+        "source": "/@(index.html|kg-data.js|kg-data.json|app.js|doctors.js)",
         "headers": [
           { "key": "Cache-Control", "value": "no-cache, max-age=0" }
         ]

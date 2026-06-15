@@ -37,11 +37,19 @@ serviceAccountKey.json
 # Firebase CLI local cache (created by `firebase deploy`)
 .firebase/
 
-# Generated waiting-room poster (contains only the public app URL)
+# Generated waiting-room posters (per-doctor: poster_<slug>.png/.pdf, plus poster.*)
 webapp/poster.*
+webapp/poster_*
 
 # Reference textbooks / large binaries — copyrighted, not for distribution
 *.pdf
 
 # Local-only working notes (not for the repo)
 CLAUDE.md
+
+# Doctor credentials & registry — emails, SMTP passwords, receptionist contacts,
+# dashboard password hashes. NEVER commit (public repo). Only example templates
+# and the README are tracked; all real files are ignored.
+doctors/*
+!doctors/*.example.yaml
+!doctors/README.md

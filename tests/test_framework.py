@@ -8,8 +8,10 @@ import unittest
 
 from fastapi.testclient import TestClient
 
-# Force the dashboard to use local sample data (not Firestore) for tests.
+# Force the dashboard to use local sample data (not Firestore) for tests, and pin a
+# session secret so login tokens are deterministic and no secret file is written.
 os.environ.setdefault("CDSS_SOURCE", "sample")
+os.environ.setdefault("CDSS_SESSION_SECRET", "test-secret-do-not-use-in-prod")
 
 from cdss import CDSSPipeline
 from cdss.api import app
@@ -258,13 +260,28 @@ class DashboardTest(unittest.TestCase):
         # The dashboard's source is a module-level singleton; reset its in-memory
         # "seen" state so tests don't leak into each other.
         from cdss.dashboard import app as dash_module
+        from cdss.dashboard import auth
         if hasattr(dash_module.source, "_seen"):
             dash_module.source._seen.clear()
         self.client = TestClient(dashboard_app)
+        # Log in as Nitin (all sample cases are tagged with his slug).
+        self.client.cookies.set("cdss_session", auth.make_token("nitin"))
+
+    def test_requires_login(self) -> None:
+        anon = TestClient(dashboard_app)
+        self.assertEqual(anon.get("/api/triage").status_code, 401)
+
+    def test_only_shows_logged_in_doctors_patients(self) -> None:
+        from cdss.dashboard import auth
+        other = TestClient(dashboard_app)
+        other.cookies.set("cdss_session", auth.make_token("krithi"))
+        data = other.get("/api/triage").json()
+        self.assertEqual(data["count"], 0)  # Krithi has no sample patients
 
     def test_triage_ranks_red_flag_first(self) -> None:
         data = self.client.get("/api/triage").json()
         self.assertEqual(data["source"], "SampleSource")
+        self.assertEqual(data["doctor"], "nitin")
         self.assertEqual(data["count"], 3)
 
         patients = data["patients"]
@@ -299,6 +316,57 @@ class DashboardTest(unittest.TestCase):
         self.assertIn("Triage Dashboard", self.client.get("/").text)
         self.assertEqual(self.client.get("/dashboard.js").status_code, 200)
         self.assertEqual(self.client.get("/dashboard.css").status_code, 200)
+
+    def test_anonymous_root_redirects_to_login(self) -> None:
+        anon = TestClient(dashboard_app, follow_redirects=False)
+        resp = anon.get("/")
+        self.assertEqual(resp.status_code, 307)
+        self.assertEqual(resp.headers["location"], "/login")
+
+
+class AuthTest(unittest.TestCase):
+    def test_password_hash_roundtrip(self) -> None:
+        from cdss.dashboard import auth
+        stored = auth.hash_password("s3cret!")
+        self.assertTrue(auth.verify_password("s3cret!", stored))
+        self.assertFalse(auth.verify_password("wrong", stored))
+
+    def test_session_token_roundtrip_and_tamper(self) -> None:
+        from cdss.dashboard import auth
+        token = auth.make_token("nitin")
+        self.assertEqual(auth.read_token(token), "nitin")
+        self.assertIsNone(auth.read_token("nitin.deadbeef"))   # bad signature
+        self.assertIsNone(auth.read_token(None))
+
+
+class NotifyListenerTest(unittest.TestCase):
+    """The email listener's decision logic is pure (no Firestore/SMTP needed)."""
+
+    CREDS = {"email": "dr@h.com", "password": "x", "receptionist": "recep@h.com"}
+
+    def _plan(self, submission, creds=None, name="Nitin Jagtap"):
+        from cdss.notify.listener import plan_confirmation
+        return plan_confirmation(submission, creds, name)
+
+    def test_patient_with_email_gets_confirmation(self) -> None:
+        plan = self._plan({"patient_name": "Asha", "uhid": "UH1", "patient_email": "asha@x.com"}, self.CREDS)
+        self.assertEqual(plan.action, "patient")
+        self.assertEqual(plan.recipient, "asha@x.com")
+        self.assertIn("Nitin Jagtap", plan.subject)
+
+    def test_no_email_notifies_receptionist(self) -> None:
+        plan = self._plan({"patient_name": "Ravi", "uhid": "UH2", "patient_email": ""}, self.CREDS)
+        self.assertEqual(plan.action, "receptionist")
+        self.assertEqual(plan.recipient, "recep@h.com")
+        self.assertIn("Ravi", plan.subject)
+
+    def test_doctor_without_credentials_is_skipped(self) -> None:
+        plan = self._plan({"patient_name": "Ravi", "patient_email": "r@x.com"}, None)
+        self.assertEqual(plan.action, "skip")
+
+    def test_no_email_and_no_receptionist_is_skipped(self) -> None:
+        plan = self._plan({"patient_name": "Ravi"}, {"email": "a@b.com", "password": "x"})
+        self.assertEqual(plan.action, "skip")
 
 
 if __name__ == "__main__":

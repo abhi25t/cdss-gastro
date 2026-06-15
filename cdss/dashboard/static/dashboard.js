@@ -5,6 +5,7 @@
   const board = document.getElementById("board");
   const statusEl = document.getElementById("status");
   const sourceEl = document.getElementById("sourceLabel");
+  const doctorEl = document.getElementById("doctorName");
   const showSeenEl = document.getElementById("showSeen");
   const REFRESH_MS = 5000;
   let timer = null;
@@ -12,9 +13,11 @@
   async function load() {
     try {
       const res = await fetch(`/api/triage?include_seen=${showSeenEl.checked}`);
+      if (res.status === 401) { window.location = "/login"; return; }
       if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       render(data);
+      if (data.doctor_name) doctorEl.textContent = `Dr. ${data.doctor_name}`;
       statusEl.textContent = `${data.count} patient${data.count === 1 ? "" : "s"} · updated ${nowTime()}`;
       sourceEl.textContent = `Source: ${data.source}`;
     } catch (err) {
@@ -61,7 +64,7 @@
       <article class="patient ${seen ? "seen" : ""}" data-tier="${esc(p.risk_tier)}">
         <div class="rank"><small>Rank</small>${p.position}</div>
         <div class="pinfo">
-          <h2>${esc(p.uhid || "Unknown UHID")} <span class="uhid">· ${esc(p.kg_version)}</span></h2>
+          <h2>${esc(p.patient_name || "Unknown")} <span class="uhid">· ${esc(p.uhid || "no UHID")} · ${esc(p.kg_version)}</span></h2>
           ${flags ? `<div class="flags">${flags}</div>` : ""}
           ${dxLine}
           ${evidence ? `<div class="evidence">${evidence}</div>` : ""}

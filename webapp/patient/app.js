@@ -7,11 +7,26 @@
   "use strict";
 
   const KG = window.KG_DATA;
+  const DOCTORS = window.DOCTORS || {};
   const appEl = document.getElementById("app");
+
+  // ---- Doctor (multi-doctor routing) -------------------------------------
+  // Each doctor has a slug. In production the slug is the URL path (/nitin),
+  // served to index.html by a Firebase Hosting rewrite. For local dev (plain
+  // http.server, no rewrite) we also accept ?doctor=nitin.
+  function resolveDoctorSlug() {
+    const fromPath = window.location.pathname.split("/").filter(Boolean)[0];
+    const fromQuery = new URLSearchParams(window.location.search).get("doctor");
+    return String(fromPath || fromQuery || "").trim().toLowerCase();
+  }
 
   // ---- State -------------------------------------------------------------
   const state = {
+    doctorSlug: "",
+    doctorName: "",
     uhid: "",
+    patientName: "",
+    patientEmail: "",
     answers: {},          // { question_id: value }  (yes_no -> "yes"/"no")
     current: null,        // current question id
     history: [],          // visited question ids, for the Back button
@@ -63,8 +78,18 @@
       <div class="spacer"></div>
       <div class="card">
         <p class="eyebrow">Welcome</p>
-        <h1>Before you see the doctor</h1>
+        <h1>Before you see Dr. ${escapeHtml(state.doctorName)}</h1>
         <p class="subtle">Please answer a few questions about your symptoms while you wait. Your doctor will review your answers.</p>
+        <div class="field">
+          <label for="patientName">Your name</label>
+          <input class="input" id="patientName" inputmode="text" autocomplete="name"
+                 placeholder="Full name" value="${escapeAttr(state.patientName)}" />
+        </div>
+        <div class="field">
+          <label for="patientEmail">Email <span class="subtle">(optional)</span></label>
+          <input class="input" id="patientEmail" inputmode="email" autocomplete="email"
+                 placeholder="you@example.com — for a confirmation" value="${escapeAttr(state.patientEmail)}" />
+        </div>
         <div class="field">
           <label for="uhid">Hospital ID (UHID)</label>
           <input class="input" id="uhid" inputmode="text" autocomplete="off"
@@ -83,13 +108,28 @@
       ${footer()}
     `);
 
+    const nameInput = document.getElementById("patientName");
+    const emailInput = document.getElementById("patientEmail");
     const uhidInput = document.getElementById("uhid");
+    nameInput.addEventListener("input", (e) => { state.patientName = e.target.value.trim(); });
+    emailInput.addEventListener("input", (e) => { state.patientEmail = e.target.value.trim(); });
     uhidInput.addEventListener("input", (e) => { state.uhid = e.target.value.trim(); });
     document.getElementById("scanBtn").addEventListener("click", startScan);
     document.getElementById("startBtn").addEventListener("click", () => {
+      const msg = document.getElementById("scanMsg");
+      if (!state.patientName) {
+        nameInput.focus();
+        msg.textContent = "Please enter your name first.";
+        return;
+      }
       if (!state.uhid) {
         uhidInput.focus();
-        document.getElementById("scanMsg").textContent = "Please enter or scan your Hospital ID first.";
+        msg.textContent = "Please enter or scan your Hospital ID first.";
+        return;
+      }
+      if (state.patientEmail && !isValidEmail(state.patientEmail)) {
+        emailInput.focus();
+        msg.textContent = "That email doesn't look right — fix it, or leave it blank.";
         return;
       }
       stopScan();
@@ -150,7 +190,9 @@
       <div class="card">
         <p class="eyebrow">Review</p>
         <h1>Check your answers</h1>
+        <p class="subtle">Name: <strong>${escapeHtml(state.patientName)}</strong></p>
         <p class="subtle">Hospital ID: <strong>${escapeHtml(state.uhid)}</strong></p>
+        ${state.patientEmail ? `<p class="subtle">Email: <strong>${escapeHtml(state.patientEmail)}</strong></p>` : ""}
         <ul class="review-list">${rows}</ul>
       </div>
       <div class="footer-actions">
@@ -205,7 +247,10 @@
   // ---- Submission --------------------------------------------------------
   function buildPayload() {
     return {
+      doctor_slug: state.doctorSlug,
       uhid: state.uhid,
+      patient_name: state.patientName,
+      patient_email: state.patientEmail,
       kg_version: KG.version,
       answers: { ...state.answers },
       submitted_at: new Date().toISOString(),
@@ -300,10 +345,37 @@
   }
   function escapeAttr(s) { return escapeHtml(s); }
 
+  function isValidEmail(s) {
+    // Deliberately lenient — just catches obvious typos, not RFC-perfect.
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+  }
+
+  function renderNoDoctor() {
+    render(`
+      <div class="spacer"></div>
+      <div class="card center">
+        <h1>Almost there</h1>
+        <p class="subtle">Please scan the QR code on your doctor's check-in card to begin. If you typed the address by hand, double-check it with the reception desk.</p>
+      </div>
+      <div class="spacer"></div>
+      ${footer()}
+    `);
+  }
+
   // ---- Boot --------------------------------------------------------------
   if (!KG || !KG.entry_question) {
     render(`<div class="card"><h1>Setup needed</h1><p class="subtle">Questionnaire data did not load. Run <code>build_kg_json.py</code> and reload.</p></div>`);
     return;
   }
+
+  // A valid doctor slug is required — it tags the submission and routes the
+  // confirmation. An unknown/missing slug means the patient reached the wrong URL.
+  state.doctorSlug = resolveDoctorSlug();
+  const doctor = DOCTORS[state.doctorSlug];
+  if (!doctor) {
+    renderNoDoctor();
+    return;
+  }
+  state.doctorName = doctor.name;
   renderStart();
 })();
