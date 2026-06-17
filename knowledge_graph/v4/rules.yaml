@@ -1,0 +1,228 @@
+# ADVISORY DRAFT weighted differential (my clinical knowledge + adapted from v3).
+# Each finding nudges one or more diagnoses up (positive) or down (negative);
+# `specificity` is an explainability label. Weights are reference-informed starting
+# points for PHYSICIAN REVIEW — not validated. Cross-cutting findings (fever,
+# weight_loss, alcohol_use) come from the shared general block.
+rules:
+  # ===== Abdominal pain =====
+  - {id: ap_pud_epigastric, diagnosis: peptic_ulcer_disease, condition: ap_epigastric, weight: 10, specificity: moderate}
+  - {id: ap_pud_burning, diagnosis: peptic_ulcer_disease, condition: ap_burning, weight: 8, specificity: low}
+  - {id: ap_pud_relief_eating, diagnosis: peptic_ulcer_disease, condition: ap_better_eating, weight: 14, specificity: high}
+  - {id: ap_pud_night, diagnosis: peptic_ulcer_disease, condition: ap_night_pain, weight: 8, specificity: moderate}
+  - {id: ap_pud_worse_eating_neg, diagnosis: peptic_ulcer_disease, condition: ap_worse_eating, weight: 6, direction: negative}
+  - {id: ap_gerd_epigastric, diagnosis: gerd, condition: ap_epigastric, weight: 6, specificity: low}
+  - {id: ap_gerd_burning, diagnosis: gerd, condition: ap_burning, weight: 12, specificity: moderate}
+  - {id: ap_gerd_worse_eating, diagnosis: gerd, condition: ap_worse_eating, weight: 10, specificity: moderate}
+  - {id: ap_bc_ruq, diagnosis: biliary_colic, condition: ap_ruq, weight: 14, specificity: high}
+  - {id: ap_bc_cramping, diagnosis: biliary_colic, condition: ap_cramping, weight: 8, specificity: moderate}
+  - {id: ap_bc_shoulder, diagnosis: biliary_colic, condition: ap_radiates_shoulder, weight: 8, specificity: moderate}
+  - {id: ap_ac_ruq, diagnosis: acute_cholecystitis, condition: ap_ruq, weight: 10, specificity: moderate}
+  - {id: ap_ac_fever, diagnosis: acute_cholecystitis, condition: fever, weight: 16, specificity: high}
+  - {id: ap_ac_shoulder, diagnosis: acute_cholecystitis, condition: ap_radiates_shoulder, weight: 6, specificity: low}
+  - {id: ap_panc_epigastric, diagnosis: acute_pancreatitis, condition: ap_epigastric, weight: 8, specificity: low}
+  - {id: ap_panc_back, diagnosis: acute_pancreatitis, condition: ap_radiates_back, weight: 20, specificity: high}
+  - {id: ap_panc_relief_neg, diagnosis: acute_pancreatitis, condition: ap_better_eating, weight: 10, direction: negative}
+  - {id: ap_app_rlq, diagnosis: appendicitis, condition: ap_rlq, weight: 18, specificity: high}
+  - {id: ap_app_periumbilical, diagnosis: appendicitis, condition: ap_periumbilical, weight: 8, specificity: moderate}
+  - {id: ap_app_fever, diagnosis: appendicitis, condition: fever, weight: 8, specificity: moderate}
+  - {id: ap_ibs_cramping, diagnosis: irritable_bowel_syndrome, condition: ap_cramping, weight: 8, specificity: low}
+  - {id: ap_ibs_diffuse, diagnosis: irritable_bowel_syndrome, condition: ap_diffuse, weight: 6, specificity: low}
+
+  # ===== Heartburn =====
+  - {id: hb_gerd_rising, diagnosis: gerd, condition: hb_rising_burning, weight: 14, specificity: high}
+  - {id: hb_gerd_acid, diagnosis: gerd, condition: hb_acid_taste, weight: 12, specificity: high}
+  - {id: hb_gerd_night, diagnosis: gerd, condition: hb_nocturnal, weight: 8, specificity: moderate}
+  - {id: hb_gerd_ppi, diagnosis: gerd, condition: hb_ppi_response, weight: 8, specificity: moderate}
+  - {id: hb_pud_acid, diagnosis: peptic_ulcer_disease, condition: hb_acid_taste, weight: 5, specificity: low}
+  - {id: hb_pud_ppi, diagnosis: peptic_ulcer_disease, condition: hb_ppi_response, weight: 6, specificity: low}
+  - {id: hb_fd_postprandial, diagnosis: functional_dyspepsia, condition: hb_postprandial, weight: 6, specificity: low}
+
+  # ===== Dysphagia =====
+  - {id: dys_stric_solids, diagnosis: peptic_stricture, condition: dys_solids_only, weight: 10, specificity: moderate}
+  - {id: dys_stric_reflux, diagnosis: peptic_stricture, condition: dys_acid_reflux, weight: 12, specificity: high}
+  - {id: dys_ca_solids, diagnosis: oesophageal_cancer, condition: dys_solids_only, weight: 10, specificity: moderate}
+  - {id: dys_ca_progressive, diagnosis: oesophageal_cancer, condition: dys_progressive, weight: 16, specificity: high}
+  - {id: dys_ca_weightloss, diagnosis: oesophageal_cancer, condition: weight_loss, weight: 14, specificity: high}
+  - {id: dys_ach_both, diagnosis: achalasia, condition: dys_solids_and_liquids, weight: 16, specificity: high}
+  - {id: dys_ach_regurg, diagnosis: achalasia, condition: dys_regurg_food, weight: 12, specificity: high}
+  - {id: dys_ach_intermittent, diagnosis: achalasia, condition: dys_intermittent, weight: 6, specificity: low}
+  - {id: dys_eoe_intermittent, diagnosis: eosinophilic_esophagitis, condition: dys_intermittent, weight: 10, specificity: moderate}
+  - {id: dys_eoe_solids, diagnosis: eosinophilic_esophagitis, condition: dys_solids_only, weight: 6, specificity: low}
+
+  # ===== Nausea / vomiting =====
+  - {id: nv_age_travel, diagnosis: acute_gastroenteritis, condition: nv_travel_diet, weight: 12, specificity: moderate}
+  - {id: nv_age_soon, diagnosis: acute_gastroenteritis, condition: nv_soon_after_eating, weight: 6, specificity: low}
+  - {id: nv_age_fever, diagnosis: acute_gastroenteritis, condition: fever, weight: 8, specificity: moderate}
+  - {id: nv_gastritis_meds, diagnosis: gastritis, condition: nv_new_meds, weight: 10, specificity: moderate}
+  - {id: nv_gastritis_pain, diagnosis: gastritis, condition: nv_abd_pain, weight: 6, specificity: low}
+  - {id: nv_goo_undigested, diagnosis: gastric_outlet_obstruction, condition: nv_undigested, weight: 14, specificity: high}
+  - {id: nv_goo_delayed, diagnosis: gastric_outlet_obstruction, condition: nv_delayed, weight: 12, specificity: high}
+  - {id: nv_bo_bile, diagnosis: bowel_obstruction, condition: nv_bile, weight: 14, specificity: high}
+  - {id: nv_bo_pain, diagnosis: bowel_obstruction, condition: nv_abd_pain, weight: 8, specificity: moderate}
+
+  # ===== Dyspepsia =====
+  - {id: dy_fd_postmeal, diagnosis: functional_dyspepsia, condition: dy_after_meals, weight: 10, specificity: moderate}
+  - {id: dy_fd_bloating, diagnosis: functional_dyspepsia, condition: dy_bloating, weight: 12, specificity: moderate}
+  - {id: dy_fd_during, diagnosis: functional_dyspepsia, condition: dy_during_meals, weight: 6, specificity: low}
+  - {id: dy_pud_empty, diagnosis: peptic_ulcer_disease, condition: dy_empty_stomach, weight: 14, specificity: high}
+  - {id: dy_pud_antacid, diagnosis: peptic_ulcer_disease, condition: dy_antacid_relief, weight: 10, specificity: moderate}
+  - {id: dy_gerd_postmeal, diagnosis: gerd, condition: dy_after_meals, weight: 6, specificity: low}
+  - {id: dy_gerd_antacid, diagnosis: gerd, condition: dy_antacid_relief, weight: 6, specificity: low}
+  - {id: dy_gastritis_antacid, diagnosis: gastritis, condition: dy_antacid_relief, weight: 6, specificity: low}
+  - {id: dy_gastritis_empty, diagnosis: gastritis, condition: dy_empty_stomach, weight: 6, specificity: low}
+  - {id: dy_ibs_stool, diagnosis: irritable_bowel_syndrome, condition: dy_stool_relief, weight: 12, specificity: high}
+
+  # ===== Belching =====
+  - {id: be_aero_triggers, diagnosis: aerophagia, condition: be_aerophagia, weight: 16, specificity: high}
+  - {id: be_aero_flatulence, diagnosis: aerophagia, condition: be_flatulence, weight: 8, specificity: moderate}
+  - {id: be_gerd_postmeal, diagnosis: gerd, condition: be_postprandial, weight: 8, specificity: moderate}
+  - {id: be_gerd_food, diagnosis: gerd, condition: be_food_trigger, weight: 6, specificity: low}
+  - {id: be_fd_flatulence, diagnosis: functional_dyspepsia, condition: be_flatulence, weight: 6, specificity: low}
+  - {id: be_fd_food, diagnosis: functional_dyspepsia, condition: be_food_trigger, weight: 6, specificity: low}
+
+  # ===== Diarrhoea =====
+  - {id: di_age_acute, diagnosis: acute_gastroenteritis, condition: di_acute, weight: 12, specificity: moderate}
+  - {id: di_age_watery, diagnosis: acute_gastroenteritis, condition: di_watery, weight: 8, specificity: low}
+  - {id: di_age_travel, diagnosis: acute_gastroenteritis, condition: di_travel, weight: 8, specificity: moderate}
+  - {id: di_age_fever, diagnosis: acute_gastroenteritis, condition: fever, weight: 8, specificity: moderate}
+  - {id: di_age_chronic_neg, diagnosis: acute_gastroenteritis, condition: di_chronic, weight: 12, direction: negative}
+  - {id: di_ibs_relief, diagnosis: irritable_bowel_syndrome, condition: di_relieved_defecation, weight: 14, specificity: high}
+  - {id: di_ibs_chronic, diagnosis: irritable_bowel_syndrome, condition: di_chronic, weight: 8, specificity: moderate}
+  - {id: di_ibs_blood_neg, diagnosis: irritable_bowel_syndrome, condition: di_blood, weight: 10, direction: negative}
+  - {id: di_ibs_nocturnal_neg, diagnosis: irritable_bowel_syndrome, condition: di_nocturnal, weight: 8, direction: negative}
+  - {id: di_ibd_blood, diagnosis: inflammatory_bowel_disease, condition: di_blood, weight: 14, specificity: high}
+  - {id: di_ibd_nocturnal, diagnosis: inflammatory_bowel_disease, condition: di_nocturnal, weight: 12, specificity: high}
+  - {id: di_ibd_chronic, diagnosis: inflammatory_bowel_disease, condition: di_chronic, weight: 8, specificity: moderate}
+  - {id: di_ibd_mucus, diagnosis: inflammatory_bowel_disease, condition: di_mucus, weight: 6, specificity: low}
+  - {id: di_coeliac_chronic, diagnosis: coeliac_disease, condition: di_chronic, weight: 8, specificity: low}
+  - {id: di_coeliac_weightloss, diagnosis: coeliac_disease, condition: weight_loss, weight: 8, specificity: moderate}
+  - {id: di_crc_blood, diagnosis: colorectal_cancer, condition: di_blood, weight: 10, specificity: moderate}
+  - {id: di_crc_weightloss, diagnosis: colorectal_cancer, condition: weight_loss, weight: 16, specificity: high}
+  - {id: di_crc_chronic, diagnosis: colorectal_cancer, condition: di_chronic, weight: 6, specificity: low}
+
+  # ===== Constipation =====
+  - {id: co_fc_straining, diagnosis: functional_constipation, condition: co_straining, weight: 12, specificity: moderate}
+  - {id: co_fc_incomplete, diagnosis: functional_constipation, condition: co_incomplete, weight: 8, specificity: moderate}
+  - {id: co_fc_lowfreq, diagnosis: functional_constipation, condition: co_low_frequency, weight: 8, specificity: moderate}
+  - {id: co_ibs_straining, diagnosis: irritable_bowel_syndrome, condition: co_straining, weight: 6, specificity: low}
+  - {id: co_ibs_incomplete, diagnosis: irritable_bowel_syndrome, condition: co_incomplete, weight: 6, specificity: low}
+  - {id: co_crc_blood, diagnosis: colorectal_cancer, condition: co_blood, weight: 12, specificity: high}
+  - {id: co_crc_weightloss, diagnosis: colorectal_cancer, condition: weight_loss, weight: 16, specificity: high}
+  - {id: co_crc_recent, diagnosis: colorectal_cancer, condition: co_recent_onset, weight: 8, specificity: moderate}
+  - {id: co_hypo_lowfreq, diagnosis: hypothyroidism, condition: co_low_frequency, weight: 6, specificity: low}
+  - {id: co_fc_hardstool, diagnosis: functional_constipation, condition: co_hard_stool, weight: 10, specificity: moderate}
+  - {id: co_fc_nourge, diagnosis: functional_constipation, condition: co_no_daily_urge, weight: 6, specificity: low}
+
+  # ===== Jaundice =====
+  - {id: jy_chol_pale, diagnosis: choledocholithiasis, condition: jy_pale_stool, weight: 12, specificity: moderate}
+  - {id: jy_chol_pain, diagnosis: choledocholithiasis, condition: jy_pain, weight: 14, specificity: high}
+  - {id: jy_chol_itch, diagnosis: choledocholithiasis, condition: jy_itching, weight: 8, specificity: moderate}
+  - {id: jy_chol_history, diagnosis: choledocholithiasis, condition: jy_liver_history, weight: 6, specificity: low}
+  - {id: jy_chol_fever, diagnosis: choledocholithiasis, condition: fever, weight: 8, specificity: moderate}
+  - {id: jy_vh_exposure, diagnosis: viral_hepatitis, condition: jy_exposure, weight: 14, specificity: high}
+  - {id: jy_vh_fever, diagnosis: viral_hepatitis, condition: fever, weight: 8, specificity: moderate}
+  - {id: jy_vh_pain_neg, diagnosis: viral_hepatitis, condition: jy_pain, weight: 6, direction: negative}
+  - {id: jy_ah_alcohol, diagnosis: alcoholic_hepatitis, condition: alcohol_use, weight: 18, specificity: high}
+  - {id: jy_ah_pain, diagnosis: alcoholic_hepatitis, condition: jy_pain, weight: 6, specificity: low}
+  - {id: jy_panc_weightloss, diagnosis: pancreatic_cancer, condition: weight_loss, weight: 18, specificity: high}
+  - {id: jy_panc_pale, diagnosis: pancreatic_cancer, condition: jy_pale_stool, weight: 8, specificity: moderate}
+  - {id: jy_panc_itch, diagnosis: pancreatic_cancer, condition: jy_itching, weight: 8, specificity: moderate}
+  - {id: jy_panc_painless_neg, diagnosis: pancreatic_cancer, condition: jy_pain, weight: 8, direction: negative}
+  - {id: jy_cirr_history, diagnosis: cirrhosis, condition: jy_liver_history, weight: 10, specificity: moderate}
+  - {id: jy_cirr_alcohol, diagnosis: cirrhosis, condition: alcohol_use, weight: 8, specificity: moderate}
+
+  # ===== Rectal bleeding =====
+  - {id: rb_haem_bright, diagnosis: haemorrhoids, condition: rb_bright_red, weight: 12, specificity: moderate}
+  - {id: rb_haem_paper, diagnosis: haemorrhoids, condition: rb_on_paper, weight: 8, specificity: moderate}
+  - {id: rb_haem_drip, diagnosis: haemorrhoids, condition: rb_dripping, weight: 10, specificity: moderate}
+  - {id: rb_haem_lump, diagnosis: haemorrhoids, condition: rb_lump, weight: 12, specificity: high}
+  - {id: rb_haem_painless, diagnosis: haemorrhoids, condition: rb_painless, weight: 6, specificity: low}
+  - {id: rb_fiss_pain, diagnosis: anal_fissure, condition: rb_painful, weight: 16, specificity: high}
+  - {id: rb_fiss_bright, diagnosis: anal_fissure, condition: rb_bright_red, weight: 6, specificity: low}
+  - {id: rb_fiss_paper, diagnosis: anal_fissure, condition: rb_on_paper, weight: 6, specificity: low}
+  - {id: rb_crc_mixed, diagnosis: colorectal_cancer, condition: rb_blood_mixed, weight: 14, specificity: high}
+  - {id: rb_crc_bowel, diagnosis: colorectal_cancer, condition: rb_bowel_change, weight: 14, specificity: high}
+  - {id: rb_crc_weightloss, diagnosis: colorectal_cancer, condition: weight_loss, weight: 16, specificity: high}
+  - {id: rb_crc_dark, diagnosis: colorectal_cancer, condition: rb_dark_blood, weight: 8, specificity: moderate}
+  - {id: rb_ibd_mucus, diagnosis: inflammatory_bowel_disease, condition: rb_mucus, weight: 12, specificity: high}
+  - {id: rb_ibd_mixed, diagnosis: inflammatory_bowel_disease, condition: rb_blood_mixed, weight: 8, specificity: moderate}
+  - {id: rb_div_dark, diagnosis: diverticular_disease, condition: rb_dark_blood, weight: 10, specificity: moderate}
+  - {id: rb_div_painless, diagnosis: diverticular_disease, condition: rb_painless, weight: 6, specificity: low}
+
+  # ===== Perianal =====
+  - {id: pa_haem_lump, diagnosis: haemorrhoids, condition: pa_lump, weight: 12, specificity: moderate}
+  - {id: pa_haem_bleed, diagnosis: haemorrhoids, condition: pa_bleeding, weight: 8, specificity: low}
+  - {id: pa_fiss_paindef, diagnosis: anal_fissure, condition: pa_pain_defecation, weight: 16, specificity: high}
+  - {id: pa_fiss_pain, diagnosis: anal_fissure, condition: pa_pain, weight: 8, specificity: moderate}
+  - {id: pa_absc_swelling, diagnosis: perianal_abscess, condition: pa_swelling, weight: 16, specificity: high}
+  - {id: pa_absc_fever, diagnosis: perianal_abscess, condition: fever, weight: 12, specificity: high}
+  - {id: pa_absc_pain, diagnosis: perianal_abscess, condition: pa_pain, weight: 6, specificity: low}
+  - {id: pa_fist_discharge, diagnosis: anal_fistula, condition: pa_discharge, weight: 16, specificity: high}
+  - {id: pa_fist_recurrent, diagnosis: anal_fistula, condition: pa_recurrent, weight: 10, specificity: moderate}
+
+  # ===== Faecal incontinence =====
+  - {id: fi_sd_injury, diagnosis: anal_sphincter_dysfunction, condition: fi_sphincter_injury, weight: 16, specificity: high}
+  - {id: fi_sd_passive, diagnosis: anal_sphincter_dysfunction, condition: fi_passive, weight: 10, specificity: moderate}
+  - {id: fi_sd_urgency, diagnosis: anal_sphincter_dysfunction, condition: fi_urgency, weight: 6, specificity: low}
+  - {id: fi_of_overflow, diagnosis: overflow_incontinence, condition: fi_overflow, weight: 16, specificity: high}
+  - {id: fi_of_liquid, diagnosis: overflow_incontinence, condition: fi_liquid, weight: 6, specificity: low}
+  - {id: fi_ibd_blood, diagnosis: inflammatory_bowel_disease, condition: fi_blood, weight: 14, specificity: high}
+  - {id: fi_ibd_urgency, diagnosis: inflammatory_bowel_disease, condition: fi_urgency, weight: 8, specificity: moderate}
+  - {id: fi_ibd_liquid, diagnosis: inflammatory_bowel_disease, condition: fi_liquid, weight: 6, specificity: low}
+
+  # ===== Bloating / distension =====
+  - {id: bl_ibs_defecation, diagnosis: irritable_bowel_syndrome, condition: bl_relieved_defecation, weight: 14, specificity: high}
+  - {id: bl_ibs_bowel, diagnosis: irritable_bowel_syndrome, condition: bl_bowel_change, weight: 10, specificity: moderate}
+  - {id: bl_ibs_flatus, diagnosis: irritable_bowel_syndrome, condition: bl_relieved_flatus, weight: 8, specificity: moderate}
+  - {id: bl_fb_postmeal, diagnosis: functional_bloating, condition: bl_postprandial, weight: 10, specificity: moderate}
+  - {id: bl_fb_flatus, diagnosis: functional_bloating, condition: bl_relieved_flatus, weight: 6, specificity: low}
+  - {id: bl_coeliac_food, diagnosis: coeliac_disease, condition: bl_food_related, weight: 10, specificity: moderate}
+  - {id: bl_coeliac_weightloss, diagnosis: coeliac_disease, condition: weight_loss, weight: 10, specificity: moderate}
+  - {id: bl_ma_progressive, diagnosis: malignant_ascites, condition: bl_progressive, weight: 14, specificity: high}
+  - {id: bl_ma_distension, diagnosis: malignant_ascites, condition: bl_distension, weight: 8, specificity: moderate}
+  - {id: bl_ma_weightloss, diagnosis: malignant_ascites, condition: weight_loss, weight: 14, specificity: high}
+
+  # ===== Ascites =====
+  - {id: as_cirr_liver, diagnosis: cirrhosis, condition: as_liver_history, weight: 16, specificity: high}
+  - {id: as_cirr_alcohol, diagnosis: cirrhosis, condition: alcohol_use, weight: 14, specificity: high}
+  - {id: as_cirr_leg, diagnosis: cirrhosis, condition: as_leg_swelling, weight: 6, specificity: low}
+  - {id: as_ma_cancer, diagnosis: malignant_ascites, condition: as_known_cancer, weight: 18, specificity: high}
+  - {id: as_ma_weightloss, diagnosis: malignant_ascites, condition: weight_loss, weight: 14, specificity: high}
+  - {id: as_tb_fever, diagnosis: tuberculosis, condition: fever, weight: 12, specificity: moderate}
+  - {id: as_tb_weightloss, diagnosis: tuberculosis, condition: weight_loss, weight: 10, specificity: moderate}
+  - {id: as_tb_gradual, diagnosis: tuberculosis, condition: as_gradual, weight: 6, specificity: low}
+  - {id: as_ccf_leg, diagnosis: congestive_cardiac_failure, condition: as_leg_swelling, weight: 14, specificity: high}
+  - {id: as_ccf_breathless, diagnosis: congestive_cardiac_failure, condition: as_breathless, weight: 12, specificity: high}
+
+  # ===== Weight loss =====
+  - {id: wl_gca_appetite, diagnosis: gastric_cancer, condition: wl_decreased_appetite, weight: 10, specificity: moderate}
+  - {id: wl_gca_lump, diagnosis: gastric_cancer, condition: wl_lump, weight: 10, specificity: moderate}
+  - {id: wl_crc_bowel, diagnosis: colorectal_cancer, condition: wl_bowel_change, weight: 16, specificity: high}
+  - {id: wl_crc_lump, diagnosis: colorectal_cancer, condition: wl_lump, weight: 8, specificity: low}
+  - {id: wl_hyper_appetite, diagnosis: hyperthyroidism, condition: wl_increased_appetite, weight: 14, specificity: high}
+  - {id: wl_hyper_heat, diagnosis: hyperthyroidism, condition: wl_heat_intolerance, weight: 16, specificity: high}
+  - {id: wl_dm_thirst, diagnosis: diabetes_mellitus, condition: wl_thirst, weight: 18, specificity: high}
+  - {id: wl_dm_appetite, diagnosis: diabetes_mellitus, condition: wl_increased_appetite, weight: 8, specificity: moderate}
+  - {id: wl_tb_cough, diagnosis: tuberculosis, condition: wl_chronic_cough, weight: 14, specificity: high}
+  - {id: wl_tb_fever, diagnosis: tuberculosis, condition: fever, weight: 10, specificity: moderate}
+
+  # ===== Anaemia symptoms =====
+  - {id: an_ida_pica, diagnosis: iron_deficiency_anaemia, condition: an_pica, weight: 14, specificity: high}
+  - {id: an_ida_menorrhagia, diagnosis: iron_deficiency_anaemia, condition: an_menorrhagia, weight: 16, specificity: high}
+  - {id: an_ida_melaena, diagnosis: iron_deficiency_anaemia, condition: melaena, weight: 10, specificity: moderate}
+  - {id: an_pud_melaena, diagnosis: peptic_ulcer_disease, condition: melaena, weight: 14, specificity: high}
+  - {id: an_pud_pain, diagnosis: peptic_ulcer_disease, condition: an_abdo_pain, weight: 8, specificity: moderate}
+  - {id: an_crc_bowel, diagnosis: colorectal_cancer, condition: an_bowel_change, weight: 12, specificity: high}
+  - {id: an_crc_blood, diagnosis: colorectal_cancer, condition: fresh_rectal_blood, weight: 10, specificity: moderate}
+  - {id: an_crc_weightloss, diagnosis: colorectal_cancer, condition: weight_loss, weight: 14, specificity: high}
+  - {id: an_coeliac_weightloss, diagnosis: coeliac_disease, condition: weight_loss, weight: 8, specificity: moderate}
+
+  # ===== Loss of appetite =====
+  - {id: ao_gca_satiety, diagnosis: gastric_cancer, condition: ao_early_satiety, weight: 14, specificity: high}
+  - {id: ao_gca_meat, diagnosis: gastric_cancer, condition: ao_meat_aversion, weight: 12, specificity: high}
+  - {id: ao_gca_weightloss, diagnosis: gastric_cancer, condition: weight_loss, weight: 14, specificity: high}
+  - {id: ao_fd_satiety, diagnosis: functional_dyspepsia, condition: ao_early_satiety, weight: 8, specificity: moderate}
+  - {id: ao_fd_nausea, diagnosis: functional_dyspepsia, condition: ao_nausea, weight: 6, specificity: low}
+  - {id: ao_panc_weightloss, diagnosis: pancreatic_cancer, condition: weight_loss, weight: 12, specificity: high}
+  - {id: ao_panc_pain, diagnosis: pancreatic_cancer, condition: ao_abdo_pain, weight: 8, specificity: moderate}
+  - {id: ao_dep_mood, diagnosis: depression, condition: ao_low_mood, weight: 16, specificity: high}

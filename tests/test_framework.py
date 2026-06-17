@@ -68,7 +68,7 @@ class FrameworkTest(unittest.TestCase):
         self.assertIn("Proton pump inhibitor", TreatmentEngine(kg).recommend(diagnoses)["Peptic Ulcer Disease"])
 
     def test_all_versions_load_without_application_changes(self) -> None:
-        for version in ("v1", "v2", "v2.1", "v3"):
+        for version in ("v1", "v2", "v2.1", "v3", "v4"):
             with self.subTest(version=version):
                 kg = KnowledgeGraph.load(f"knowledge_graph/{version}")
                 self.assertGreater(len(kg.questions), 0)
@@ -390,6 +390,26 @@ class DashboardTest(unittest.TestCase):
         finally:
             consultations.DB_PATH = original
 
+    def test_consultation_logs_doctor_additional_findings(self) -> None:
+        import tempfile
+        from cdss.dashboard import consultations
+        original = consultations.DB_PATH
+        consultations.DB_PATH = os.path.join(tempfile.mkdtemp(), "c.db")
+        try:
+            body = {"note": {"additional_findings": ["night sweats", "recent travel"]},
+                    "suggestions": {}}
+            resp = self.client.post("/api/patient/v1_biliary_pain/consultation", json=body)
+            self.assertEqual(resp.status_code, 200)
+            saved = consultations.load_consultation(resp.json()["consultation_id"], path=consultations.DB_PATH)
+            # Doctor-added findings are mineable items: kind=symptom, source=doctor.
+            doc_symptoms = {i["value"] for i in saved["items"]
+                            if i["kind"] == "symptom" and i["source"] == "doctor"}
+            self.assertIn("night sweats", doc_symptoms)
+            self.assertIn("recent travel", doc_symptoms)
+            self.assertEqual(saved["note"]["additional_findings"], ["night sweats", "recent travel"])
+        finally:
+            consultations.DB_PATH = original
+
     def test_malformed_consultation_is_422(self) -> None:
         self.assertEqual(
             self.client.post("/api/patient/v1_biliary_pain/consultation", json={"bad": 1}).status_code, 422
@@ -522,6 +542,214 @@ class V3SymptomFirstTest(unittest.TestCase):
         )
         codes = {issue.code for issue in validate(broken).issues}
         self.assertIn("unreachable_workup_question", codes)
+
+
+class V4QuestionTypeTest(unittest.TestCase):
+    """v4 introduces number / text / multi_choice questions. They must flow through
+    the summary engine and the dashboard answer labels cleanly (not as raw lists)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.kg = KnowledgeGraph.load("knowledge_graph/v4")
+        cls.pipeline = CDSSPipeline(cls.kg)
+
+    def test_v4_loads_all_chief_complaints_and_validates_clinical(self) -> None:
+        self.assertTrue(self.kg.is_symptom_first)
+        self.assertEqual(len(self.kg.symptoms), 17)
+        report = validate(self.kg, profile="clinical")
+        self.assertTrue(report.is_valid, report.as_dict())
+
+    def test_v4_multi_choice_renders_in_summary(self) -> None:
+        result = self.pipeline.run({
+            "q_main_complaint": "heartburn", "hb_location": "chest", "hb_rising": "yes",
+            "hb_taste": "yes", "hb_timing": "at_night", "hb_triggers": ["spicy", "coffee"],
+        }).as_dict()
+        # multi_choice joins option labels — never a raw "['spicy', ...]".
+        self.assertEqual(result["symptom_summary"]["findings"]["Aggravating"], "Spicy food and Coffee")
+        self.assertIn("triggered by Spicy food and Coffee", result["draft_hpi"])
+        self.assertNotIn("[", result["draft_hpi"])
+
+    def test_v4_number_renders_in_summary(self) -> None:
+        result = self.pipeline.run({
+            "q_main_complaint": "diarrhoea", "di_duration": "lt_2w", "di_frequency": 6,
+            "di_consistency": "watery", "di_blood": "no",
+        }).as_dict()
+        self.assertEqual(result["symptom_summary"]["findings"]["Frequency"], "6")
+        self.assertIn("6 times a day", result["draft_hpi"])
+
+    def test_v4_dashboard_answer_label_handles_new_types(self) -> None:
+        from cdss.dashboard import summary as dsummary
+        self.assertEqual(dsummary.answer_label(self.kg, "hb_triggers", ["spicy", "coffee"]), "Spicy food, Coffee")
+        self.assertEqual(dsummary.answer_label(self.kg, "di_frequency", 6), "6")
+        self.assertEqual(dsummary.answer_label(self.kg, "gen_surgery_detail", "Appendix 2019"), "Appendix 2019")
+
+    def test_v4_flow_chains_symptom_then_general_block(self) -> None:
+        from cdss.questionnaire.flow_engine import FlowEngine
+        fe = FlowEngine(self.kg)
+        # End of a symptom flow chains into the shared general block...
+        end_of_diarrhoea = fe.next_question("di_recent_antibiotics", "no")["next_question"]
+        self.assertEqual(end_of_diarrhoea, self.kg.flows["general"].start)
+        # ...and the last general question ends the questionnaire (no re-chain).
+        self.assertIsNone(fe.next_question("gen_fatigue", "no")["next_question"])
+
+    def test_v3_flow_does_not_chain_to_general(self) -> None:
+        # v3 has no separate general flow, so symptom flows still end at None.
+        from cdss.questionnaire.flow_engine import FlowEngine
+        v3 = KnowledgeGraph.load("knowledge_graph/v3")
+        self.assertNotIn("general", v3.flows)
+        fe = FlowEngine(v3)
+        # A terminal v3 question must not invent a next question.
+        self.assertIsNone(fe.next_question("q_ap_jaundice", "no")["next_question"])
+
+    def test_v4_new_symptom_differential_is_scoped(self) -> None:
+        # Rectal bleeding + a shared general finding (weight loss) must not pull in
+        # diagnoses from other chief complaints.
+        result = self.pipeline.run({
+            "q_main_complaint": "rectal_bleeding", "rb_colour": "mixed_in_stool",
+            "rb_pain": "no", "rb_bowel_change": "yes", "gen_weight_loss": "yes",
+        }).as_dict()
+        self.assertEqual(result["diagnoses"][0]["diagnosis"], "Colorectal Cancer")
+        allowed = {"Haemorrhoids", "Anal Fissure", "Colorectal Cancer",
+                   "Inflammatory Bowel Disease", "Diverticular Disease"}
+        self.assertTrue({d["diagnosis"] for d in result["diagnoses"]}.issubset(allowed))
+
+
+class V4MultiSymptomTest(unittest.TestCase):
+    """Multi-symptom intake: q_main_complaint is multi-select; each complaint gets a
+    full work-up, then the shared general block; the differential is one deduped list."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.kg = KnowledgeGraph.load("knowledge_graph/v4")
+        cls.pipeline = CDSSPipeline(cls.kg)
+
+    def test_main_complaint_is_multi_select(self) -> None:
+        self.assertEqual(self.kg.questions["q_main_complaint"].type, "multi_choice")
+
+    def test_flow_walks_each_complaint_then_general(self) -> None:
+        from cdss.questionnaire.flow_engine import FlowEngine
+        fe = FlowEngine(self.kg)
+        chosen = ["heartburn", "constipation"]
+        first = fe.next_question("q_main_complaint", chosen, chosen_symptoms=chosen)["next_question"]
+        self.assertEqual(first, self.kg.flows["heartburn"].start)
+        # End of the first complaint's flow advances to the second complaint's start.
+        after_first = fe.next_question("hb_prior_scope", "no", chosen_symptoms=chosen)["next_question"]
+        self.assertEqual(after_first, self.kg.flows["constipation"].start)
+        # End of the last complaint's flow chains into the shared general block.
+        after_last = fe.next_question("co_laxatives", "no", chosen_symptoms=chosen)["next_question"]
+        self.assertEqual(after_last, self.kg.flows["general"].start)
+
+    def test_resolve_symptoms_returns_all_selected(self) -> None:
+        from cdss.recommendations.summary_engine import resolve_symptoms
+        syms = resolve_symptoms(self.kg, {"q_main_complaint": ["heartburn", "constipation"]})
+        self.assertEqual([s.id for s in syms], ["heartburn", "constipation"])
+
+    def test_shared_diagnosis_deduped_with_merged_evidence(self) -> None:
+        # Diarrhoea + constipation both include colorectal cancer — it must appear ONCE.
+        result = self.pipeline.run({
+            "q_main_complaint": ["diarrhoea", "constipation"],
+            "di_duration": "gt_4w", "di_blood": "yes",
+            "co_duration": "lt_1m", "co_blood": "yes", "gen_weight_loss": "yes",
+        }).as_dict()
+        names = [d["diagnosis"] for d in result["diagnoses"]]
+        self.assertEqual(names.count("Colorectal Cancer"), 1)
+        # One HPI paragraph + one structured summary per complaint.
+        self.assertEqual(result["draft_hpi"].count("Patient presents with"), 2)
+        self.assertEqual(len(result["symptom_summaries"]), 2)
+
+    def test_assess_detail_tags_complaints_and_sends_maps(self) -> None:
+        from cdss.api.registry import PipelineRegistry
+        from cdss.dashboard.triage import assess_detail
+        sub = {"id": "m1", "kg_version": "v4", "answers": {
+            "q_main_complaint": ["diarrhoea", "constipation"],
+            "di_duration": "gt_4w", "di_blood": "yes", "co_blood": "yes", "gen_weight_loss": "yes"}}
+        d = assess_detail(sub, PipelineRegistry())
+        crc = next(x for x in d["differential"] if x["diagnosis"] == "Colorectal Cancer")
+        self.assertCountEqual(crc["chief_complaints"], ["Diarrhoea", "Constipation"])
+        self.assertIn("Colorectal Cancer", d["tests_by_diagnosis"])
+        self.assertEqual(len(d["symptom_summaries"]), 2)
+        self.assertIn("Diarrhoea", d["chief_complaint"])
+        self.assertIn("Constipation", d["chief_complaint"])
+
+    def test_single_complaint_still_works(self) -> None:
+        # A one-element selection behaves like the old single-symptom path (no tags).
+        from cdss.api.registry import PipelineRegistry
+        from cdss.dashboard.triage import assess_detail
+        sub = {"id": "s1", "kg_version": "v4", "answers": {
+            "q_main_complaint": ["heartburn"], "hb_rising": "yes", "hb_taste": "yes"}}
+        d = assess_detail(sub, PipelineRegistry())
+        self.assertEqual(d["chief_complaint"], "Heartburn / Acid Reflux")
+        self.assertNotIn("chief_complaints", d["differential"][0])
+
+
+class V4InteractiveQuestionTest(unittest.TestCase):
+    """region_select (abdomen diagram) + bristol_select (stool chart) — multi-select
+    answers that drive the differential and render in the HPI, plus the new
+    constipation questions (urge, timing, Bristol)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.kg = KnowledgeGraph.load("knowledge_graph/v4")
+        cls.pipeline = CDSSPipeline(cls.kg)
+
+    def test_new_question_types_declared(self) -> None:
+        self.assertEqual(self.kg.questions["ap_site"].type, "region_select")
+        self.assertEqual(self.kg.questions["co_bristol"].type, "bristol_select")
+        # Region options keep the clinical site value AND map to an SVG region key.
+        opt = self.kg.questions["ap_site"].options[0]
+        self.assertIn("region", opt)
+        self.assertIn("value", opt)
+
+    def test_constipation_workup_includes_new_questions(self) -> None:
+        workup = self.kg.symptoms["constipation"].workup
+        for qid in ("co_urge", "co_timing", "co_bristol"):
+            self.assertIn(qid, workup)
+        # Flow reaches them in order: frequency -> urge -> timing -> bristol -> straining.
+        trans = self.kg.flows["constipation"].transitions
+        self.assertEqual(trans["co_frequency"]["default"], "co_urge")
+        self.assertEqual(trans["co_urge"]["default"], "co_timing")
+        self.assertEqual(trans["co_timing"]["default"], "co_bristol")
+        self.assertEqual(trans["co_bristol"]["default"], "co_straining")
+
+    def test_list_answer_drives_condition_via_membership(self) -> None:
+        # A multi-region pain answer satisfies the existing `ap_site == 'ruq'` rule.
+        conditions = ConditionEngine(self.kg).evaluate({"ap_site": ["ruq", "epigastric"]})
+        self.assertTrue(conditions["ap_ruq"])
+        self.assertTrue(conditions["ap_epigastric"])
+        self.assertFalse(conditions["ap_rlq"])
+        # Bristol 1/2 triggers the hard-stool condition (OR over membership).
+        conditions = ConditionEngine(self.kg).evaluate({"co_bristol": ["2"]})
+        self.assertTrue(conditions["co_hard_stool"])
+        conditions = ConditionEngine(self.kg).evaluate({"co_bristol": ["5"]})
+        self.assertFalse(conditions["co_hard_stool"])
+
+    def test_multi_region_pain_ranks_and_renders(self) -> None:
+        result = self.pipeline.run({
+            "q_main_complaint": ["abdominal_pain"], "ap_duration": "1_4w",
+            "ap_site": ["ruq", "epigastric"], "ap_character": "cramping",
+            "ap_radiation": "right_shoulder", "ap_meals": "worse_eating",
+        }).as_dict()
+        # Biliary colic (RUQ + radiation to shoulder) should surface.
+        self.assertIn("Biliary Colic", [d["diagnosis"] for d in result["diagnoses"]])
+        self.assertIn("right upper quadrant and epigastrium", result["draft_hpi"])
+
+    def test_bristol_and_urge_feed_functional_constipation(self) -> None:
+        result = self.pipeline.run({
+            "q_main_complaint": ["constipation"], "co_duration": "gt_6m",
+            "co_frequency": "once_3plus_days", "co_urge": "no", "co_timing": ["morning"],
+            "co_bristol": ["1", "2"], "co_straining": "yes",
+        }).as_dict()
+        top = result["diagnoses"][0]["diagnosis"]
+        self.assertEqual(top, "Functional Constipation")
+        self.assertIn("Bristol type 1", result["draft_hpi"])
+
+    def test_browser_export_carries_new_types(self) -> None:
+        from webapp.build_kg_json import build_payload
+        payload = build_payload("v4")
+        self.assertEqual(payload["questions"]["ap_site"]["type"], "region_select")
+        self.assertEqual(payload["questions"]["co_bristol"]["type"], "bristol_select")
+        self.assertEqual(len(payload["questions"]["co_bristol"]["options"]), 7)
+        self.assertIn("region", payload["questions"]["ap_site"]["options"][0])
 
 
 if __name__ == "__main__":

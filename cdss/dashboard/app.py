@@ -63,6 +63,9 @@ class _Note(BaseModel):
     tests: list[str] = Field(default_factory=list)
     prescribed_medications: list[str] = Field(default_factory=list)
     advice_followup: str = ""
+    # Symptoms/history the doctor adds during the visit — captured as discrete items
+    # for the future association-rule loop (consultations.py turns these into rows).
+    additional_findings: list[str] = Field(default_factory=list)
 
 
 class _ConsultationBody(BaseModel):

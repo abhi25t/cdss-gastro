@@ -1,0 +1,46 @@
+# Display names for the diagnoses referenced by the advisory differential rules.
+# DRAFT for physician review.
+diagnoses:
+  peptic_ulcer_disease: {name: Peptic Ulcer Disease}
+  gerd: {name: GERD}
+  biliary_colic: {name: Biliary Colic}
+  acute_cholecystitis: {name: Acute Cholecystitis}
+  acute_pancreatitis: {name: Acute Pancreatitis}
+  appendicitis: {name: Acute Appendicitis}
+  irritable_bowel_syndrome: {name: Irritable Bowel Syndrome}
+  functional_dyspepsia: {name: Functional Dyspepsia}
+  peptic_stricture: {name: Peptic Oesophageal Stricture}
+  oesophageal_cancer: {name: Oesophageal Cancer}
+  achalasia: {name: Achalasia}
+  eosinophilic_esophagitis: {name: Eosinophilic Oesophagitis}
+  acute_gastroenteritis: {name: Acute Gastroenteritis}
+  gastritis: {name: Gastritis}
+  gastric_outlet_obstruction: {name: Gastric Outlet Obstruction}
+  bowel_obstruction: {name: Bowel Obstruction}
+  aerophagia: {name: Aerophagia (Air Swallowing)}
+  inflammatory_bowel_disease: {name: Inflammatory Bowel Disease}
+  coeliac_disease: {name: Coeliac Disease}
+  colorectal_cancer: {name: Colorectal Cancer}
+  functional_constipation: {name: Functional Constipation}
+  hypothyroidism: {name: Hypothyroidism}
+  choledocholithiasis: {name: Choledocholithiasis}
+  viral_hepatitis: {name: Viral Hepatitis}
+  alcoholic_hepatitis: {name: Alcoholic Hepatitis}
+  pancreatic_cancer: {name: Pancreatic Cancer}
+  cirrhosis: {name: Cirrhosis}
+  haemorrhoids: {name: Haemorrhoids}
+  anal_fissure: {name: Anal Fissure}
+  perianal_abscess: {name: Perianal Abscess}
+  anal_fistula: {name: Anal Fistula}
+  diverticular_disease: {name: Diverticular Disease}
+  anal_sphincter_dysfunction: {name: Anal Sphincter Dysfunction}
+  overflow_incontinence: {name: Overflow Faecal Incontinence}
+  functional_bloating: {name: Functional Bloating}
+  malignant_ascites: {name: Malignant Ascites}
+  tuberculosis: {name: Tuberculosis}
+  congestive_cardiac_failure: {name: Congestive Cardiac Failure}
+  gastric_cancer: {name: Gastric Cancer}
+  hyperthyroidism: {name: Hyperthyroidism}
+  diabetes_mellitus: {name: Diabetes Mellitus}
+  iron_deficiency_anaemia: {name: Iron-Deficiency Anaemia}
+  depression: {name: Depression}

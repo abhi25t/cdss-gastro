@@ -88,6 +88,49 @@ h1 { font-size: 1.5rem; margin: 0 0 8px; }
 .btn--yesno { text-align: center; font-weight: 600; }
 .yesno-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+/* Multi-select pills (multi_choice questions) */
+.btn--multi { position: relative; padding-right: 44px; }
+.btn--selected {
+  border-color: var(--teal);
+  background: #f0fdfa;
+  font-weight: 600;
+}
+.btn--selected::after {
+  content: "✓";
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--teal);
+  font-weight: 700;
+}
+
+.hint { margin: 0 0 12px; }
+.err { color: #dc2626; font-size: 0.95rem; min-height: 1.2em; margin: 12px 0 0; }
+textarea.input { resize: vertical; letter-spacing: normal; line-height: 1.4; }
+
+/* Region selector (abdomen diagram) */
+.region-picker { margin: 4px 0 8px; min-height: 60px; }
+.region-svg { width: 100%; height: auto; display: block; touch-action: manipulation; }
+.region-svg .sel, .region-svg .cell, .region-svg .entire { cursor: pointer; }
+
+/* Bristol stool chart */
+.bristol-list { display: flex; flex-direction: column; gap: 8px; }
+.bristol-row {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; text-align: left; font-family: inherit;
+  padding: 10px 14px; border: 1px solid var(--border, #e2e0d8);
+  border-radius: 12px; background: #fff; cursor: pointer;
+}
+.bristol-row.selected { border: 2px solid var(--teal); background: #f0fdfa; font-weight: 600; }
+.bristol-num {
+  flex: 0 0 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: #f3f4f6; font-weight: 600; color: #6b7280;
+}
+.bristol-row.selected .bristol-num { background: var(--teal); color: #fff; }
+.bristol-art { flex: 0 0 96px; height: 46px; }
+.bristol-desc { flex: 1; font-size: 0.98rem; }
+
 .btn--primary {
   background: var(--teal);
   border-color: var(--teal);

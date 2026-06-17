@@ -1,0 +1,133 @@
+# v4 chief complaints. `workup` = symptom-specific questions only (general items live
+# in the shared general block). `differential` lists the candidate diagnoses; the
+# weighted rules that rank them are an ADVISORY DRAFT (my clinical knowledge + v3) for
+# physician review — not validated weights.
+symptoms:
+  abdominal_pain:
+    label: Abdominal Pain
+    chief_complaint_text: abdominal pain
+    flow: abdominal_pain
+    required_semiology: [site, character, radiation, onset, timing]
+    workup: [ap_duration, ap_site, ap_character, ap_radiation, ap_pattern, ap_meals, ap_night]
+    differential: [peptic_ulcer_disease, gerd, biliary_colic, acute_cholecystitis,
+                   acute_pancreatitis, appendicitis, irritable_bowel_syndrome]
+
+  heartburn:
+    label: Heartburn / Acid Reflux
+    chief_complaint_text: heartburn
+    flow: heartburn
+    workup: [hb_duration, hb_location, hb_rising, hb_taste, hb_timing, hb_triggers,
+             hb_frequency, hb_sleep, hb_cough_voice, hb_chest_pain, hb_chest_pain_radiate,
+             hb_tried_meds, hb_meds_helped, hb_prior_scope]
+    differential: [gerd, peptic_ulcer_disease, functional_dyspepsia]
+
+  dysphagia:
+    label: Difficulty Swallowing
+    chief_complaint_text: difficulty swallowing
+    flow: dysphagia
+    workup: [dys_duration, dys_type, dys_consistency, dys_progression, dys_onset,
+             dys_regurg, dys_reflux, dys_aspiration, dys_voice, dys_radiation_hx, dys_corrosive]
+    differential: [peptic_stricture, oesophageal_cancer, achalasia, eosinophilic_esophagitis]
+
+  nausea_vomiting:
+    label: Nausea / Vomiting
+    chief_complaint_text: nausea and vomiting
+    flow: nausea_vomiting
+    workup: [nv_duration, nv_vomit_content, nv_timing, nv_abd_pain, nv_new_meds, nv_travel_diet]
+    differential: [acute_gastroenteritis, gastritis, gastric_outlet_obstruction, bowel_obstruction]
+
+  dyspepsia:
+    label: Indigestion / Bloating
+    chief_complaint_text: indigestion and bloating
+    flow: dyspepsia
+    workup: [dy_duration, dy_relation, dy_food_triggers, dy_antacid_relief, dy_stool_relief, dy_bloating]
+    differential: [functional_dyspepsia, peptic_ulcer_disease, gerd, gastritis, irritable_bowel_syndrome]
+
+  belching:
+    label: Belching / Wind
+    chief_complaint_text: excessive belching
+    flow: belching
+    workup: [be_duration, be_timing, be_fizzy_fast_stress, be_food_triggers, be_flatulence]
+    differential: [aerophagia, gerd, functional_dyspepsia]
+
+  diarrhoea:
+    label: Diarrhoea
+    chief_complaint_text: diarrhoea
+    flow: diarrhoea
+    workup: [di_duration, di_frequency, di_consistency, di_blood, di_mucus, di_nocturnal,
+             di_relieved_by_defecation, di_recent_travel, di_recent_antibiotics]
+    differential: [acute_gastroenteritis, irritable_bowel_syndrome, inflammatory_bowel_disease,
+                   coeliac_disease, colorectal_cancer]
+
+  constipation:
+    label: Constipation
+    chief_complaint_text: constipation
+    flow: constipation
+    workup: [co_duration, co_frequency, co_urge, co_timing, co_bristol, co_straining,
+             co_incomplete, co_digitation, co_pain_passing, co_blood, co_laxatives]
+    differential: [functional_constipation, irritable_bowel_syndrome, colorectal_cancer, hypothyroidism]
+
+  jaundice:
+    label: Jaundice
+    chief_complaint_text: yellowing of the eyes and skin
+    flow: jaundice
+    workup: [jy_duration, jy_urine, jy_pale_stool, jy_itching, jy_abd_pain,
+             jy_liver_history, jy_risk_exposure, jy_new_meds_herbal]
+    differential: [choledocholithiasis, viral_hepatitis, alcoholic_hepatitis, pancreatic_cancer, cirrhosis]
+
+  rectal_bleeding:
+    label: Rectal Bleeding
+    chief_complaint_text: bleeding from the back passage
+    flow: rectal_bleeding
+    workup: [rb_duration, rb_colour, rb_relation, rb_pain, rb_lump, rb_bowel_change, rb_mucus]
+    differential: [haemorrhoids, anal_fissure, colorectal_cancer, inflammatory_bowel_disease, diverticular_disease]
+
+  perianal:
+    label: Perianal Problem
+    chief_complaint_text: a problem around the back passage
+    flow: perianal
+    workup: [pa_duration, pa_main, pa_pain_defecation, pa_swelling, pa_discharge, pa_bleeding, pa_recurrent]
+    differential: [haemorrhoids, anal_fissure, perianal_abscess, anal_fistula]
+
+  faecal_incontinence:
+    label: Faecal Incontinence
+    chief_complaint_text: difficulty controlling the bowels
+    flow: faecal_incontinence
+    workup: [fi_duration, fi_type, fi_consistency, fi_constipation_hx, fi_obstetric_surgical, fi_blood]
+    differential: [anal_sphincter_dysfunction, overflow_incontinence, inflammatory_bowel_disease]
+
+  bloating:
+    label: Bloating / Distension
+    chief_complaint_text: bloating and abdominal distension
+    flow: bloating
+    workup: [bl_duration, bl_pattern, bl_relieved_flatus, bl_relieved_defecation,
+             bl_bowel_change, bl_visible_distension, bl_food_relation]
+    differential: [irritable_bowel_syndrome, functional_bloating, coeliac_disease, malignant_ascites]
+
+  ascites:
+    label: Ascites / Abdominal Swelling
+    chief_complaint_text: swelling of the abdomen
+    flow: ascites
+    workup: [as_duration, as_onset, as_leg_swelling, as_breathlessness, as_liver_history, as_known_cancer]
+    differential: [cirrhosis, malignant_ascites, tuberculosis, congestive_cardiac_failure]
+
+  weight_loss:
+    label: Weight Loss
+    chief_complaint_text: unintentional weight loss
+    flow: weight_loss
+    workup: [wl_appetite, wl_heat_intolerance, wl_thirst_polyuria, wl_bowel_change, wl_chronic_cough, wl_lump]
+    differential: [gastric_cancer, colorectal_cancer, hyperthyroidism, diabetes_mellitus, tuberculosis]
+
+  anaemia:
+    label: Anaemia Symptoms
+    chief_complaint_text: tiredness and pallor
+    flow: anaemia
+    workup: [an_duration, an_exertional_breathless, an_pica, an_menorrhagia, an_abdo_pain, an_bowel_change]
+    differential: [iron_deficiency_anaemia, peptic_ulcer_disease, colorectal_cancer, coeliac_disease]
+
+  anorexia:
+    label: Loss of Appetite
+    chief_complaint_text: loss of appetite
+    flow: anorexia
+    workup: [ao_duration, ao_early_satiety, ao_meat_aversion, ao_nausea, ao_abdo_pain, ao_low_mood]
+    differential: [gastric_cancer, functional_dyspepsia, pancreatic_cancer, depression]

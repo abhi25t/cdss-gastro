@@ -1,0 +1,162 @@
+# Discriminating features used by the advisory differential, plus cross-cutting
+# findings from the shared general block (defined once, usable by every symptom).
+# DRAFT for physician review.
+conditions:
+  # ---- Cross-cutting (general block) ----
+  weight_loss: {expression: "gen_weight_loss == 'yes'", label: Unintentional weight loss}
+  melaena: {expression: "gen_black_stool == 'yes'", label: Melaena (black stools)}
+  haematemesis: {expression: "gen_haematemesis == 'yes'", label: Haematemesis (vomiting blood)}
+  fresh_rectal_blood: {expression: "gen_fresh_blood == 'yes'", label: Fresh rectal bleeding}
+  fever: {expression: "gen_fever == 'yes'", label: Fever}
+  alcohol_use: {expression: "gen_alcohol == 'yes'", label: Regular alcohol use}
+
+  # ---- Abdominal pain ----
+  ap_epigastric: {expression: "ap_site == 'epigastric'", label: Epigastric pain}
+  ap_ruq: {expression: "ap_site == 'ruq'", label: Right-upper-quadrant pain}
+  ap_rlq: {expression: "ap_site == 'rlq'", label: Right-lower-quadrant pain}
+  ap_periumbilical: {expression: "ap_site == 'periumbilical'", label: Periumbilical pain}
+  ap_diffuse: {expression: "ap_site == 'diffuse'", label: Diffuse pain}
+  ap_burning: {expression: "ap_character == 'burning'", label: Burning pain}
+  ap_cramping: {expression: "ap_character == 'cramping'", label: Cramping pain}
+  ap_radiates_back: {expression: "ap_radiation == 'back'", label: Radiation to the back}
+  ap_radiates_shoulder: {expression: "ap_radiation == 'right_shoulder'", label: Radiation to right shoulder}
+  ap_worse_eating: {expression: "ap_meals == 'worse_eating'", label: Worse after eating}
+  ap_better_eating: {expression: "ap_meals == 'better_eating'", label: Relieved by eating}
+  ap_night_pain: {expression: "ap_night == 'yes'", label: Night-time pain}
+
+  # ---- Heartburn ----
+  hb_rising_burning: {expression: "hb_rising == 'yes'", label: Rising retrosternal burning}
+  hb_acid_taste: {expression: "hb_taste == 'yes'", label: Acid/sour regurgitation}
+  hb_nocturnal: {expression: "hb_timing == 'at_night'", label: Night-time heartburn}
+  hb_postprandial: {expression: "hb_timing == 'after_meals'", label: Post-meal heartburn}
+  hb_ppi_response: {expression: "hb_meds_helped == 'yes'", label: Responds to acid suppression}
+
+  # ---- Dysphagia ----
+  dys_solids_only: {expression: "dys_consistency == 'solids'", label: Dysphagia to solids}
+  dys_solids_and_liquids: {expression: "dys_consistency == 'both'", label: Dysphagia to solids and liquids}
+  dys_progressive: {expression: "dys_progression == 'worsening'", label: Progressive dysphagia}
+  dys_intermittent: {expression: "dys_progression == 'intermittent'", label: Intermittent dysphagia}
+  dys_regurg_food: {expression: "dys_regurg == 'yes'", label: Regurgitation of undigested food}
+  dys_acid_reflux: {expression: "dys_reflux == 'yes'", label: Associated acid reflux}
+
+  # ---- Nausea / vomiting ----
+  nv_bile: {expression: "nv_vomit_content == 'bile'", label: Bilious vomiting}
+  nv_undigested: {expression: "nv_vomit_content == 'undigested_food'", label: Undigested-food vomiting}
+  nv_haematemesis: {expression: "nv_vomit_content == 'blood'", label: Vomiting blood}
+  nv_coffee_ground: {expression: "nv_vomit_content == 'coffee_ground'", label: Coffee-ground vomiting}
+  nv_soon_after_eating: {expression: "nv_timing == 'soon_after_eating'", label: Vomiting soon after eating}
+  nv_delayed: {expression: "nv_timing == 'hours_after_eating'", label: Delayed vomiting (hours after eating)}
+  nv_abd_pain: {expression: "nv_abd_pain == 'yes'", label: Associated abdominal pain}
+  nv_new_meds: {expression: "nv_new_meds == 'yes'", label: Recent new medication}
+  nv_travel_diet: {expression: "nv_travel_diet == 'yes'", label: Recent travel/diet change}
+
+  # ---- Dyspepsia ----
+  dy_empty_stomach: {expression: "dy_relation == 'empty_stomach'", label: Pain on empty stomach}
+  dy_after_meals: {expression: "dy_relation == 'after_meals'", label: Post-meal discomfort}
+  dy_during_meals: {expression: "dy_relation == 'during_meals'", label: Discomfort during meals}
+  dy_antacid_relief: {expression: "dy_antacid_relief == 'yes'", label: Relieved by antacids}
+  dy_stool_relief: {expression: "dy_stool_relief == 'yes'", label: Relieved by passing stool}
+  dy_bloating: {expression: "dy_bloating == 'yes'", label: Bloating / early satiety}
+
+  # ---- Belching ----
+  be_aerophagia: {expression: "be_fizzy_fast_stress == 'yes'", label: Aerophagia triggers}
+  be_food_trigger: {expression: "be_food_triggers == 'yes'", label: Food-triggered belching}
+  be_flatulence: {expression: "be_flatulence == 'yes'", label: Flatulence / borborygmi}
+  be_postprandial: {expression: "be_timing == 'after_meals'", label: Post-meal belching}
+
+  # ---- Diarrhoea ----
+  di_acute: {expression: "di_duration == 'lt_2w'", label: Acute diarrhoea (<2 weeks)}
+  di_chronic: {expression: "di_duration == 'gt_4w'", label: Chronic diarrhoea (>4 weeks)}
+  di_watery: {expression: "di_consistency == 'watery'", label: Watery stool}
+  di_blood: {expression: "di_blood == 'yes'", label: Blood in stool}
+  di_mucus: {expression: "di_mucus == 'yes'", label: Mucus in stool}
+  di_nocturnal: {expression: "di_nocturnal == 'yes'", label: Nocturnal diarrhoea}
+  di_relieved_defecation: {expression: "di_relieved_by_defecation == 'yes'", label: Cramps relieved by defecation}
+  di_travel: {expression: "di_recent_travel == 'yes'", label: Recent travel}
+  di_antibiotics: {expression: "di_recent_antibiotics == 'yes'", label: Recent antibiotics}
+
+  # ---- Constipation ----
+  co_low_frequency: {expression: "co_frequency == 'once_3plus_days'", label: Infrequent stools}
+  co_straining: {expression: "co_straining == 'yes'", label: Straining}
+  co_incomplete: {expression: "co_incomplete == 'yes'", label: Incomplete evacuation}
+  co_blood: {expression: "co_blood == 'yes'", label: Blood in stool}
+  co_recent_onset: {expression: "co_duration == 'lt_1m'", label: Recent-onset constipation}
+  co_no_daily_urge: {expression: "co_urge == 'no'", label: Absent daily call to stool}
+  co_hard_stool: {expression: "co_bristol == '1' or co_bristol == '2'", label: Hard/lumpy stool (Bristol 1–2)}
+
+  # ---- Jaundice ----
+  jy_pale_stool: {expression: "jy_pale_stool == 'yes'", label: Pale stools}
+  jy_itching: {expression: "jy_itching == 'yes'", label: Itching}
+  jy_pain: {expression: "jy_abd_pain == 'yes'", label: Painful jaundice}
+  jy_dark_urine: {expression: "jy_urine != 'normal'", label: Dark urine}
+  jy_liver_history: {expression: "jy_liver_history == 'yes'", label: History of liver disease/gallstones}
+  jy_exposure: {expression: "jy_risk_exposure == 'yes'", label: Parenteral exposure risk}
+  jy_drug: {expression: "jy_new_meds_herbal == 'yes'", label: New drug/herbal exposure}
+
+  # ---- Rectal bleeding ----
+  rb_bright_red: {expression: "rb_colour == 'bright_red'", label: Bright-red rectal bleeding}
+  rb_dark_blood: {expression: "rb_colour == 'dark'", label: Dark rectal blood}
+  rb_blood_mixed: {expression: "rb_colour == 'mixed_in_stool'", label: Blood mixed in stool}
+  rb_on_paper: {expression: "rb_relation == 'on_paper'", label: Blood only on wiping}
+  rb_dripping: {expression: "rb_relation == 'dripping'", label: Blood dripping into pan}
+  rb_painful: {expression: "rb_pain == 'yes'", label: Painful defecation}
+  rb_painless: {expression: "rb_pain == 'no'", label: Painless bleeding}
+  rb_lump: {expression: "rb_lump == 'yes'", label: Prolapsing perianal lump}
+  rb_bowel_change: {expression: "rb_bowel_change == 'yes'", label: Change in bowel habit}
+  rb_mucus: {expression: "rb_mucus == 'yes'", label: Mucus with blood}
+
+  # ---- Perianal ----
+  pa_pain: {expression: "pa_main == 'pain'", label: Perianal pain}
+  pa_lump: {expression: "pa_main == 'lump'", label: Perianal lump}
+  pa_pain_defecation: {expression: "pa_pain_defecation == 'yes'", label: Severe pain on defecation}
+  pa_swelling: {expression: "pa_swelling == 'yes'", label: Tender perianal swelling}
+  pa_discharge: {expression: "pa_discharge == 'yes'", label: Perianal discharge}
+  pa_bleeding: {expression: "pa_bleeding == 'yes'", label: Perianal bleeding}
+  pa_recurrent: {expression: "pa_recurrent == 'yes'", label: Recurrent perianal problem}
+
+  # ---- Faecal incontinence ----
+  fi_urgency: {expression: "fi_type == 'urgency'", label: Urge faecal incontinence}
+  fi_passive: {expression: "fi_type == 'passive_leak'", label: Passive faecal leakage}
+  fi_overflow: {expression: "fi_constipation_hx == 'yes'", label: Background constipation (overflow)}
+  fi_sphincter_injury: {expression: "fi_obstetric_surgical == 'yes'", label: Obstetric/anal sphincter injury}
+  fi_liquid: {expression: "fi_consistency == 'liquid'", label: Liquid-stool leakage}
+  fi_blood: {expression: "fi_blood == 'yes'", label: Blood with leakage}
+
+  # ---- Bloating ----
+  bl_postprandial: {expression: "bl_pattern == 'after_meals'", label: Post-meal bloating}
+  bl_progressive: {expression: "bl_pattern == 'progressive'", label: Progressive distension}
+  bl_relieved_flatus: {expression: "bl_relieved_flatus == 'yes'", label: Relieved by flatus}
+  bl_relieved_defecation: {expression: "bl_relieved_defecation == 'yes'", label: Relieved by defecation}
+  bl_bowel_change: {expression: "bl_bowel_change == 'yes'", label: Altered bowel habit}
+  bl_distension: {expression: "bl_visible_distension == 'yes'", label: Visible distension}
+  bl_food_related: {expression: "bl_food_relation == 'yes'", label: Wheat/dairy-related bloating}
+
+  # ---- Ascites ----
+  as_gradual: {expression: "as_onset == 'gradual'", label: Gradual-onset swelling}
+  as_rapid: {expression: "as_onset == 'rapid'", label: Rapid-onset swelling}
+  as_leg_swelling: {expression: "as_leg_swelling == 'yes'", label: Peripheral oedema}
+  as_breathless: {expression: "as_breathlessness == 'yes'", label: Breathlessness}
+  as_liver_history: {expression: "as_liver_history == 'yes'", label: History of liver disease}
+  as_known_cancer: {expression: "as_known_cancer == 'yes'", label: Known malignancy}
+
+  # ---- Weight loss ----
+  wl_increased_appetite: {expression: "wl_appetite == 'increased'", label: Increased appetite}
+  wl_decreased_appetite: {expression: "wl_appetite == 'decreased'", label: Reduced appetite}
+  wl_heat_intolerance: {expression: "wl_heat_intolerance == 'yes'", label: Heat intolerance/tremor}
+  wl_thirst: {expression: "wl_thirst_polyuria == 'yes'", label: Thirst and polyuria}
+  wl_bowel_change: {expression: "wl_bowel_change == 'yes'", label: Altered bowel habit}
+  wl_chronic_cough: {expression: "wl_chronic_cough == 'yes'", label: Chronic cough/night sweats}
+  wl_lump: {expression: "wl_lump == 'yes'", label: Palpable lump}
+
+  # ---- Anaemia ----
+  an_pica: {expression: "an_pica == 'yes'", label: Pica}
+  an_menorrhagia: {expression: "an_menorrhagia == 'yes'", label: Heavy menstrual bleeding}
+  an_abdo_pain: {expression: "an_abdo_pain == 'yes'", label: Associated dyspepsia/abdominal pain}
+  an_bowel_change: {expression: "an_bowel_change == 'yes'", label: Altered bowel habit}
+
+  # ---- Anorexia ----
+  ao_early_satiety: {expression: "ao_early_satiety == 'yes'", label: Early satiety}
+  ao_meat_aversion: {expression: "ao_meat_aversion == 'yes'", label: Aversion to meat}
+  ao_nausea: {expression: "ao_nausea == 'yes'", label: Nausea}
+  ao_abdo_pain: {expression: "ao_abdo_pain == 'yes'", label: Associated abdominal pain}
+  ao_low_mood: {expression: "ao_low_mood == 'yes'", label: Low mood/anhedonia}

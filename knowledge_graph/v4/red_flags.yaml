@@ -1,0 +1,36 @@
+# Cross-cutting urgency alerts (shown as a non-reordering safety badge on the queue).
+# Driven by the shared general block + symptom alarms. DRAFT for review.
+red_flags:
+  - id: gi_haemorrhage_haematemesis
+    urgency: immediate
+    when: [haematemesis]
+  - id: gi_haemorrhage_melaena
+    urgency: immediate
+    when: [melaena]
+  - id: rectal_bleeding
+    urgency: urgent
+    when: [fresh_rectal_blood]
+  - id: unexplained_weight_loss
+    urgency: urgent
+    when: [weight_loss]
+  - id: progressive_dysphagia
+    urgency: urgent
+    when: [dys_progressive]
+  - id: haematemesis_in_vomit
+    urgency: immediate
+    when: [nv_haematemesis]
+  - id: coffee_ground_vomiting
+    urgency: immediate
+    when: [nv_coffee_ground]
+  - id: bloody_diarrhoea
+    urgency: urgent
+    when: [di_blood]
+  - id: altered_bowel_habit_with_bleeding
+    urgency: urgent
+    when: [rb_bowel_change]
+  - id: perianal_sepsis
+    urgency: urgent
+    when: [pa_swelling]
+  - id: new_onset_ascites
+    urgency: urgent
+    when: [as_rapid]

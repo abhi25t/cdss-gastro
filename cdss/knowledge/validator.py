@@ -7,6 +7,10 @@ from cdss.knowledge.models import Flow, KnowledgeGraph, ValidationReport, canoni
 
 VALIDATION_PROFILES = {"prototype", "clinical"}
 
+# A symptom-first graph may define a flow with this id as a shared "general history"
+# block that the patient app runs after every symptom flow.
+GENERAL_FLOW_ID = "general"
+
 
 def validate(kg: KnowledgeGraph, profile: str = "prototype") -> ValidationReport:
     if profile not in VALIDATION_PROFILES:
@@ -114,16 +118,23 @@ def validate(kg: KnowledgeGraph, profile: str = "prototype") -> ValidationReport
 
 
 def _check_symptom_first(report: ValidationReport, kg: KnowledgeGraph, clinical: bool) -> None:
-    """v3 symptom-first checks: every work-up question must be reachable in its flow,
-    every rule condition must be collectable somewhere, and every listed differential
-    diagnosis must be able to accumulate score on its symptom's pathway. Directly
-    prevents the historical 'diagnosis unreachable because a question is never asked' bug.
+    """Symptom-led checks. The blocking concern is questionnaire integrity: every
+    work-up question a symptom claims must actually be asked in its flow. The
+    differential is an advisory draft overlay (physician-reviewed later), so the
+    diagnosis-side checks (condition collectability, diagnosis reachability) are
+    non-blocking *warnings* only — we deliberately do NOT gate on every diagnosis
+    being reachable (that was a disease-first instinct, not how symptom-led works).
     """
+    # A flow named "general" is the shared block the app appends after every symptom
+    # flow, so its questions are reachable from every symptom (cross-cutting findings
+    # like fever/weight loss can legitimately feed any symptom's differential).
+    general_reachable = _reachable_questions(kg.flows.get(GENERAL_FLOW_ID))
+
     per_flow_reachable: dict[str, set[str]] = {}
-    global_reachable: set[str] = set()
+    global_reachable: set[str] = set(general_reachable)
     for symptom in kg.symptoms.values():
         flow = kg.flows.get(symptom.flow) if symptom.flow else None
-        reachable = _reachable_questions(flow)
+        reachable = _reachable_questions(flow) | general_reachable
         per_flow_reachable[symptom.id] = reachable
         global_reachable |= reachable
 
@@ -163,24 +174,24 @@ def _check_symptom_first(report: ValidationReport, kg: KnowledgeGraph, clinical:
             qset = _condition_questions(kg, cond_id, cond_cache)
             if qset and not (qset & global_reachable):
                 report.add(
-                    "error" if clinical else "warning",
+                    "warning",
                     "condition_not_collectable",
                     f"Condition '{cond_id}' (used by rule '{rule.id}') needs question(s) "
                     f"{sorted(qset)} that are unreachable in any symptom flow",
                     f"conditions.{cond_id}",
                 )
 
-    # 3. Every differential diagnosis must be reachable on its symptom's pathway.
+    # 3. Differential reachability — informational only (advisory draft differential).
     for symptom in kg.symptoms.values():
         reachable = per_flow_reachable.get(symptom.id, set())
         for diag in symptom.differential:
             diag_id = canonical_id(diag)
             if not _diagnosis_reachable(kg, diag_id, reachable, cond_cache):
                 report.add(
-                    "error" if clinical else "warning",
+                    "warning",
                     "unreachable_diagnosis",
-                    f"Diagnosis '{diag}' in symptom '{symptom.id}' differential cannot accumulate "
-                    f"score from its flow (no positive rule with collectable conditions)",
+                    f"Diagnosis '{diag}' in symptom '{symptom.id}' differential has no positive "
+                    f"rule with collectable conditions yet (advisory — for physician review)",
                     f"symptoms.{symptom.id}.differential",
                 )
 

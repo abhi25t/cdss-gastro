@@ -6,7 +6,9 @@ from typing import Any
 
 from cdss.knowledge import KnowledgeGraph, validate
 from cdss.knowledge.models import DiagnosisResult, ValidationReport
+from cdss.knowledge.models import canonical_id
 from cdss.recommendations import InvestigationEngine, SummaryEngine, TreatmentEngine
+from cdss.recommendations.summary_engine import resolve_symptoms
 from cdss.rules import ConditionEngine, RedFlagEngine, ScoringEngine
 
 
@@ -22,6 +24,9 @@ class CDSSPipelineResult:
     # v3 symptom-first additions; None for older versions so the v1 contract is unchanged.
     symptom_summary: dict[str, Any] | None = None
     draft_hpi: str | None = None
+    # v4 multi-symptom: one structured summary per active chief complaint (symptom_summary
+    # stays = the first, for back-compat). None/empty for older versions.
+    symptom_summaries: list[dict[str, Any]] | None = None
 
     @property
     def true_conditions(self) -> list[str]:
@@ -45,6 +50,8 @@ class CDSSPipelineResult:
         }
         if self.symptom_summary is not None:
             data["symptom_summary"] = self.symptom_summary
+        if self.symptom_summaries:
+            data["symptom_summaries"] = self.symptom_summaries
         if self.draft_hpi is not None:
             data["draft_hpi"] = self.draft_hpi
         return data
@@ -76,10 +83,23 @@ class CDSSPipeline:
     def run(self, answers: dict[str, Any]) -> CDSSPipelineResult:
         conditions = self.condition_engine.evaluate(answers)
         red_flags = self.red_flag_engine.detect(conditions)
-        diagnoses = self.scoring_engine.score(conditions)
+        # In the symptom-first model, restrict the differential to the active chief
+        # complaint(s)' candidate diagnoses so cross-cutting findings don't leak in
+        # diagnoses from other symptoms. With multiple complaints the scope is the UNION
+        # of their differentials; the scorer aggregates by diagnosis, so a diagnosis shared
+        # by two complaints appears once with the evidence from both merged.
+        allowed: set[str] | None = None
+        if self.kg.is_symptom_first:
+            symptoms = resolve_symptoms(self.kg, answers)
+            if symptoms:
+                allowed = set()
+                for symptom in symptoms:
+                    allowed |= {canonical_id(d) for d in symptom.differential}
+        diagnoses = self.scoring_engine.score(conditions, allowed_diagnoses=allowed)
         investigations = self.investigation_engine.recommend(diagnoses)
         treatments = self.treatment_engine.recommend(diagnoses)
-        symptom_summary, draft_hpi = self.summary_engine.summarize(answers)
+        symptom_summaries, draft_hpi = self.summary_engine.summarize_all(answers)
+        symptom_summary = symptom_summaries[0] if symptom_summaries else None
 
         return CDSSPipelineResult(
             version=self.kg.version,
@@ -90,5 +110,6 @@ class CDSSPipeline:
             investigations=investigations,
             treatments=treatments,
             symptom_summary=symptom_summary,
+            symptom_summaries=symptom_summaries or None,
             draft_hpi=draft_hpi,
         )

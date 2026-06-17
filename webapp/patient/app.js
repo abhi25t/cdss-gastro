@@ -32,6 +32,7 @@
     answers: {},          // { question_id: value }  (yes_no -> "yes"/"no")
     current: null,        // current question id
     history: [],          // visited question ids, for the Back button
+    symptomFlows: [],     // ordered chief-complaint flows still to walk (multi-symptom)
   };
 
   // ---- Flow engine (mirrors cdss/questionnaire/flow_engine.py) ------------
@@ -40,19 +41,68 @@
     return String(answer).trim().toLowerCase();
   }
 
+  // v4 asks symptom-specific questions first, then ONE shared general block. When a
+  // symptom flow ends, chain into this flow (asked once). Absent for v1/v3 → no-op.
+  const GENERAL_FLOW = "general";
+  const generalQuestionIds = flowQuestionIds(KG.flows[GENERAL_FLOW]);
+
+  function flowQuestionIds(flow) {
+    const ids = new Set();
+    if (!flow) return ids;
+    if (flow.start) ids.add(flow.start);
+    for (const [source, branches] of Object.entries(flow.transitions)) {
+      ids.add(source);
+      for (const target of Object.values(branches)) if (target) ids.add(target);
+    }
+    return ids;
+  }
+
+  // Order selected chief complaints by their position in the q_main_complaint options
+  // (deterministic), keeping only those that route to a flow.
+  function orderComplaints(chosen) {
+    const opts = ((KG.questions[KG.entry_question] || {}).options || []).map((o) => o.value);
+    const want = new Set(chosen.map((c) => String(c).trim().toLowerCase()));
+    const ordered = opts.filter((v) => want.has(v) && KG.flows[v]);
+    chosen.forEach((c) => {
+      const v = String(c).trim().toLowerCase();
+      if (KG.flows[v] && !ordered.includes(v)) ordered.push(v);
+    });
+    return ordered;
+  }
+
   function nextQuestion(questionId, answer) {
     const key = answerKey(answer);
-
-    // q_main_complaint routes to a flow's start question by its answer value.
-    if (questionId === KG.entry_question && KG.flows[key]) {
-      return KG.flows[key].start;
-    }
     for (const flow of Object.values(KG.flows)) {
       const branches = flow.transitions[questionId];
       if (!branches) continue;
-      return branches[key] ?? branches["default"] ?? null;
+      const next = branches[key] ?? branches["default"] ?? null;
+      if (next) return next;
+      break;
+    }
+    return afterSymptomFlow(questionId);
+  }
+
+  // End of a symptom flow → the next selected complaint, else the shared general block.
+  function afterSymptomFlow(questionId) {
+    const owning = owningSymptomFlow(questionId);
+    if (owning >= 0) {
+      for (let i = owning + 1; i < state.symptomFlows.length; i++) {
+        const flow = KG.flows[state.symptomFlows[i]];
+        if (flow && flow.start) return flow.start;
+      }
+    }
+    if (KG.flows[GENERAL_FLOW] && !generalQuestionIds.has(questionId)) {
+      return KG.flows[GENERAL_FLOW].start;
     }
     return null;
+  }
+
+  function owningSymptomFlow(questionId) {
+    for (let i = 0; i < state.symptomFlows.length; i++) {
+      const flow = KG.flows[state.symptomFlows[i]];
+      if (flow && flowQuestionIds(flow).has(questionId)) return i;
+    }
+    return -1;
   }
 
   function totalAnswered() {
@@ -65,8 +115,9 @@
   }
 
   function progressBar() {
-    // Rough progress: answered so far vs a typical path length.
-    const approxPathLength = 5;
+    // Rough progress: answered so far vs a typical path length (symptom block + the
+    // shared general block, which dominates the v4 path).
+    const approxPathLength = Math.max(6, generalQuestionIds.size + 6);
     const pct = Math.min(95, Math.round((totalAnswered() / approxPathLength) * 100));
     return `<div class="progress"><div class="progress__bar" style="width:${pct}%"></div></div>`;
   }
@@ -172,15 +223,48 @@
     const q = KG.questions[qid];
     if (!q) return renderReview();
 
-    let optionsHtml;
+    // Tap-to-advance types answer on click; entry types (number/text/multi_choice)
+    // collect input and need a Continue button.
+    let bodyHtml;
+    let instant = false;
     if (q.type === "yes_no") {
-      optionsHtml = `
+      instant = true;
+      bodyHtml = `
         <div class="yesno-row">
           <button class="btn btn--yesno" data-value="no">No</button>
           <button class="btn btn--yesno" data-value="yes">Yes</button>
         </div>`;
+    } else if (q.type === "number") {
+      bodyHtml = `
+        <div class="field">
+          <input class="input" id="inputField" type="number" inputmode="numeric"
+                 min="0" step="1" placeholder="Enter a number" />
+        </div>`;
+    } else if (q.type === "text") {
+      bodyHtml = `
+        <div class="field">
+          <textarea class="input" id="inputField" rows="3" placeholder="Type your answer"></textarea>
+        </div>`;
+    } else if (q.type === "multi_choice") {
+      bodyHtml =
+        `<p class="subtle hint">Choose all that apply.</p><div class="options">` +
+        q.options.map((o) =>
+          `<button type="button" class="btn btn--multi" data-value="${escapeAttr(o.value)}">${escapeHtml(o.label)}</button>`
+        ).join("") +
+        `</div>`;
+    } else if (q.type === "region_select") {
+      bodyHtml =
+        `<p class="subtle hint">Tap the area(s) where you feel it. Tap again to unselect.</p>` +
+        `<div class="region-picker" id="regionPicker">Loading diagram…</div>` +
+        `<p class="subtle" id="regionSel">Tap the area(s) above.</p>`;
+    } else if (q.type === "bristol_select") {
+      bodyHtml =
+        `<p class="subtle hint">Pick the 1–2 types that look most like yours.</p>` +
+        `<div class="bristol-list" id="bristolList"></div>`;
     } else {
-      optionsHtml = `<div class="options">` +
+      // single_choice (and any other choice type)
+      instant = true;
+      bodyHtml = `<div class="options">` +
         q.options.map((o) =>
           `<button class="btn" data-value="${escapeAttr(o.value)}">${escapeHtml(o.label)}</button>`
         ).join("") +
@@ -192,20 +276,226 @@
       <div class="card">
         <p class="eyebrow">Question ${totalAnswered() + 1}</p>
         <p class="question-text">${escapeHtml(q.text)}</p>
-        ${optionsHtml}
+        ${bodyHtml}
+        <p class="err" id="qErr"></p>
       </div>
       <div class="footer-actions">
+        ${instant ? "" : `<button class="btn btn--primary" id="continueBtn">Continue</button>`}
         ${state.history.length ? `<button class="btn--ghost" id="backBtn">← Back</button>` : ""}
       </div>
       <div class="spacer"></div>
       ${footer()}
     `);
 
-    appEl.querySelectorAll("[data-value]").forEach((btn) => {
-      btn.addEventListener("click", () => answer(qid, btn.getAttribute("data-value")));
-    });
+    if (instant) {
+      appEl.querySelectorAll("[data-value]").forEach((btn) => {
+        btn.addEventListener("click", () => answer(qid, btn.getAttribute("data-value")));
+      });
+    } else if (q.type === "multi_choice") {
+      wireMultiChoice(qid);
+    } else if (q.type === "region_select") {
+      wireRegion(qid, q);
+    } else if (q.type === "bristol_select") {
+      wireBristol(qid, q);
+    } else {
+      wireEntry(qid, q);
+    }
     const backBtn = document.getElementById("backBtn");
     if (backBtn) backBtn.addEventListener("click", goBack);
+  }
+
+  // Multi-select: toggle pills, with "None" being mutually exclusive with the rest.
+  function wireMultiChoice(qid) {
+    const pills = Array.from(appEl.querySelectorAll(".btn--multi"));
+    const selected = new Set();
+    pills.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const val = btn.getAttribute("data-value");
+        const nowOn = btn.classList.toggle("btn--selected");
+        if (!nowOn) { selected.delete(val); return; }
+        selected.add(val);
+        if (val === "none") {
+          pills.forEach((other) => {
+            if (other !== btn) { other.classList.remove("btn--selected"); selected.delete(other.getAttribute("data-value")); }
+          });
+        } else {
+          const none = pills.find((p) => p.getAttribute("data-value") === "none");
+          if (none) { none.classList.remove("btn--selected"); selected.delete("none"); }
+        }
+      });
+    });
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      if (selected.size === 0) {
+        document.getElementById("qErr").textContent = "Please choose at least one option.";
+        return;
+      }
+      answer(qid, Array.from(selected));
+    });
+  }
+
+  // Region selector: load the abdomen diagram and let the patient tap one or more
+  // regions ("All over" is exclusive). Each region maps to a clinical site value.
+  function wireRegion(qid, q) {
+    const host = document.getElementById("regionPicker");
+    const selLine = document.getElementById("regionSel");
+    const valueByRegion = {};
+    const labelByValue = {};
+    q.options.forEach((o) => {
+      if (o.region) valueByRegion[o.region] = o.value;
+      labelByValue[o.value] = o.label;
+    });
+    const selected = new Set();
+    const ENTIRE = "diffuse";
+
+    function refresh() {
+      selLine.textContent = selected.size
+        ? "Selected: " + Array.from(selected).map((v) => labelByValue[v] || v).join(", ")
+        : "Tap the area(s) above.";
+    }
+
+    function pick(value, on, syncEl) {
+      if (on) {
+        selected.add(value);
+        if (value === ENTIRE) {
+          // "All over" clears the individual regions.
+          Array.from(selected).forEach((v) => { if (v !== ENTIRE) selected.delete(v); });
+        } else {
+          selected.delete(ENTIRE);
+        }
+      } else {
+        selected.delete(value);
+      }
+      if (syncEl) syncEl();
+      refresh();
+    }
+
+    fetch("abdominopelvic_regions.svg")
+      .then((r) => { if (!r.ok) throw new Error("svg"); return r.text(); })
+      .then((svg) => {
+        host.innerHTML = svg;
+        const svgEl = host.querySelector("svg");
+        if (svgEl) { svgEl.removeAttribute("width"); svgEl.removeAttribute("height"); svgEl.classList.add("region-svg"); }
+        const cells = Array.from(host.querySelectorAll("[data-region]"));
+        const sync = () => cells.forEach((c) => {
+          const v = valueByRegion[c.getAttribute("data-region")];
+          c.classList.toggle("selected", !!v && selected.has(v));
+        });
+        cells.forEach((cell) => {
+          const value = valueByRegion[cell.getAttribute("data-region")];
+          if (!value) return;
+          const toggle = () => pick(value, !selected.has(value), sync);
+          cell.addEventListener("click", toggle);
+          cell.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+          });
+        });
+        sync();
+      })
+      .catch(() => {
+        // Fallback if the diagram can't load: plain region pills.
+        host.innerHTML =
+          `<div class="options">` +
+          q.options.map((o) =>
+            `<button type="button" class="btn btn--multi" data-value="${escapeAttr(o.value)}">${escapeHtml(o.label)}</button>`
+          ).join("") + `</div>`;
+        const pills = Array.from(host.querySelectorAll(".btn--multi"));
+        const sync = () => pills.forEach((b) => b.classList.toggle("btn--selected", selected.has(b.getAttribute("data-value"))));
+        pills.forEach((b) => {
+          const value = b.getAttribute("data-value");
+          b.addEventListener("click", () => pick(value, !selected.has(value), sync));
+        });
+        sync();
+      });
+
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      if (selected.size === 0) {
+        document.getElementById("qErr").textContent = "Please tap at least one area.";
+        return;
+      }
+      answer(qid, Array.from(selected));
+    });
+  }
+
+  // Bristol stool chart: pick up to 2 types. Art ported from bristol-stool-chart.html.
+  const BRISTOL_ART = {
+    "1": `<circle cx="20" cy="23" r="7" fill="#6B4423"/><circle cx="40" cy="18" r="6.5" fill="#7A4F28"/><circle cx="58" cy="26" r="7" fill="#6B4423"/><circle cx="76" cy="20" r="6" fill="#7A4F28"/><circle cx="48" cy="33" r="5.5" fill="#8B5A2B"/>`,
+    "2": `<path d="M8 23 Q14 12 22 22 Q30 12 40 22 Q50 12 60 22 Q70 12 84 22 Q90 30 80 33 Q60 38 40 35 Q18 34 8 28 Z" fill="#7A4F28"/>`,
+    "3": `<rect x="8" y="16" width="80" height="16" rx="8" fill="#7A4F28"/><path d="M24 16 L26 32 M44 16 L42 32 M62 16 L64 32 M76 16 L74 32" stroke="#6B4423" stroke-width="1.5"/>`,
+    "4": `<path d="M8 26 Q26 12 48 24 Q70 36 88 22" stroke="#8B5A2B" stroke-width="13" fill="none" stroke-linecap="round"/>`,
+    "5": `<ellipse cx="24" cy="24" rx="13" ry="10" fill="#8B5A2B"/><ellipse cx="52" cy="22" rx="11" ry="9" fill="#A0703D"/><ellipse cx="76" cy="26" rx="10" ry="8" fill="#8B5A2B"/>`,
+    "6": `<path d="M10 24 Q12 14 22 18 Q26 10 36 16 Q44 9 52 17 Q62 11 70 18 Q82 14 84 24 Q88 32 78 34 Q66 40 54 35 Q42 41 30 35 Q16 36 10 28 Z" fill="#A0703D"/>`,
+    "7": `<path d="M14 26 Q10 18 20 20 Q24 12 34 20 Q46 14 56 22 Q70 18 78 26 Q90 28 82 33 Q60 39 40 35 Q20 36 14 30 Z" fill="#B8843E"/><circle cx="26" cy="38" r="2.5" fill="#B8843E"/><circle cx="68" cy="39" r="2" fill="#B8843E"/>`,
+  };
+
+  function wireBristol(qid, q) {
+    const list = document.getElementById("bristolList");
+    const selected = [];
+    const MAX = 2;
+    q.options.forEach((o) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "bristol-row";
+      row.setAttribute("data-value", o.value);
+      row.innerHTML =
+        `<span class="bristol-num">${escapeHtml(o.value)}</span>` +
+        `<svg class="bristol-art" viewBox="0 0 96 46" aria-hidden="true">${BRISTOL_ART[o.value] || ""}</svg>` +
+        `<span class="bristol-desc">${escapeHtml(o.label)}</span>`;
+      row.addEventListener("click", () => {
+        const i = selected.indexOf(o.value);
+        if (i >= 0) {
+          selected.splice(i, 1);
+          row.classList.remove("selected");
+        } else {
+          if (selected.length >= MAX) {
+            document.getElementById("qErr").textContent = "You can choose up to 2 types.";
+            return;
+          }
+          selected.push(o.value);
+          row.classList.add("selected");
+        }
+        document.getElementById("qErr").textContent = "";
+      });
+      list.appendChild(row);
+    });
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      if (selected.length === 0) {
+        document.getElementById("qErr").textContent = "Please choose at least one type.";
+        return;
+      }
+      answer(qid, selected.slice());
+    });
+  }
+
+  // Number / free-text entry.
+  function wireEntry(qid, q) {
+    const field = document.getElementById("inputField");
+    field.focus();
+    field.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && q.type === "number") {
+        e.preventDefault();
+        document.getElementById("continueBtn").click();
+      }
+    });
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      const err = document.getElementById("qErr");
+      const raw = field.value.trim();
+      if (q.type === "number") {
+        const n = Number(raw);
+        if (raw === "" || !Number.isFinite(n) || n < 0) {
+          err.textContent = "Please enter a valid number.";
+          field.focus();
+          return;
+        }
+        answer(qid, n);
+      } else {
+        if (raw === "") {
+          err.textContent = "Please type an answer.";
+          field.focus();
+          return;
+        }
+        answer(qid, raw);
+      }
+    });
   }
 
   function renderReview() {
@@ -263,8 +553,16 @@
   function answer(qid, value) {
     state.answers[qid] = value;
     state.history.push(qid);
-    const next = nextQuestion(qid, value);
-    goTo(next);
+    // The entry question (q_main_complaint) may select several chief complaints; build
+    // the ordered queue of symptom flows and jump to the first one's start.
+    if (qid === KG.entry_question) {
+      const chosen = orderComplaints(Array.isArray(value) ? value : [value]);
+      if (chosen.length) {
+        state.symptomFlows = chosen;
+        return goTo(KG.flows[chosen[0]].start);
+      }
+    }
+    goTo(nextQuestion(qid, value));
   }
 
   function goBack() {
@@ -366,7 +664,14 @@
   function labelFor(qid, value) {
     const q = KG.questions[qid];
     if (q && q.type === "yes_no") return value === "yes" ? "Yes" : "No";
-    if (q && q.options) {
+    if (Array.isArray(value)) {
+      return value.map((v) => optionLabel(q, v)).join(", ") || "—";
+    }
+    return optionLabel(q, value);
+  }
+
+  function optionLabel(q, value) {
+    if (q && q.options && q.options.length) {
       const opt = q.options.find((o) => o.value === value);
       if (opt) return opt.label;
     }

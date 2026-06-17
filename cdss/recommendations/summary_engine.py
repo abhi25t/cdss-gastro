@@ -32,17 +32,66 @@ ASSOCIATED_SLOT = "Associated symptoms"
 NEGATIVES_SLOT = "Pertinent negatives"
 
 
+def resolve_symptoms(kg: KnowledgeGraph, answers: dict[str, Any]) -> list[Symptom]:
+    """The chief complaint(s) the patient is presenting with. q_main_complaint may be a
+    single value or a list (multi-symptom intake); each value is matched to a symptom by
+    id or flow, in knowledge-graph order for determinism. Falls back to any symptom whose
+    work-up was answered. Shared by the summary engine and the differential scorer so both
+    agree on which symptoms are active."""
+    entry = "q_main_complaint" if "q_main_complaint" in kg.questions else None
+    raw = answers.get(entry) if entry else None
+    values = raw if isinstance(raw, (list, tuple)) else ([raw] if raw is not None else [])
+    wanted = [_norm(v) for v in values]
+
+    found: list[Symptom] = []
+    for value in wanted:
+        for symptom in kg.symptoms.values():
+            if (symptom.id == value or symptom.flow == value) and symptom not in found:
+                found.append(symptom)
+    if found:
+        return found
+
+    for symptom in kg.symptoms.values():
+        if any(qid in answers for qid in symptom.workup):
+            return [symptom]
+    return []
+
+
+def resolve_symptom(kg: KnowledgeGraph, answers: dict[str, Any]) -> Symptom | None:
+    """The first/primary active chief complaint (back-compat single-symptom helper)."""
+    symptoms = resolve_symptoms(kg, answers)
+    return symptoms[0] if symptoms else None
+
+
 class SummaryEngine:
     def __init__(self, kg: KnowledgeGraph) -> None:
         self.kg = kg
 
     def summarize(self, answers: dict[str, Any]) -> tuple[dict[str, Any] | None, str | None]:
+        """Primary chief complaint's structured summary + HPI (back-compat)."""
         if not self.kg.is_symptom_first:
             return None, None
-        symptom = self._active_symptom(answers)
+        symptom = resolve_symptom(self.kg, answers)
         if symptom is None:
             return None, None
+        return self._summarize_one(symptom, answers)
 
+    def summarize_all(self, answers: dict[str, Any]) -> tuple[list[dict[str, Any]], str | None]:
+        """All active chief complaints: one structured summary per complaint and a
+        combined HPI with one paragraph per complaint (multi-symptom intake)."""
+        if not self.kg.is_symptom_first:
+            return [], None
+        summaries: list[dict[str, Any]] = []
+        paragraphs: list[str] = []
+        for symptom in resolve_symptoms(self.kg, answers):
+            summary, hpi = self._summarize_one(symptom, answers)
+            if summary:
+                summaries.append(summary)
+            if hpi:
+                paragraphs.append(hpi)
+        return summaries, ("\n\n".join(paragraphs) if paragraphs else None)
+
+    def _summarize_one(self, symptom: Symptom, answers: dict[str, Any]) -> tuple[dict[str, Any] | None, str | None]:
         slot_findings: dict[str, str] = {}
         associated: list[str] = []
         negatives: list[str] = []
@@ -66,19 +115,6 @@ class SummaryEngine:
 
     # ------------------------------------------------------------------
 
-    def _active_symptom(self, answers: dict[str, Any]) -> Symptom | None:
-        entry = "q_main_complaint" if "q_main_complaint" in self.kg.questions else None
-        value = _norm(answers.get(entry)) if entry else None
-        if value:
-            for symptom in self.kg.symptoms.values():
-                if symptom.id == value or symptom.flow == value:
-                    return symptom
-        # Fallback: the only symptom whose work-up questions were actually answered.
-        for symptom in self.kg.symptoms.values():
-            if any(qid in answers for qid in symptom.workup):
-                return symptom
-        return None
-
     def _consume(
         self,
         question: Question,
@@ -101,11 +137,28 @@ class SummaryEngine:
                 negatives.append(f"no {finding}")
             return
 
-        # single_choice (and any other choice type): resolve the option's display text.
+        if question.type in ("multi_choice", "region_select", "bristol_select"):
+            # A list of selected option values; "none" (and empties) are dropped.
+            values = value if isinstance(value, list) else [value]
+            chosen = [self._option_text(question, _norm(item)) for item in values
+                      if _norm(item) not in (None, "", "none")]
+            chosen = [text for text in chosen if text]
+            if not chosen:
+                return
+            display = _join(chosen)
+            slot_label = slot.title() if slot else _fallback_slot(raw, question)
+            slot_findings[slot_label] = display
+            template = raw.get("summary_template")
+            fragment = template.format(answer=display) if template else f"with {display}"
+            order = SEMIOLOGY_ORDER.index(slot) if slot in SEMIOLOGY_ORDER else len(SEMIOLOGY_ORDER)
+            hpi_fragments.append((order, fragment))
+            return
+
+        # single_choice / number (and any other scalar type): resolve the display text.
         display = self._option_text(question, value)
         if not display:
             return
-        slot_label = slot.title() if slot else (question.group or "Finding").replace("_", " ").title()
+        slot_label = slot.title() if slot else _fallback_slot(raw, question)
         slot_findings[slot_label] = display
 
         template = raw.get("summary_template")
@@ -137,6 +190,13 @@ class SummaryEngine:
             denied = _join([neg[3:] if neg.startswith("no ") else neg for neg in negatives])
             sentence = f"{sentence} Denies {denied}."
         return sentence
+
+
+def _fallback_slot(raw: dict[str, Any], question: Question) -> str:
+    """Slot label for findings without a semiology slot: the `finding` phrase, else
+    the question group, else a generic label."""
+    label = str(raw.get("finding") or question.group or "Finding")
+    return label.replace("_", " ").title()
 
 
 def _ordered_slots(slot_findings: dict[str, str]) -> list[tuple[str, str]]:

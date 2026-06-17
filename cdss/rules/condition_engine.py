@@ -29,6 +29,10 @@ def _normalize_answer(value: Any) -> Any:
         return lowered
     if isinstance(value, bool):
         return "yes" if value else "no"
+    if isinstance(value, (list, tuple)):
+        # Multi-select answers (multi_choice / region_select / bristol_select) stay a
+        # list; normalize each element so membership comparisons match condition values.
+        return [_normalize_answer(item) for item in value]
     return value
 
 
@@ -53,9 +57,9 @@ def _eval_node(node: ast.AST, context: dict[str, Any]) -> Any:
         left = _eval_node(node.left, context)
         for op, comparator in zip(node.ops, node.comparators):
             right = _eval_node(comparator, context)
-            if isinstance(op, ast.Eq) and not left == right:
+            if isinstance(op, ast.Eq) and not _eq(left, right):
                 return False
-            if isinstance(op, ast.NotEq) and not left != right:
+            if isinstance(op, ast.NotEq) and _eq(left, right):
                 return False
             if not isinstance(op, (ast.Eq, ast.NotEq)):
                 return False
@@ -66,3 +70,13 @@ def _eval_node(node: ast.AST, context: dict[str, Any]) -> Any:
     if isinstance(node, ast.Constant):
         return node.value
     return False
+
+
+def _eq(left: Any, right: Any) -> bool:
+    """Equality that treats `list == scalar` (and vice-versa) as membership, so a
+    multi-select answer satisfies `field == 'value'` when that value was chosen."""
+    if isinstance(left, (list, tuple, set)) and not isinstance(right, (list, tuple, set)):
+        return right in left
+    if isinstance(right, (list, tuple, set)) and not isinstance(left, (list, tuple, set)):
+        return left in right
+    return left == right

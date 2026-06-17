@@ -4,6 +4,7 @@ from typing import Any
 
 from cdss.api.registry import PipelineRegistry, UnknownVersionError
 from cdss.dashboard import summary
+from cdss.recommendations.summary_engine import resolve_symptoms
 
 # How urgent each red-flag level is. Higher = called first. Unknown urgencies
 # fall in the middle so a misconfigured flag is never silently ignored. Doctors
@@ -115,11 +116,12 @@ def assess_detail(sub: dict[str, Any], registry: PipelineRegistry) -> dict[str, 
             "error": f"Unknown knowledge graph version '{version}'",
             "chief_complaint": "—", "main_symptom": "—", "draft_hpi": "",
             "answers": answers, "answers_summary": [], "symptom_summary": None,
-            "red_flags": [], "differential": [],
-            "suggested_tests": [], "suggested_medications": [], "true_conditions": [],
+            "symptom_summaries": [], "red_flags": [], "differential": [],
+            "suggested_tests": [], "suggested_medications": [],
+            "tests_by_diagnosis": {}, "medications_by_diagnosis": {}, "true_conditions": [],
         }
 
-    diagnoses = result["diagnoses"]
+    diagnoses = _tag_with_complaints(result["diagnoses"], kg, answers)
     return {
         **base,
         "chief_complaint": summary.chief_complaint(kg, answers, result),
@@ -128,12 +130,45 @@ def assess_detail(sub: dict[str, Any], registry: PipelineRegistry) -> dict[str, 
         "answers": answers,
         "answers_summary": summary.humanize_answers(kg, answers),
         "symptom_summary": result.get("symptom_summary"),
+        "symptom_summaries": result.get("symptom_summaries")
+        or ([result["symptom_summary"]] if result.get("symptom_summary") else []),
         "red_flags": result["red_flags"],
         "differential": diagnoses,
         "suggested_tests": _flatten_recommendations(result["investigations"], diagnoses),
         "suggested_medications": _flatten_recommendations(result["treatments"], diagnoses),
+        # Per-diagnosis maps (keyed by diagnosis name) so the consultation page can float a
+        # clicked diagnosis's specific tests/medicines to the top of the pool.
+        "tests_by_diagnosis": result["investigations"],
+        "medications_by_diagnosis": result["treatments"],
         "true_conditions": result["true_conditions"],
     }
+
+
+def _tag_with_complaints(
+    diagnoses: list[dict[str, Any]], kg: Any, answers: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """When the patient has more than one chief complaint, tag each diagnosis with the
+    complaint(s) it belongs to (so the deduped differential shows "from: …"). Single
+    complaint → no tags (avoids noise)."""
+    if not getattr(kg, "is_symptom_first", False):
+        return diagnoses
+    active = resolve_symptoms(kg, answers)
+    if len(active) <= 1:
+        return diagnoses
+    name_to_complaints: dict[str, list[str]] = {}
+    for symptom in active:
+        for dx_id in symptom.differential:
+            dx = kg.diagnoses.get(dx_id)
+            if dx and symptom.label not in name_to_complaints.setdefault(dx.name, []):
+                name_to_complaints[dx.name].append(symptom.label)
+    tagged: list[dict[str, Any]] = []
+    for diagnosis in diagnoses:
+        entry = dict(diagnosis)
+        complaints = name_to_complaints.get(diagnosis.get("diagnosis"))
+        if complaints:
+            entry["chief_complaints"] = complaints
+        tagged.append(entry)
+    return tagged
 
 
 def _flatten_recommendations(mapping: dict[str, list[str]], diagnoses: list[dict[str, Any]]) -> list[str]:

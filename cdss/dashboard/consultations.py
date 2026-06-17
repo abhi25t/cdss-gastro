@@ -152,6 +152,12 @@ def _build_items(record: dict[str, Any], note: dict[str, Any]):
         for value in _as_list(note.get(field)):
             yield (kind, value, "doctor", None)
 
+    # Symptoms / history the doctor added during the visit. Captured as discrete
+    # mineable items (the seed for a future association-rule loop that proposes new
+    # questions for findings doctors frequently add). No accept/ignore semantics.
+    for value in _as_list(note.get("additional_findings")):
+        yield ("symptom", value, "doctor", None)
+
     # Suggested pills: accepted vs ignored is the supervised signal.
     suggestions = record.get("suggestions") or {}
     for group, kind in _SUGGESTION_KINDS.items():

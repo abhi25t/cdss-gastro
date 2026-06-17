@@ -1,0 +1,1125 @@
+# v4 — symptom-first questionnaire authored from the doctor's "history taking.docx"
+# (2026-06-17). Structure follows her instruction: symptom-specific questions first,
+# then ONE shared general block at the end; general items are NOT repeated inside a
+# symptom, and a finding that is itself a chief complaint is not re-asked.
+#
+# DRAFT for physician review. Batch 1 = abdominal pain, heartburn, dysphagia + the
+# shared general block. Remaining chief complaints to follow.
+#
+# Question types: single_choice, yes_no (rendered today) plus number, text,
+# multi_choice (need patient-app renderers — Phase 2). `semiology`/`finding`/
+# `summary_template`/option `hpi` drive the structured summary + draft HPI.
+questions:
+  - id: q_main_complaint
+    text: What problems are you having today?
+    type: multi_choice
+    options:
+      - {value: abdominal_pain, label: Abdominal / Tummy Pain}
+      - {value: heartburn, label: Heartburn / Acid Reflux}
+      - {value: dysphagia, label: Difficulty Swallowing}
+      - {value: nausea_vomiting, label: Nausea / Vomiting}
+      - {value: dyspepsia, label: Indigestion / Bloating}
+      - {value: belching, label: Belching / Wind}
+      - {value: diarrhoea, label: Loose Motions / Diarrhoea}
+      - {value: constipation, label: Constipation}
+      - {value: jaundice, label: Yellowing of Eyes or Skin}
+      - {value: rectal_bleeding, label: Bleeding from the Back Passage}
+      - {value: perianal, label: Pain / Lump Around the Back Passage}
+      - {value: faecal_incontinence, label: Trouble Controlling the Bowels}
+      - {value: bloating, label: Bloating / Swollen Tummy}
+      - {value: ascites, label: Tummy Swelling with Fluid}
+      - {value: weight_loss, label: Losing Weight}
+      - {value: anaemia, label: Tiredness / Looking Pale}
+      - {value: anorexia, label: Loss of Appetite}
+
+  # ===================================================================
+  # ABDOMINAL PAIN  (her "Pain" section)
+  # ===================================================================
+  - id: ap_duration
+    text: How long have you had this pain?
+    type: single_choice
+    group: abdominal_pain
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: ap_site
+    # region_select: tap the abdomen diagram (abdominopelvic_regions.svg). Several
+    # regions may be chosen; "Entire tummy" is exclusive. Each option's `region` maps
+    # to the SVG's data-region; `value` stays the clinical site the pain rules use.
+    text: Where is the pain? Tap the area(s) on the picture.
+    type: region_select
+    group: abdominal_pain
+    semiology: site
+    summary_template: "in the {answer}"
+    options:
+      - {value: ruq, region: upper-right, label: Upper right, hpi: right upper quadrant}
+      - {value: epigastric, region: upper-centre, label: Upper middle, hpi: epigastrium}
+      - {value: luq, region: upper-left, label: Upper left, hpi: left upper quadrant}
+      - {value: right_flank, region: middle-right, label: Right side, hpi: right flank}
+      - {value: periumbilical, region: middle-centre, label: Around the navel, hpi: periumbilical region}
+      - {value: left_flank, region: middle-left, label: Left side, hpi: left flank}
+      - {value: rlq, region: lower-right, label: Lower right, hpi: right lower quadrant}
+      - {value: hypogastric, region: lower-centre, label: Lower middle, hpi: suprapubic region}
+      - {value: llq, region: lower-left, label: Lower left, hpi: left lower quadrant}
+      - {value: diffuse, region: entire-abdomen, label: All over, hpi: diffuse abdomen}
+  - id: ap_character
+    text: What does the pain feel like?
+    type: single_choice
+    group: abdominal_pain
+    semiology: character
+    summary_template: "{answer} in character"
+    options:
+      - {value: burning, label: Burning, hpi: burning}
+      - {value: cramping, label: Cramping / comes in waves, hpi: cramping}
+      - {value: sharp, label: Sharp, hpi: sharp}
+      - {value: pricking, label: Pricking, hpi: pricking}
+      - {value: dull, label: Dull ache, hpi: dull}
+  - id: ap_radiation
+    text: Does the pain travel anywhere?
+    type: single_choice
+    group: abdominal_pain
+    semiology: radiation
+    summary_template: "radiating {answer}"
+    options:
+      - {value: back, label: To the back, hpi: to the back}
+      - {value: right_shoulder, label: To the right shoulder, hpi: to the right shoulder}
+      - {value: chest, label: To the chest, hpi: to the chest}
+      - {value: none, label: Stays in one place, hpi: nowhere}
+  - id: ap_pattern
+    text: Is the pain there all the time, or does it come and go?
+    type: single_choice
+    group: abdominal_pain
+    semiology: timing
+    summary_template: "{answer}"
+    options:
+      - {value: constant, label: All the time, hpi: constant}
+      - {value: intermittent, label: Comes and goes, hpi: intermittent}
+  - id: ap_meals
+    text: Does eating change the pain?
+    type: single_choice
+    group: abdominal_pain
+    semiology: aggravating
+    summary_template: "{answer}"
+    options:
+      - {value: better_eating, label: Better after eating, hpi: relieved by eating}
+      - {value: worse_eating, label: Worse after eating, hpi: worse after eating}
+      - {value: none, label: No change, hpi: unrelated to meals}
+  - id: ap_night
+    text: Does the pain wake you up at night?
+    type: yes_no
+    group: abdominal_pain
+    finding: night-time pain
+
+  # ===================================================================
+  # HEARTBURN / ACID REFLUX
+  # ===================================================================
+  - id: hb_duration
+    text: How long have you had heartburn?
+    type: single_choice
+    group: heartburn
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: hb_location
+    text: Where do you feel the burning?
+    type: single_choice
+    group: heartburn
+    semiology: site
+    summary_template: "felt in the {answer}"
+    options:
+      - {value: chest, label: Chest, hpi: chest}
+      - {value: throat, label: Throat, hpi: throat}
+      - {value: both, label: Both chest and throat, hpi: chest and throat}
+  - id: hb_rising
+    text: Does the burning rise up toward your mouth?
+    type: yes_no
+    group: heartburn
+    finding: rising retrosternal burning
+  - id: hb_taste
+    text: Do you get a sour or bitter taste in your mouth?
+    type: yes_no
+    group: heartburn
+    finding: acid regurgitation
+  - id: hb_timing
+    text: When does it usually happen?
+    type: single_choice
+    group: heartburn
+    semiology: timing
+    summary_template: "worst {answer}"
+    options:
+      - {value: after_meals, label: After meals, hpi: after meals}
+      - {value: at_night, label: At night, hpi: at night}
+      - {value: both, label: Both, hpi: after meals and at night}
+  - id: hb_triggers
+    text: Which foods or drinks trigger it? (choose any)
+    type: multi_choice
+    group: heartburn
+    semiology: aggravating
+    summary_template: "triggered by {answer}"
+    options:
+      - {value: spicy, label: Spicy food}
+      - {value: fatty, label: Fatty food}
+      - {value: coffee, label: Coffee}
+      - {value: alcohol, label: Alcohol}
+      - {value: carbonated, label: Fizzy drinks}
+      - {value: none, label: None in particular}
+  - id: hb_frequency
+    text: How often does it happen?
+    type: single_choice
+    group: heartburn
+    semiology: severity
+    summary_template: "occurring {answer}"
+    options:
+      - {value: daily, label: Daily, hpi: daily}
+      - {value: weekly, label: Weekly, hpi: weekly}
+      - {value: occasional, label: Now and then, hpi: occasionally}
+  - id: hb_sleep
+    text: Does it disturb your sleep?
+    type: yes_no
+    group: heartburn
+    finding: sleep disturbance
+  - id: hb_cough_voice
+    text: Do you have a long-standing cough or hoarse voice?
+    type: yes_no
+    group: heartburn
+    finding: chronic cough or hoarseness
+  - id: hb_chest_pain
+    text: Do you have any chest pain?
+    type: yes_no
+    group: heartburn
+    finding: chest pain
+  - id: hb_chest_pain_radiate
+    text: Does the chest pain spread to your arm or jaw?
+    type: yes_no
+    group: heartburn
+    finding: chest pain radiating to arm or jaw
+  - id: hb_tried_meds
+    text: Have you tried antacids or acid-reducing medicines?
+    type: yes_no
+    group: heartburn
+    finding: prior antacid use
+  - id: hb_meds_helped
+    text: Did the medicines help?
+    type: yes_no
+    group: heartburn
+    finding: response to acid suppression
+  - id: hb_prior_scope
+    text: Have you had an endoscopy or other tests before?
+    type: yes_no
+    group: heartburn
+    finding: prior endoscopy
+
+  # ===================================================================
+  # DYSPHAGIA (difficulty swallowing)
+  # ===================================================================
+  - id: dys_duration
+    text: How long have you had difficulty swallowing?
+    type: single_choice
+    group: dysphagia
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: dys_type
+    text: When you swallow, does food get stuck, is it painful, or both?
+    type: single_choice
+    group: dysphagia
+    semiology: character
+    summary_template: "with {answer}"
+    options:
+      - {value: stuck, label: Food gets stuck, hpi: food sticking}
+      - {value: painful, label: Painful to swallow, hpi: painful swallowing}
+      - {value: both, label: Both, hpi: food sticking and painful swallowing}
+  - id: dys_consistency
+    text: Is it worse with solids, liquids, or both?
+    type: single_choice
+    group: dysphagia
+    semiology: aggravating
+    summary_template: "worse with {answer}"
+    options:
+      - {value: solids, label: Solids, hpi: solids}
+      - {value: liquids, label: Liquids, hpi: liquids}
+      - {value: both, label: Both, hpi: both solids and liquids}
+  - id: dys_progression
+    text: Is it getting worse, staying the same, or coming and going?
+    type: single_choice
+    group: dysphagia
+    semiology: timing
+    summary_template: "and is {answer}"
+    options:
+      - {value: worsening, label: Getting worse, hpi: progressive}
+      - {value: stable, label: Staying the same, hpi: stable}
+      - {value: intermittent, label: Comes and goes, hpi: intermittent}
+  - id: dys_onset
+    text: Did it start suddenly or gradually?
+    type: single_choice
+    group: dysphagia
+    semiology: onset
+    options:
+      - {value: sudden, label: Suddenly, hpi: sudden}
+      - {value: gradual, label: Gradually, hpi: gradual}
+  - id: dys_regurg
+    text: Do you bring up undigested food?
+    type: yes_no
+    group: dysphagia
+    finding: regurgitation of undigested food
+  - id: dys_reflux
+    text: Do you also have heartburn or acid reflux?
+    type: yes_no
+    group: dysphagia
+    finding: associated reflux
+  - id: dys_aspiration
+    text: Do you cough or choke when swallowing, especially liquids?
+    type: yes_no
+    group: dysphagia
+    finding: coughing or choking on swallowing
+  - id: dys_voice
+    text: Has your voice changed or become hoarse?
+    type: yes_no
+    group: dysphagia
+    finding: voice change
+  - id: dys_radiation_hx
+    text: Have you ever had radiation treatment to the chest or neck?
+    type: yes_no
+    group: dysphagia
+    finding: prior chest/neck radiation
+  - id: dys_corrosive
+    text: Have you ever swallowed a corrosive substance or had a pill injury?
+    type: yes_no
+    group: dysphagia
+    finding: corrosive or pill injury
+
+  # ===================================================================
+  # NAUSEA / VOMITING
+  # ===================================================================
+  - id: nv_duration
+    text: How long have you had nausea or vomiting?
+    type: single_choice
+    group: nausea_vomiting
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: gt_1m, label: More than a month, hpi: more than a month}
+  - id: nv_vomit_content
+    text: What does the vomit look like?
+    type: single_choice
+    group: nausea_vomiting
+    semiology: character
+    summary_template: "vomiting {answer}"
+    options:
+      - {value: digested_food, label: Digested food, hpi: digested food}
+      - {value: undigested_food, label: Undigested food, hpi: undigested food}
+      - {value: bile, label: Yellow-green bile, hpi: bile}
+      - {value: blood, label: Blood, hpi: blood}
+      - {value: coffee_ground, label: Coffee-ground material, hpi: coffee-ground material}
+      - {value: none, label: Only nausea, no vomit, hpi: nausea without vomiting}
+  - id: nv_timing
+    text: When does the vomiting happen?
+    type: single_choice
+    group: nausea_vomiting
+    semiology: timing
+    summary_template: "{answer}"
+    options:
+      - {value: soon_after_eating, label: Soon after eating, hpi: soon after eating}
+      - {value: hours_after_eating, label: A few hours after eating, hpi: hours after eating}
+      - {value: unrelated, label: Not related to food, hpi: unrelated to meals}
+  - id: nv_abd_pain
+    text: Do you also have tummy pain?
+    type: yes_no
+    group: nausea_vomiting
+    finding: associated abdominal pain
+  - id: nv_new_meds
+    text: Have you started any new medicines recently?
+    type: yes_no
+    group: nausea_vomiting
+    finding: recent new medication
+  - id: nv_travel_diet
+    text: Any recent travel or change in diet?
+    type: yes_no
+    group: nausea_vomiting
+    finding: recent travel or diet change
+
+  # ===================================================================
+  # DYSPEPSIA / INDIGESTION / BLOATING
+  # ===================================================================
+  - id: dy_duration
+    text: How long have you had indigestion or bloating?
+    type: single_choice
+    group: dyspepsia
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: dy_relation
+    text: When does it come on?
+    type: single_choice
+    group: dyspepsia
+    semiology: timing
+    summary_template: "worst {answer}"
+    options:
+      - {value: during_meals, label: During meals, hpi: during meals}
+      - {value: after_meals, label: After meals, hpi: after meals}
+      - {value: empty_stomach, label: On an empty stomach, hpi: on an empty stomach}
+  - id: dy_food_triggers
+    text: Do certain foods trigger it? (choose any)
+    type: multi_choice
+    group: dyspepsia
+    semiology: aggravating
+    summary_template: "triggered by {answer}"
+    options:
+      - {value: wheat, label: Wheat}
+      - {value: dairy, label: Dairy}
+      - {value: fatty, label: Fatty food}
+      - {value: none, label: None in particular}
+  - id: dy_antacid_relief
+    text: Is it relieved by antacids?
+    type: yes_no
+    group: dyspepsia
+    finding: relief with antacids
+  - id: dy_stool_relief
+    text: Is it better after you pass stool?
+    type: yes_no
+    group: dyspepsia
+    finding: relief on defecation
+  - id: dy_bloating
+    text: Do you feel bloated or full quickly?
+    type: yes_no
+    group: dyspepsia
+    finding: bloating and early satiety
+
+  # ===================================================================
+  # BELCHING / WIND
+  # ===================================================================
+  - id: be_duration
+    text: How long have you had excessive belching?
+    type: single_choice
+    group: belching
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: gt_1m, label: More than a month, hpi: more than a month}
+  - id: be_timing
+    text: When do you belch most?
+    type: single_choice
+    group: belching
+    semiology: timing
+    summary_template: "{answer}"
+    options:
+      - {value: after_meals, label: After meals, hpi: after meals}
+      - {value: anytime, label: Any time, hpi: throughout the day}
+  - id: be_fizzy_fast_stress
+    text: Is it worse with fizzy drinks, eating fast, or stress?
+    type: yes_no
+    group: belching
+    finding: aerophagia triggers (fizzy drinks, fast eating, stress)
+  - id: be_food_triggers
+    text: Do particular foods bring it on?
+    type: yes_no
+    group: belching
+    finding: food-triggered belching
+  - id: be_flatulence
+    text: Do you also have a lot of flatulence or tummy rumbling?
+    type: yes_no
+    group: belching
+    finding: flatulence / borborygmi
+
+  # ===================================================================
+  # DIARRHOEA / LOOSE MOTIONS
+  # ===================================================================
+  - id: di_duration
+    text: How long have you had loose motions?
+    type: single_choice
+    group: diarrhoea
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_2w, label: Less than 2 weeks, hpi: an acute (<2 week)}
+      - {value: 2_4w, label: 2–4 weeks, hpi: a 2–4 week}
+      - {value: gt_4w, label: More than 4 weeks, hpi: a chronic (>4 week)}
+  - id: di_frequency
+    text: How many times a day?
+    type: number
+    group: diarrhoea
+    semiology: frequency
+    summary_template: "{answer} times a day"
+  - id: di_consistency
+    text: What are the stools like?
+    type: single_choice
+    group: diarrhoea
+    semiology: character
+    summary_template: "{answer} in consistency"
+    options:
+      - {value: mushy, label: Mushy, hpi: mushy}
+      - {value: watery, label: Watery, hpi: watery}
+      - {value: liquid, label: Completely liquid, hpi: liquid}
+  - id: di_blood
+    text: Is there blood in the stool?
+    type: yes_no
+    group: diarrhoea
+    finding: blood in the stool
+  - id: di_mucus
+    text: Is there mucus in the stool?
+    type: yes_no
+    group: diarrhoea
+    finding: mucus in the stool
+  - id: di_nocturnal
+    text: Does it wake you from sleep at night?
+    type: yes_no
+    group: diarrhoea
+    finding: nocturnal diarrhoea
+  - id: di_relieved_by_defecation
+    text: Are the cramps relieved by passing stool?
+    type: yes_no
+    group: diarrhoea
+    finding: cramps relieved by defecation
+  - id: di_recent_travel
+    text: Any recent travel?
+    type: yes_no
+    group: diarrhoea
+    finding: recent travel
+  - id: di_recent_antibiotics
+    text: Any recent course of antibiotics?
+    type: yes_no
+    group: diarrhoea
+    finding: recent antibiotics
+
+  # ===================================================================
+  # CONSTIPATION
+  # ===================================================================
+  - id: co_duration
+    text: How long have you been constipated?
+    type: single_choice
+    group: constipation
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: co_frequency
+    text: How often do you pass stool?
+    type: single_choice
+    group: constipation
+    semiology: timing
+    summary_template: "passing stool {answer}"
+    options:
+      - {value: once_daily, label: Once a day, hpi: once daily}
+      - {value: alt_days, label: Every 2–3 days, hpi: every 2–3 days}
+      - {value: once_3plus_days, label: Less than twice a week, hpi: less than twice a week}
+  - id: co_urge
+    text: Do you feel the urge to pass stool each day?
+    type: yes_no
+    group: constipation
+    finding: a daily urge to pass stool
+  - id: co_timing
+    text: When do you usually feel the urge to pass stool? (choose any)
+    type: multi_choice
+    group: constipation
+    semiology: timing
+    summary_template: "urge usually {answer}"
+    options:
+      - {value: morning, label: In the morning, hpi: in the morning}
+      - {value: after_meals, label: After meals, hpi: after meals}
+      - {value: night, label: At night, hpi: at night}
+      - {value: irregular, label: No fixed time, hpi: at no fixed time}
+  - id: co_bristol
+    # bristol_select: shows the Bristol stool chart; patient picks up to 2 types.
+    text: Which stool type(s) best match yours? Choose up to 2.
+    type: bristol_select
+    group: constipation
+    semiology: character
+    summary_template: "stool resembling {answer}"
+    options:
+      - {value: '1', label: "Type 1 — separate hard lumps", hpi: "Bristol type 1 (separate hard lumps)"}
+      - {value: '2', label: "Type 2 — lumpy, sausage-like", hpi: "Bristol type 2 (lumpy and sausage-like)"}
+      - {value: '3', label: "Type 3 — sausage with cracks", hpi: "Bristol type 3 (cracked sausage)"}
+      - {value: '4', label: "Type 4 — smooth, soft sausage", hpi: "Bristol type 4 (smooth and soft)"}
+      - {value: '5', label: "Type 5 — soft blobs", hpi: "Bristol type 5 (soft blobs)"}
+      - {value: '6', label: "Type 6 — mushy, ragged edges", hpi: "Bristol type 6 (mushy)"}
+      - {value: '7', label: "Type 7 — watery, no solids", hpi: "Bristol type 7 (watery)"}
+  - id: co_straining
+    text: Do you strain or spend a long time trying to pass stool?
+    type: yes_no
+    group: constipation
+    finding: straining
+  - id: co_incomplete
+    text: Do you feel you haven't fully emptied?
+    type: yes_no
+    group: constipation
+    finding: incomplete evacuation
+  - id: co_digitation
+    text: Do you use a finger or water jet to pass stool?
+    type: yes_no
+    group: constipation
+    finding: need for digitation
+  - id: co_pain_passing
+    text: Is it painful to pass stool?
+    type: yes_no
+    group: constipation
+    finding: painful defecation
+  - id: co_blood
+    text: Is there blood in your stool?
+    type: yes_no
+    group: constipation
+    finding: blood in stool
+  - id: co_laxatives
+    text: Do you take medicines to pass stool?
+    type: yes_no
+    group: constipation
+    finding: laxative use
+
+  # ===================================================================
+  # JAUNDICE (yellowing of eyes/skin)
+  # ===================================================================
+  - id: jy_duration
+    text: How long have you been yellow?
+    type: single_choice
+    group: jaundice
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: gt_1m, label: More than a month, hpi: more than a month}
+  - id: jy_urine
+    text: What colour is your urine?
+    type: single_choice
+    group: jaundice
+    semiology: character
+    summary_template: "with {answer} urine"
+    options:
+      - {value: normal, label: Normal, hpi: normal}
+      - {value: dark_yellow, label: Dark yellow, hpi: dark yellow}
+      - {value: brown, label: Brown, hpi: brown}
+  - id: jy_pale_stool
+    text: Are your stools pale or clay-coloured?
+    type: yes_no
+    group: jaundice
+    finding: pale stools
+  - id: jy_itching
+    text: Do you have itching of the skin?
+    type: yes_no
+    group: jaundice
+    finding: itching
+  - id: jy_abd_pain
+    text: Do you have tummy pain with the yellowing?
+    type: yes_no
+    group: jaundice
+    finding: abdominal pain
+  - id: jy_liver_history
+    text: Any history of liver disease, hepatitis, or gallstones?
+    type: yes_no
+    group: jaundice
+    finding: history of liver disease/gallstones
+  - id: jy_risk_exposure
+    text: Any injections, tattoos, or blood transfusions?
+    type: yes_no
+    group: jaundice
+    finding: parenteral exposure risk
+  - id: jy_new_meds_herbal
+    text: Any new medicines or herbal supplements?
+    type: yes_no
+    group: jaundice
+    finding: new drug/herbal exposure
+
+  # ===================================================================
+  # RECTAL BLEEDING (bleeding from the back passage)
+  # ===================================================================
+  - id: rb_duration
+    text: How long have you noticed bleeding from the back passage?
+    type: single_choice
+    group: rectal_bleeding
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: gt_1m, label: More than a month, hpi: more than a month}
+  - id: rb_colour
+    text: What colour is the blood?
+    type: single_choice
+    group: rectal_bleeding
+    semiology: character
+    summary_template: "{answer}"
+    options:
+      - {value: bright_red, label: Bright red, hpi: bright-red blood}
+      - {value: dark, label: Dark / maroon, hpi: dark blood}
+      - {value: mixed_in_stool, label: Mixed in the stool, hpi: blood mixed in the stool}
+  - id: rb_relation
+    text: When do you see the blood?
+    type: single_choice
+    group: rectal_bleeding
+    semiology: timing
+    summary_template: "{answer}"
+    options:
+      - {value: on_paper, label: Only on the toilet paper, hpi: on wiping}
+      - {value: dripping, label: Dripping into the pan, hpi: dripping into the pan}
+      - {value: mixed_with_stool, label: Mixed with the stool, hpi: mixed with stool}
+      - {value: after_stool, label: After passing stool, hpi: after defecation}
+  - id: rb_pain
+    text: Is passing stool painful?
+    type: yes_no
+    group: rectal_bleeding
+    finding: painful defecation
+  - id: rb_lump
+    text: Do you feel a lump coming out of the back passage?
+    type: yes_no
+    group: rectal_bleeding
+    finding: prolapsing perianal lump
+  - id: rb_bowel_change
+    text: Has your bowel habit changed recently?
+    type: yes_no
+    group: rectal_bleeding
+    finding: change in bowel habit
+  - id: rb_mucus
+    text: Is there mucus or slime with the blood?
+    type: yes_no
+    group: rectal_bleeding
+    finding: mucus with blood
+
+  # ===================================================================
+  # PERIANAL PROBLEMS (pain, lump, or discharge around the back passage)
+  # ===================================================================
+  - id: pa_duration
+    text: How long have you had the perianal problem?
+    type: single_choice
+    group: perianal
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1w, label: Less than a week, hpi: less than a week}
+      - {value: 1_4w, label: 1–4 weeks, hpi: one to four weeks}
+      - {value: gt_1m, label: More than a month, hpi: more than a month}
+  - id: pa_main
+    text: What is the main problem around the back passage?
+    type: single_choice
+    group: perianal
+    semiology: character
+    summary_template: "mainly {answer}"
+    options:
+      - {value: pain, label: Pain, hpi: perianal pain}
+      - {value: lump, label: A lump or swelling, hpi: a perianal lump}
+      - {value: discharge, label: Discharge or pus, hpi: perianal discharge}
+      - {value: itching, label: Itching, hpi: perianal itching}
+  - id: pa_pain_defecation
+    text: Is it very painful to pass stool?
+    type: yes_no
+    group: perianal
+    finding: severe pain on defecation
+  - id: pa_swelling
+    text: Is there a tender swelling you can feel?
+    type: yes_no
+    group: perianal
+    finding: tender perianal swelling
+  - id: pa_discharge
+    text: Is there pus or discharge?
+    type: yes_no
+    group: perianal
+    finding: perianal discharge
+  - id: pa_bleeding
+    text: Is there any bleeding?
+    type: yes_no
+    group: perianal
+    finding: perianal bleeding
+  - id: pa_recurrent
+    text: Has this happened before, or does it keep coming back?
+    type: yes_no
+    group: perianal
+    finding: recurrent perianal problem
+
+  # ===================================================================
+  # FAECAL INCONTINENCE (leakage / loss of bowel control)
+  # ===================================================================
+  - id: fi_duration
+    text: How long have you had trouble controlling your bowels?
+    type: single_choice
+    group: faecal_incontinence
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: fi_type
+    text: What happens?
+    type: single_choice
+    group: faecal_incontinence
+    semiology: character
+    summary_template: "with {answer}"
+    options:
+      - {value: urgency, label: I cannot reach the toilet in time, hpi: urge incontinence}
+      - {value: passive_leak, label: It leaks without my knowing, hpi: passive leakage}
+      - {value: with_constipation, label: Leakage with hard stools / constipation, hpi: leakage on a background of constipation}
+  - id: fi_consistency
+    text: Is the leakage solid, liquid, or both?
+    type: single_choice
+    group: faecal_incontinence
+    semiology: aggravating
+    summary_template: "of {answer} stool"
+    options:
+      - {value: solid, label: Solid, hpi: solid}
+      - {value: liquid, label: Liquid, hpi: liquid}
+      - {value: both, label: Both, hpi: solid and liquid}
+  - id: fi_constipation_hx
+    text: Do you also get constipated with hard stools?
+    type: yes_no
+    group: faecal_incontinence
+    finding: background constipation
+  - id: fi_obstetric_surgical
+    text: Have you had a difficult childbirth or surgery near the back passage?
+    type: yes_no
+    group: faecal_incontinence
+    finding: obstetric or anal surgical injury
+  - id: fi_blood
+    text: Is there blood with the leakage?
+    type: yes_no
+    group: faecal_incontinence
+    finding: blood with leakage
+
+  # ===================================================================
+  # BLOATING / ABDOMINAL DISTENSION
+  # ===================================================================
+  - id: bl_duration
+    text: How long have you felt bloated or distended?
+    type: single_choice
+    group: bloating
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: bl_pattern
+    text: When is the bloating worst?
+    type: single_choice
+    group: bloating
+    semiology: timing
+    summary_template: "worst {answer}"
+    options:
+      - {value: after_meals, label: After meals, hpi: after meals}
+      - {value: all_day, label: All day, hpi: throughout the day}
+      - {value: progressive, label: Getting steadily bigger, hpi: with progressive distension}
+  - id: bl_relieved_flatus
+    text: Is it relieved by passing wind?
+    type: yes_no
+    group: bloating
+    finding: relief on passing flatus
+  - id: bl_relieved_defecation
+    text: Is it relieved by passing stool?
+    type: yes_no
+    group: bloating
+    finding: relief on defecation
+  - id: bl_bowel_change
+    text: Has your bowel habit changed?
+    type: yes_no
+    group: bloating
+    finding: altered bowel habit
+  - id: bl_visible_distension
+    text: Is your tummy visibly swollen?
+    type: yes_no
+    group: bloating
+    finding: visible abdominal distension
+  - id: bl_food_relation
+    text: Is it worse with wheat or dairy foods?
+    type: yes_no
+    group: bloating
+    finding: wheat/dairy-related bloating
+
+  # ===================================================================
+  # ASCITES / ABDOMINAL SWELLING WITH FLUID
+  # ===================================================================
+  - id: as_duration
+    text: How long has your tummy been swollen?
+    type: single_choice
+    group: ascites
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_2w, label: Less than 2 weeks, hpi: less than two weeks}
+      - {value: 2_8w, label: 2–8 weeks, hpi: two to eight weeks}
+      - {value: gt_2m, label: More than 2 months, hpi: more than two months}
+  - id: as_onset
+    text: Did the swelling come on gradually or quickly?
+    type: single_choice
+    group: ascites
+    semiology: timing
+    summary_template: "of {answer} onset"
+    options:
+      - {value: gradual, label: Gradually, hpi: gradual}
+      - {value: rapid, label: Quickly, hpi: rapid}
+  - id: as_leg_swelling
+    text: Are your legs or ankles also swollen?
+    type: yes_no
+    group: ascites
+    finding: peripheral oedema
+  - id: as_breathlessness
+    text: Are you short of breath?
+    type: yes_no
+    group: ascites
+    finding: breathlessness
+  - id: as_liver_history
+    text: Any history of liver disease or hepatitis?
+    type: yes_no
+    group: ascites
+    finding: history of liver disease
+  - id: as_known_cancer
+    text: Have you ever been diagnosed with cancer?
+    type: yes_no
+    group: ascites
+    finding: known malignancy
+
+  # ===================================================================
+  # WEIGHT LOSS (losing weight as the main concern)
+  # ===================================================================
+  - id: wl_appetite
+    text: How is your appetite?
+    type: single_choice
+    group: weight_loss
+    semiology: character
+    summary_template: "with {answer} appetite"
+    options:
+      - {value: increased, label: Increased, hpi: increased}
+      - {value: decreased, label: Decreased, hpi: reduced}
+      - {value: normal, label: Normal, hpi: normal}
+  - id: wl_heat_intolerance
+    text: Do you feel hot, sweaty, or have a racing heart?
+    type: yes_no
+    group: weight_loss
+    finding: heat intolerance / tremor
+  - id: wl_thirst_polyuria
+    text: Are you very thirsty or passing a lot of urine?
+    type: yes_no
+    group: weight_loss
+    finding: thirst and polyuria
+  - id: wl_bowel_change
+    text: Has your bowel habit changed?
+    type: yes_no
+    group: weight_loss
+    finding: altered bowel habit
+  - id: wl_chronic_cough
+    text: Do you have a long-standing cough or night sweats?
+    type: yes_no
+    group: weight_loss
+    finding: chronic cough / night sweats
+  - id: wl_lump
+    text: Have you noticed any lump or swelling?
+    type: yes_no
+    group: weight_loss
+    finding: palpable lump
+
+  # ===================================================================
+  # ANAEMIA SYMPTOMS (tiredness, breathlessness, looking pale)
+  # ===================================================================
+  - id: an_duration
+    text: How long have you felt tired or looked pale?
+    type: single_choice
+    group: anaemia
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: an_exertional_breathless
+    text: Do you get breathless on exertion?
+    type: yes_no
+    group: anaemia
+    finding: exertional breathlessness
+  - id: an_pica
+    text: Do you crave or chew ice, mud, or other unusual things?
+    type: yes_no
+    group: anaemia
+    finding: pica
+  - id: an_menorrhagia
+    text: "If female: are your periods heavy?"
+    type: yes_no
+    group: anaemia
+    finding: heavy menstrual bleeding
+  - id: an_abdo_pain
+    text: Do you have any tummy pain or indigestion?
+    type: yes_no
+    group: anaemia
+    finding: associated dyspepsia / abdominal pain
+  - id: an_bowel_change
+    text: Has your bowel habit changed?
+    type: yes_no
+    group: anaemia
+    finding: altered bowel habit
+
+  # ===================================================================
+  # LOSS OF APPETITE (anorexia)
+  # ===================================================================
+  - id: ao_duration
+    text: How long have you had poor appetite?
+    type: single_choice
+    group: anorexia
+    semiology: onset
+    summary_template: "present for {answer}"
+    options:
+      - {value: lt_1m, label: Less than a month, hpi: less than a month}
+      - {value: 1_6m, label: 1–6 months, hpi: one to six months}
+      - {value: gt_6m, label: More than 6 months, hpi: more than six months}
+  - id: ao_early_satiety
+    text: Do you feel full after only a few bites?
+    type: yes_no
+    group: anorexia
+    finding: early satiety
+  - id: ao_meat_aversion
+    text: Have you gone off meat or rich foods?
+    type: yes_no
+    group: anorexia
+    finding: aversion to meat
+  - id: ao_nausea
+    text: Do you feel sick (nauseated)?
+    type: yes_no
+    group: anorexia
+    finding: nausea
+  - id: ao_abdo_pain
+    text: Do you have tummy pain?
+    type: yes_no
+    group: anorexia
+    finding: abdominal pain
+  - id: ao_low_mood
+    text: Have you been feeling low, sad, or losing interest in things?
+    type: yes_no
+    group: anorexia
+    finding: low mood / anhedonia
+
+  # ===================================================================
+  # GENERAL BLOCK — asked once for EVERY patient, after the symptom block.
+  # (Her "GENERAL questions for all".) Demographics name/age/sex are collected
+  # by the app at check-in, so they are not repeated here.
+  # ===================================================================
+  - id: gen_menstruation
+    text: "If female: are your periods normal?"
+    type: single_choice
+    group: general
+    options:
+      - {value: normal, label: Normal}
+      - {value: irregular, label: Irregular}
+      - {value: menopause, label: Reached menopause}
+      - {value: na, label: Not applicable}
+  - id: gen_weight_loss
+    text: Have you lost weight without trying?
+    type: yes_no
+    group: general
+  - id: gen_weight_loss_kg
+    text: About how many kilograms have you lost?
+    type: number
+    group: general
+  - id: gen_weight_loss_months
+    text: Over how many months?
+    type: number
+    group: general
+  - id: gen_black_stool
+    text: Have you passed black, tarry stools?
+    type: yes_no
+    group: general
+  - id: gen_haematemesis
+    text: Have you vomited blood?
+    type: yes_no
+    group: general
+  - id: gen_fresh_blood
+    text: Have you seen fresh red blood in your stool?
+    type: yes_no
+    group: general
+  - id: gen_fever
+    text: Do you have fever?
+    type: yes_no
+    group: general
+  - id: gen_fever_days
+    text: For how many days?
+    type: number
+    group: general
+  - id: gen_comorbidities
+    text: Do you have any of these conditions? (choose any)
+    type: multi_choice
+    group: general
+    options:
+      - {value: diabetes, label: Diabetes}
+      - {value: hypertension, label: High blood pressure}
+      - {value: heart_disease, label: Heart disease}
+      - {value: asthma, label: Asthma}
+      - {value: none, label: None}
+  - id: gen_surgery
+    text: Have you had any surgery?
+    type: yes_no
+    group: general
+  - id: gen_surgery_detail
+    text: Which surgery, and when?
+    type: text
+    group: general
+  - id: gen_alcohol
+    text: Do you drink alcohol?
+    type: yes_no
+    group: general
+  - id: gen_alcohol_detail
+    text: Which type, and how much per week?
+    type: text
+    group: general
+  - id: gen_smoking
+    text: Do you smoke?
+    type: single_choice
+    group: general
+    options:
+      - {value: none, label: No}
+      - {value: bidi, label: Bidi}
+      - {value: cigarette, label: Cigarette}
+  - id: gen_smoking_count
+    text: How many per day?
+    type: number
+    group: general
+  - id: gen_exercise
+    text: Do you exercise regularly?
+    type: yes_no
+    group: general
+  - id: gen_diet
+    text: What is your diet?
+    type: single_choice
+    group: general
+    options:
+      - {value: vegetarian, label: Vegetarian}
+      - {value: mixed, label: Mixed}
+      - {value: mostly_nonveg, label: Mostly non-vegetarian}
+  - id: gen_regular_meds
+    text: Do you take any of these regularly? (choose any)
+    type: multi_choice
+    group: general
+    options:
+      - {value: painkillers, label: Painkillers}
+      - {value: antacids, label: Antacids}
+      - {value: blood_thinners, label: Blood thinners}
+      - {value: other, label: Other}
+      - {value: none, label: None}
+  - id: gen_previous_tests
+    text: Have you had any blood tests or scans recently?
+    type: yes_no
+    group: general
+  - id: gen_stress
+    text: Do you have a lot of stress or anxiety?
+    type: yes_no
+    group: general
+  - id: gen_palpitations
+    text: Do you get palpitations (a racing heartbeat)?
+    type: yes_no
+    group: general
+  - id: gen_fatigue
+    text: Do you feel unusually tired or weak?
+    type: yes_no
+    group: general

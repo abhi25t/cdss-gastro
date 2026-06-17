@@ -17,8 +17,11 @@ ENTRY_QUESTION = "q_main_complaint"
 
 
 def answer_label(kg: KnowledgeGraph, question_id: str, value: Any) -> str:
-    """Display text for an answer: an option's label, or Yes/No, or the raw value."""
+    """Display text for an answer: an option's label, Yes/No, a comma-joined list
+    (multi_choice), or the raw value (number/text)."""
     question = kg.questions.get(question_id)
+    if isinstance(value, (list, tuple)):
+        return ", ".join(_option_label(question, item) for item in value) or "—"
     norm = _norm(value)
     if question is not None:
         for option in question.options:
@@ -29,6 +32,15 @@ def answer_label(kg: KnowledgeGraph, question_id: str, value: Any) -> str:
     if norm == "no":
         return "No"
     return "" if value is None else str(value)
+
+
+def _option_label(question: Any, value: Any) -> str:
+    norm = _norm(value)
+    if question is not None:
+        for option in question.options:
+            if _norm(option.get("value")) == norm:
+                return str(option.get("label") or option.get("value") or norm)
+    return str(value)
 
 
 def humanize_answers(kg: KnowledgeGraph, answers: dict[str, Any]) -> list[dict[str, str]]:
@@ -50,7 +62,12 @@ def humanize_answers(kg: KnowledgeGraph, answers: dict[str, Any]) -> list[dict[s
 
 
 def chief_complaint(kg: KnowledgeGraph, answers: dict[str, Any], result: dict[str, Any] | None = None) -> str:
-    summary = (result or {}).get("symptom_summary") or {}
+    res = result or {}
+    summaries = res.get("symptom_summaries") or []
+    labels = [s.get("chief_complaint") for s in summaries if s.get("chief_complaint")]
+    if labels:
+        return ", ".join(labels)
+    summary = res.get("symptom_summary") or {}
     if summary.get("chief_complaint"):
         return str(summary["chief_complaint"])
     qid = ENTRY_QUESTION if ENTRY_QUESTION in answers else _first_answered(kg, answers)

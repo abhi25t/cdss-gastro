@@ -9,9 +9,13 @@ class ScoringEngine:
     def __init__(self, kg: KnowledgeGraph) -> None:
         self.kg = kg
 
-    def score(self, conditions: dict[str, bool]) -> list[DiagnosisResult]:
+    def score(
+        self,
+        conditions: dict[str, bool],
+        allowed_diagnoses: set[str] | None = None,
+    ) -> list[DiagnosisResult]:
         if self.kg.is_symptom_first:
-            return self._score_weighted(conditions)
+            return self._score_weighted(conditions, allowed_diagnoses)
         return self._score_legacy(conditions)
 
     # ------------------------------------------------------------------
@@ -59,7 +63,11 @@ class ScoringEngine:
     # confidence (sums to ~100% across the active differential) plus explicit
     # evidence for and against — every number traceable to a rule.
     # ------------------------------------------------------------------
-    def _score_weighted(self, conditions: dict[str, bool]) -> list[DiagnosisResult]:
+    def _score_weighted(
+        self,
+        conditions: dict[str, bool],
+        allowed_diagnoses: set[str] | None = None,
+    ) -> list[DiagnosisResult]:
         raw: dict[str, int] = defaultdict(int)
         supporting: dict[str, list[str]] = defaultdict(list)
         against: dict[str, list[str]] = defaultdict(list)
@@ -69,6 +77,11 @@ class ScoringEngine:
             if not refs or not all(conditions.get(ref, False) for ref in refs):
                 continue
             diagnosis_id = _rule_diagnosis_id(rule)
+            # Scope the differential to the active symptom's candidate diagnoses, so a
+            # shared general-block finding (fever, weight loss) can't pull in a diagnosis
+            # that belongs to a different chief complaint.
+            if allowed_diagnoses is not None and diagnosis_id not in allowed_diagnoses:
+                continue
             weight = rule.weight if rule.weight is not None else (rule.score or 0)
             if rule.is_negative:
                 raw[diagnosis_id] -= weight

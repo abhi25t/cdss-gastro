@@ -1,0 +1,211 @@
+# v4 flows. q_main_complaint routes to a symptom flow by its answer. Each symptom
+# flow covers ONLY symptom-specific questions; the patient app then runs the shared
+# `general` flow at the end (symptom questions first, general block last — per the
+# doctor's instruction). yes/no branch keys are quoted so YAML keeps them as strings.
+flows:
+  abdominal_pain:
+    start: ap_duration
+    transitions:
+      ap_duration: {default: ap_site}
+      ap_site: {default: ap_character}
+      ap_character: {default: ap_radiation}
+      ap_radiation: {default: ap_pattern}
+      ap_pattern: {default: ap_meals}
+      ap_meals: {default: ap_night}
+
+  heartburn:
+    start: hb_duration
+    transitions:
+      hb_duration: {default: hb_location}
+      hb_location: {default: hb_rising}
+      hb_rising: {default: hb_taste}
+      hb_taste: {default: hb_timing}
+      hb_timing: {default: hb_triggers}
+      hb_triggers: {default: hb_frequency}
+      hb_frequency: {default: hb_sleep}
+      hb_sleep: {default: hb_cough_voice}
+      hb_cough_voice: {default: hb_chest_pain}
+      hb_chest_pain: {"yes": hb_chest_pain_radiate, default: hb_tried_meds}
+      hb_chest_pain_radiate: {default: hb_tried_meds}
+      hb_tried_meds: {"yes": hb_meds_helped, default: hb_prior_scope}
+      hb_meds_helped: {default: hb_prior_scope}
+
+  dysphagia:
+    start: dys_duration
+    transitions:
+      dys_duration: {default: dys_type}
+      dys_type: {default: dys_consistency}
+      dys_consistency: {default: dys_progression}
+      dys_progression: {default: dys_onset}
+      dys_onset: {default: dys_regurg}
+      dys_regurg: {default: dys_reflux}
+      dys_reflux: {default: dys_aspiration}
+      dys_aspiration: {default: dys_voice}
+      dys_voice: {default: dys_radiation_hx}
+      dys_radiation_hx: {default: dys_corrosive}
+
+  nausea_vomiting:
+    start: nv_duration
+    transitions:
+      nv_duration: {default: nv_vomit_content}
+      nv_vomit_content: {default: nv_timing}
+      nv_timing: {default: nv_abd_pain}
+      nv_abd_pain: {default: nv_new_meds}
+      nv_new_meds: {default: nv_travel_diet}
+
+  dyspepsia:
+    start: dy_duration
+    transitions:
+      dy_duration: {default: dy_relation}
+      dy_relation: {default: dy_food_triggers}
+      dy_food_triggers: {default: dy_antacid_relief}
+      dy_antacid_relief: {default: dy_stool_relief}
+      dy_stool_relief: {default: dy_bloating}
+
+  belching:
+    start: be_duration
+    transitions:
+      be_duration: {default: be_timing}
+      be_timing: {default: be_fizzy_fast_stress}
+      be_fizzy_fast_stress: {default: be_food_triggers}
+      be_food_triggers: {default: be_flatulence}
+
+  diarrhoea:
+    start: di_duration
+    transitions:
+      di_duration: {default: di_frequency}
+      di_frequency: {default: di_consistency}
+      di_consistency: {default: di_blood}
+      di_blood: {default: di_mucus}
+      di_mucus: {default: di_nocturnal}
+      di_nocturnal: {default: di_relieved_by_defecation}
+      di_relieved_by_defecation: {default: di_recent_travel}
+      di_recent_travel: {default: di_recent_antibiotics}
+
+  constipation:
+    start: co_duration
+    transitions:
+      co_duration: {default: co_frequency}
+      co_frequency: {default: co_urge}
+      co_urge: {default: co_timing}
+      co_timing: {default: co_bristol}
+      co_bristol: {default: co_straining}
+      co_straining: {default: co_incomplete}
+      co_incomplete: {default: co_digitation}
+      co_digitation: {default: co_pain_passing}
+      co_pain_passing: {default: co_blood}
+      co_blood: {default: co_laxatives}
+
+  jaundice:
+    start: jy_duration
+    transitions:
+      jy_duration: {default: jy_urine}
+      jy_urine: {default: jy_pale_stool}
+      jy_pale_stool: {default: jy_itching}
+      jy_itching: {default: jy_abd_pain}
+      jy_abd_pain: {default: jy_liver_history}
+      jy_liver_history: {default: jy_risk_exposure}
+      jy_risk_exposure: {default: jy_new_meds_herbal}
+
+  rectal_bleeding:
+    start: rb_duration
+    transitions:
+      rb_duration: {default: rb_colour}
+      rb_colour: {default: rb_relation}
+      rb_relation: {default: rb_pain}
+      rb_pain: {default: rb_lump}
+      rb_lump: {default: rb_bowel_change}
+      rb_bowel_change: {default: rb_mucus}
+
+  perianal:
+    start: pa_duration
+    transitions:
+      pa_duration: {default: pa_main}
+      pa_main: {default: pa_pain_defecation}
+      pa_pain_defecation: {default: pa_swelling}
+      pa_swelling: {default: pa_discharge}
+      pa_discharge: {default: pa_bleeding}
+      pa_bleeding: {default: pa_recurrent}
+
+  faecal_incontinence:
+    start: fi_duration
+    transitions:
+      fi_duration: {default: fi_type}
+      fi_type: {default: fi_consistency}
+      fi_consistency: {default: fi_constipation_hx}
+      fi_constipation_hx: {default: fi_obstetric_surgical}
+      fi_obstetric_surgical: {default: fi_blood}
+
+  bloating:
+    start: bl_duration
+    transitions:
+      bl_duration: {default: bl_pattern}
+      bl_pattern: {default: bl_relieved_flatus}
+      bl_relieved_flatus: {default: bl_relieved_defecation}
+      bl_relieved_defecation: {default: bl_bowel_change}
+      bl_bowel_change: {default: bl_visible_distension}
+      bl_visible_distension: {default: bl_food_relation}
+
+  ascites:
+    start: as_duration
+    transitions:
+      as_duration: {default: as_onset}
+      as_onset: {default: as_leg_swelling}
+      as_leg_swelling: {default: as_breathlessness}
+      as_breathlessness: {default: as_liver_history}
+      as_liver_history: {default: as_known_cancer}
+
+  weight_loss:
+    start: wl_appetite
+    transitions:
+      wl_appetite: {default: wl_heat_intolerance}
+      wl_heat_intolerance: {default: wl_thirst_polyuria}
+      wl_thirst_polyuria: {default: wl_bowel_change}
+      wl_bowel_change: {default: wl_chronic_cough}
+      wl_chronic_cough: {default: wl_lump}
+
+  anaemia:
+    start: an_duration
+    transitions:
+      an_duration: {default: an_exertional_breathless}
+      an_exertional_breathless: {default: an_pica}
+      an_pica: {default: an_menorrhagia}
+      an_menorrhagia: {default: an_abdo_pain}
+      an_abdo_pain: {default: an_bowel_change}
+
+  anorexia:
+    start: ao_duration
+    transitions:
+      ao_duration: {default: ao_early_satiety}
+      ao_early_satiety: {default: ao_meat_aversion}
+      ao_meat_aversion: {default: ao_nausea}
+      ao_nausea: {default: ao_abdo_pain}
+      ao_abdo_pain: {default: ao_low_mood}
+
+  # Shared general history — run by the app after the symptom flow finishes.
+  # Conditional follow-ups (kg only show if relevant) via yes-branches.
+  general:
+    start: gen_menstruation
+    transitions:
+      gen_menstruation: {default: gen_weight_loss}
+      gen_weight_loss: {"yes": gen_weight_loss_kg, default: gen_black_stool}
+      gen_weight_loss_kg: {default: gen_weight_loss_months}
+      gen_weight_loss_months: {default: gen_black_stool}
+      gen_black_stool: {default: gen_haematemesis}
+      gen_haematemesis: {default: gen_fresh_blood}
+      gen_fresh_blood: {default: gen_fever}
+      gen_fever: {"yes": gen_fever_days, default: gen_comorbidities}
+      gen_fever_days: {default: gen_comorbidities}
+      gen_comorbidities: {default: gen_surgery}
+      gen_surgery: {"yes": gen_surgery_detail, default: gen_alcohol}
+      gen_surgery_detail: {default: gen_alcohol}
+      gen_alcohol: {"yes": gen_alcohol_detail, default: gen_smoking}
+      gen_alcohol_detail: {default: gen_smoking}
+      gen_smoking: {"none": gen_exercise, default: gen_smoking_count}
+      gen_smoking_count: {default: gen_exercise}
+      gen_exercise: {default: gen_diet}
+      gen_diet: {default: gen_regular_meds}
+      gen_regular_meds: {default: gen_previous_tests}
+      gen_previous_tests: {default: gen_stress}
+      gen_stress: {default: gen_palpitations}
+      gen_palpitations: {default: gen_fatigue}

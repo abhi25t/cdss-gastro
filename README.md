@@ -22,6 +22,13 @@ waiting time) and open each patient's **consultation page** — an editable note
 from the patient's answers on the left, and clickable rules-based suggestions (ranked
 differential, tests, medications) on the right.
 
+**Symptom-first.** Reasoning follows the natural clinical flow: a patient presents with one
+or more **symptoms** (not a diagnosis), the questionnaire characterises each one fully
+(SOCRATES-style), and the engine produces an **explainable ranked differential** with a
+confidence per diagnosis and the evidence **for and against** each — rather than a single
+all-or-nothing verdict. Patients can select **several chief complaints**; each gets its own
+work-up and the differential is merged into one deduplicated ranked list.
+
 **Multi-doctor.** Several gastroenterologists share the system. Each doctor has a
 short **slug** (e.g. `nitin`) that gives them their own check-in URL
 (`…/nitin`) and QR poster; submissions are tagged with that slug, and each doctor
@@ -57,14 +64,17 @@ intranet (it needs *outbound* internet to reach Firestore and send email).
 cdss/
   pipeline.py              # orchestrates the engines
   knowledge/               # loader, models, validator (versioned YAML -> dataclasses)
-  questionnaire/           # flow_engine, session (branching navigation)
+  questionnaire/           # flow_engine, session (branching navigation; multi-symptom)
   rules/                   # condition, scoring, diagnosis, red_flag engines
-  recommendations/         # investigation, treatment engines
+  recommendations/         # investigation, treatment, summary (structured note + draft HPI) engines
   api/                     # FastAPI engine API (/run, /validate) + cached registry
-  dashboard/               # doctor triage dashboard (FastAPI, per-doctor login)
+  dashboard/               # doctor dashboard + consultation page (FastAPI, per-doctor login)
+                           #   triage.py, summary.py, consultations.py (on-prem SQLite store)
   notify/                  # email confirmation listener (Firestore -> SMTP)
 knowledge_graph/
-  v1/  v2/  v2.1/          # versioned clinical knowledge (YAML)
+  v1/  v2/  v2.1/          # disease-first KGs (v1 real; v2/v2.1 synthetic test data)
+  v3/  v4/                 # symptom-first KGs (symptoms.yaml + weighted/signed rules); DRAFT content
+  abdominopelvic_regions.svg / bristol-stool-chart.html  # interactive widget sources
 doctors/                   # per-doctor registry + credentials (git-ignored; *.example tracked)
 webapp/
   build_kg_json.py         # exports a KG's questionnaire to the browser
@@ -143,7 +153,7 @@ In production the app is served from **Firebase Hosting** (a public HTTPS URL �
 development, export a knowledge graph's questionnaire for the browser and serve it:
 
 ```bash
-python3 webapp/build_kg_json.py --kg-version v1
+python3 webapp/build_kg_json.py --kg-version v4
 python3 webapp/build_doctors_js.py            # exports slug+name to doctors.js
 cd webapp/patient && python3 -m http.server 6200
 # open http://<computer-ip>:6200/?doctor=nitin on a phone on the same network
@@ -152,9 +162,14 @@ cd webapp/patient && python3 -m http.server 6200
 
 The app runs the branching questionnaire entirely client-side (its JS flow engine
 mirrors `cdss/questionnaire/flow_engine.py`). It reads the doctor **slug** from the
-URL, collects the **patient name** (required) and **email** (optional), supports UHID
-entry with optional camera barcode scan, and submits to Firestore tagged with the
-doctor slug.
+URL, collects the **patient name** (required), **age + sex** (required) and **email**
+(optional), supports UHID entry with optional camera barcode scan, and submits to
+Firestore tagged with the doctor slug. Patients pick **one or more chief complaints**;
+each complaint's questions run in turn, then a shared general-history block. It renders
+all question types — single/multi-select, yes/no, number, free text, a **clickable
+abdomen diagram** for pain location (`region_select`, multi-region), and the **Bristol
+stool chart** for constipation (`bristol_select`, up to 2). The diagram
+(`abdominopelvic_regions.svg`) is fetched and inlined, with a plain-pill fallback.
 
 To enable cloud submission, follow **[webapp/SETUP_FIREBASE.md](webapp/SETUP_FIREBASE.md)**
 and copy `firebase-config.example.js` → `firebase-config.js`. Without it, the app
@@ -186,11 +201,16 @@ in (credentials in `doctors/<slug>.yaml`) and sees **only their own** patients. 
 board auto-refreshes and shows patients **first-come-first-serve** (arrival order, with
 waiting time). Clicking a patient opens a **consultation page**: a left-hand editable
 note pre-filled from the questionnaire (chief complaint, draft history of present
-illness, diagnosis, tests, meds, …) and right-hand clickable suggestion pills (ranked
-differential + tests + medications) that insert into the note. Saving stores the note
-on-prem in SQLite (`doctors/consultations.db`, git-ignored). The risk-scoring pipeline
-still runs (it feeds the suggestions and an optional red-flag badge); risk-ranking of the
-queue is kept in code but disabled per the doctors' request.
+illness — one paragraph per complaint, deterministically generated, no LLM — diagnosis,
+tests, meds, …) and right-hand clickable suggestion pills (ranked differential + tests +
+medications) that insert into the note. Clicking a **diagnosis** floats that diagnosis's
+specific tests and medicines to the top of the suggestion pool. An **"additional
+symptoms / history"** field lets the doctor record findings they add during the visit.
+Saving stores the note on-prem in SQLite (`doctors/consultations.db`, git-ignored) as
+**mining-ready** data — symptoms, diagnoses, tests, meds, plus which suggestions were
+accepted vs ignored — for a future association-rule learning loop. The risk-scoring
+pipeline still runs (it feeds the suggestions and an optional red-flag badge);
+risk-ranking of the queue is kept in code but disabled per the doctors' request.
 
 ### 5. Email confirmation listener
 
@@ -212,18 +232,22 @@ is version-agnostic — switching versions needs no code change.
 
 | Version | Nature | Use |
 |---------|--------|-----|
-| `v1`    | Minimal, real clinical content (biliary pain, GERD, GI bleed) | Working proof of concept |
+| `v1`    | Minimal, real clinical content (biliary pain, GERD, GI bleed), **disease-first** | Working proof of concept |
 | `v2`    | Expanded structure + synthetic filler | Larger-graph / grouping structure |
 | `v2.1`  | Real diagnosis/investigation names, synthetic rules | Scalability / scoring tests |
+| `v3`    | **Symptom-first**: `symptoms.yaml` per chief complaint, weighted/signed differential, structured summary + draft HPI | The natural-clinical-flow redesign |
+| `v4`    | Symptom-first, **17 chief complaints** authored from a clinician's history-taking spec; shared general-history block; question types number/text/multi-select plus a clickable **abdomen diagram** (`region_select`) and the **Bristol stool chart** (`bristol_select`) | Current clinical content |
 
 > **v2 and v2.1 contain synthetic placeholders — schema and engine test data, not
-> medical truth.** A future clinician-reviewed `v3` graph drops in without code
-> changes.
+> medical truth.** The **symptom-first** versions (`v3`, `v4`) are the current model;
+> the engine stays version-agnostic (symptom-first behaviour is gated on whether a KG
+> has a `symptoms.yaml`). **v3/v4 clinical content — including the differential weights —
+> is a draft for physician review, not validated.**
 
 Validation has two profiles — `prototype` (structural) and `clinical` (strict):
 
 ```bash
-python3 examples/validate_kg.py --kg-version v2.1 --profile prototype
+python3 examples/validate_kg.py --kg-version v4 --profile clinical
 python3 examples/validate_kg.py --all
 ```
 
@@ -236,21 +260,28 @@ python3 examples/run_cases.py
 
 ## Status & roadmap
 
-**Working:** engine, explainable scoring, REST API, patient web app, Firestore
-submission, the doctor dashboard, multi-doctor support (per-doctor slugs/QR codes,
-patient name + optional email, confirmation emails, per-doctor login), and **public
-Firebase Hosting + a waiting-room QR poster** — the single-doctor loop is live-tested.
+**Working:** the symptom-first engine with explainable ranked differentials, REST API,
+the patient web app, Firestore submission, the doctor dashboard + consultation page,
+multi-doctor support (per-doctor slugs/QR codes, patient name + age/sex + optional email,
+confirmation emails, per-doctor login), and **public Firebase Hosting + a waiting-room QR
+poster** — the loop is live-tested.
 
-**New (symptom-first redesign):** a `v3` **symptom-first** knowledge graph (chief
-complaints with complete work-ups → weighted **ranked differential** with evidence
-for/against → structured summary + draft note), a **first-come-first-serve** queue, and a
-per-patient **consultation page** with rules-based suggestion pills. Completed notes are
-captured on-prem as mining-ready data for a future **Apriori/FP-Growth** learning loop.
-*The v3 clinical content is a draft for physician review.*
+**Symptom-first model (`v3` → `v4`):** knowledge organised around chief complaints with
+complete work-ups → a weighted, signed **ranked differential** (confidence + evidence
+for/against). `v4` covers **17 chief complaints** with a shared general-history block.
+The consultation page adds **multi-symptom intake** (several complaints, one deduplicated
+differential), **diagnosis-aware** test/medicine suggestions, and a structured capture of
+doctor-added findings. Completed notes are stored on-prem as mining-ready data.
 
-**Next:** physician review of the v3 weights/content; PHI hardening (end-of-day
-auto-delete, App Check — gated on real-patient testing); the association-rule mining job;
-optionally an AI consultation summary.
+**Next:** physician review of the v3/v4 weights and content; a **lab-report photo → table**
+feature (OCR/vision extraction of test values vs normal ranges — the last item from the
+clinician's spec, needs a vision model so it's a separate decision); PHI hardening (end-of-day
+auto-delete, App Check — gated on real-patient testing); the **association-rule mining
+job** (Apriori/FP-Growth) that turns the captured consultations into proposed knowledge-graph
+improvements; optionally an AI consultation summary.
+
+> **Clinical content is a draft for physician review.** The system is decision support,
+> not a medical device.
 
 ## License / disclaimer
 

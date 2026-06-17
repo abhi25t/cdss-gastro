@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bristol Stool Chart</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#f7f6f3; --border:#e2e0d8; --border-hover:#c9c6bc;
+    --text:#2c2c2a; --text-muted:#6b6a64; --info:#185fa5; --info-bg:#e6f1fb;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#1f1e1c; --surface:#2a2926; --border:#3a3935; --border-hover:#54534d;
+      --text:#e8e6dd; --text-muted:#a3a199; --info:#85b7eb; --info-bg:#13283d;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:24px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.5}
+  .bsc-wrap{max-width:680px;margin:0 auto}
+  h1{font-size:22px;font-weight:500;margin:0 0 4px}
+  .bsc-intro{font-size:14px;color:var(--text-muted);margin:0 0 20px}
+  .bsc-row{display:flex;align-items:center;gap:14px;padding:10px 14px;
+    border:1px solid var(--border);border-radius:12px;background:var(--bg);
+    cursor:pointer;transition:border-color .15s,background .15s;margin-bottom:8px;
+    width:100%;text-align:left;font-family:inherit}
+  .bsc-row:hover{border-color:var(--border-hover);background:var(--surface)}
+  .bsc-row[aria-pressed="true"]{border:2px solid var(--info);background:var(--info-bg)}
+  .bsc-num{flex:0 0 28px;height:28px;display:flex;align-items:center;justify-content:center;
+    border-radius:50%;background:var(--surface);font-size:14px;font-weight:500;color:var(--text-muted)}
+  .bsc-row[aria-pressed="true"] .bsc-num{background:var(--info);color:var(--bg)}
+  .bsc-art{flex:0 0 96px;height:46px}
+  .bsc-desc{flex:1;font-size:15px;color:var(--text)}
+  .bsc-check{flex:0 0 22px;height:22px;color:var(--info);opacity:0;transition:opacity .15s}
+  .bsc-row[aria-pressed="true"] .bsc-check{opacity:1}
+  .bsc-sel{margin-top:16px;font-size:14px;color:var(--text-muted)}
+  .bsc-sel b{color:var(--text);font-weight:500}
+</style>
+</head>
+<body>
+<div class="bsc-wrap">
+  <h1>Bristol stool chart</h1>
+  <p class="bsc-intro">Tap a type to select it.</p>
+  <div id="bsc-list"></div>
+  <div class="bsc-sel" id="bsc-sel">No type selected yet.</div>
+</div>
+
+<script>
+const C1="#6B4423", C2="#7A4F28", C3="#8B5A2B", L="#A0703D";
+const types = [
+  {n:1, desc:"Separate hard lumps", art:
+    `<circle cx="20" cy="23" r="7" fill="${C1}"/><circle cx="40" cy="18" r="6.5" fill="${C2}"/><circle cx="58" cy="26" r="7" fill="${C1}"/><circle cx="76" cy="20" r="6" fill="${C2}"/><circle cx="48" cy="33" r="5.5" fill="${C3}"/>`},
+  {n:2, desc:"Lumpy and sausage-like", art:
+    `<path d="M8 23 Q14 12 22 22 Q30 12 40 22 Q50 12 60 22 Q70 12 84 22 Q90 30 80 33 Q60 38 40 35 Q18 34 8 28 Z" fill="${C2}"/>`},
+  {n:3, desc:"Sausage shape with cracks on the surface", art:
+    `<rect x="8" y="16" width="80" height="16" rx="8" fill="${C2}"/><path d="M24 16 L26 32 M44 16 L42 32 M62 16 L64 32 M76 16 L74 32" stroke="${C1}" stroke-width="1.5"/>`},
+  {n:4, desc:"Smooth and soft, like a sausage or snake", art:
+    `<path d="M8 26 Q26 12 48 24 Q70 36 88 22" stroke="${C3}" stroke-width="13" fill="none" stroke-linecap="round"/>`},
+  {n:5, desc:"Soft blobs with clear-cut edges", art:
+    `<ellipse cx="24" cy="24" rx="13" ry="10" fill="${C3}"/><ellipse cx="52" cy="22" rx="11" ry="9" fill="${L}"/><ellipse cx="76" cy="26" rx="10" ry="8" fill="${C3}"/>`},
+  {n:6, desc:"Mushy with ragged edges", art:
+    `<path d="M10 24 Q12 14 22 18 Q26 10 36 16 Q44 9 52 17 Q62 11 70 18 Q82 14 84 24 Q88 32 78 34 Q66 40 54 35 Q42 41 30 35 Q16 36 10 28 Z" fill="${L}"/>`},
+  {n:7, desc:"Liquid, no solid pieces", art:
+    `<path d="M14 26 Q10 18 20 20 Q24 12 34 20 Q46 14 56 22 Q70 18 78 26 Q90 28 82 33 Q60 39 40 35 Q20 36 14 30 Z" fill="#B8843E"/><circle cx="26" cy="38" r="2.5" fill="#B8843E"/><circle cx="68" cy="39" r="2" fill="#B8843E"/>`}
+];
+
+let selected = null;
+const list = document.getElementById("bsc-list");
+const sel = document.getElementById("bsc-sel");
+
+types.forEach(t => {
+  const b = document.createElement("button");
+  b.className = "bsc-row";
+  b.setAttribute("aria-pressed", "false");
+  b.setAttribute("data-type", t.n);
+  b.innerHTML =
+    `<span class="bsc-num">${t.n}</span>` +
+    `<svg class="bsc-art" viewBox="0 0 96 46" aria-hidden="true">${t.art}</svg>` +
+    `<span class="bsc-desc">${t.desc}</span>` +
+    `<svg class="bsc-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>`;
+  b.addEventListener("click", () => selectType(t.n));
+  list.appendChild(b);
+});
+
+function selectType(n){
+  selected = n;
+  const t = types.find(x => x.n === n);
+  document.querySelectorAll(".bsc-row").forEach(r =>
+    r.setAttribute("aria-pressed", r.dataset.type == n ? "true" : "false"));
+  sel.innerHTML = `Selected: <b>Type ${t.n} — ${t.desc}</b>`;
+
+  // Hook for your own project: fires whenever a type is chosen.
+  document.dispatchEvent(new CustomEvent("bristol:select", {
+    detail: { type: t.n, description: t.desc }
+  }));
+}
+
+// Example listener — replace with your own logic:
+document.addEventListener("bristol:select", e => {
+  console.log("Selected stool type:", e.detail.type, "-", e.detail.description);
+});
+</script>
+</body>
+</html>
