@@ -13,6 +13,7 @@ from cdss.knowledge.models import (
     Question,
     RedFlag,
     Rule,
+    Symptom,
     canonical_id,
 )
 
@@ -72,6 +73,7 @@ def load_knowledge_graph(path: str | Path) -> KnowledgeGraph:
         flows=_normalize_flows(raw_files.get("flows", {})),
         conditions=_normalize_conditions(raw_files.get("conditions", {})),
         diagnoses=_normalize_diagnoses(raw_files.get("diagnoses", {})),
+        symptoms=_normalize_symptoms(raw_files.get("symptoms", {})),
         rules=_normalize_rules(raw_files.get("rules", {})),
         red_flags=_normalize_red_flags(raw_files.get("red_flags", {})),
         investigations=_normalize_recommendation_map(raw_files.get("investigations", {}).get("investigations", {})),
@@ -172,6 +174,31 @@ def _normalize_diagnoses(raw: Any) -> dict[str, Diagnosis]:
     return diagnoses
 
 
+def _normalize_symptoms(raw: Any) -> dict[str, Symptom]:
+    symptoms_raw = raw.get("symptoms", {}) if isinstance(raw, dict) else raw
+    symptoms: dict[str, Symptom] = {}
+    if isinstance(symptoms_raw, dict):
+        iterable = [{"id": key, **(value or {})} for key, value in symptoms_raw.items()]
+    else:
+        iterable = symptoms_raw or []
+
+    for item in iterable:
+        if not isinstance(item, dict) or "id" not in item:
+            continue
+        symptom_id = str(item["id"])
+        label = str(item.get("label") or symptom_id.replace("_", " ").title())
+        symptoms[symptom_id] = Symptom(
+            id=symptom_id,
+            label=label,
+            chief_complaint_text=str(item.get("chief_complaint_text") or label.lower()),
+            flow=item.get("flow"),
+            workup=[str(value) for value in item.get("workup") or []],
+            differential=[str(value) for value in item.get("differential") or []],
+            raw=item,
+        )
+    return symptoms
+
+
 def _normalize_rules(raw: Any) -> list[Rule]:
     rules_raw = raw.get("rules", []) if isinstance(raw, dict) else raw
     rules: list[Rule] = []
@@ -179,6 +206,9 @@ def _normalize_rules(raw: Any) -> list[Rule]:
         if not isinstance(item, dict):
             continue
         rule_id = str(item.get("id") or f"rule_{index}")
+        condition = item.get("condition")
+        direction = str(item.get("direction") or "positive").strip().lower()
+        specificity = item.get("specificity")
         rules.append(
             Rule(
                 id=rule_id,
@@ -187,6 +217,9 @@ def _normalize_rules(raw: Any) -> list[Rule]:
                 weight=_optional_int(item.get("weight")),
                 when=[str(value) for value in item.get("when") or []],
                 requires=[str(value) for value in item.get("requires") or []],
+                condition=str(condition) if condition is not None else None,
+                direction=direction,
+                specificity=str(specificity) if specificity is not None else None,
                 raw=item,
             )
         )

@@ -1,5 +1,5 @@
 {
-  "version": "v1",
+  "version": "v3",
   "entry_question": "q_main_complaint",
   "questions": {
     "q_main_complaint": {
@@ -12,112 +12,570 @@
           "label": "Abdominal Pain"
         },
         {
-          "value": "bloating",
-          "label": "Bloating"
+          "value": "dyspepsia",
+          "label": "Indigestion / Heartburn"
         },
         {
-          "value": "heartburn",
-          "label": "Heartburn"
+          "value": "jaundice",
+          "label": "Yellowing of Eyes or Skin"
+        },
+        {
+          "value": "altered_bowel",
+          "label": "Change in Bowel Habit"
+        },
+        {
+          "value": "gi_bleeding",
+          "label": "Blood in Vomit or Stool"
         }
       ]
     },
-    "q_location": {
-      "id": "q_location",
-      "text": "Where is the pain located?",
+    "q_ap_site": {
+      "id": "q_ap_site",
+      "text": "Where is the pain mainly located?",
       "type": "single_choice",
       "options": [
         {
-          "value": "ruq",
-          "label": "Right Upper Abdomen"
+          "value": "epigastric",
+          "label": "Upper Middle Abdomen",
+          "hpi": "epigastrium"
         },
         {
-          "value": "epigastric",
-          "label": "Upper Middle Abdomen"
+          "value": "ruq",
+          "label": "Right Upper Abdomen",
+          "hpi": "right upper quadrant"
         },
         {
           "value": "rlq",
-          "label": "Right Lower Abdomen"
+          "label": "Right Lower Abdomen",
+          "hpi": "right lower quadrant"
+        },
+        {
+          "value": "luq",
+          "label": "Left Upper Abdomen",
+          "hpi": "left upper quadrant"
+        },
+        {
+          "value": "periumbilical",
+          "label": "Around the Navel",
+          "hpi": "periumbilical region"
         },
         {
           "value": "diffuse",
-          "label": "Entire Abdomen"
+          "label": "All Over the Abdomen",
+          "hpi": "diffuse abdomen"
         }
       ]
     },
-    "q_fatty_food": {
-      "id": "q_fatty_food",
-      "text": "Does the pain worsen after fatty meals?",
+    "q_ap_onset": {
+      "id": "q_ap_onset",
+      "text": "How did the pain start?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "sudden",
+          "label": "Suddenly",
+          "hpi": "sudden onset"
+        },
+        {
+          "value": "gradual",
+          "label": "Gradually",
+          "hpi": "gradual onset"
+        }
+      ]
+    },
+    "q_ap_character": {
+      "id": "q_ap_character",
+      "text": "What does the pain feel like?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "colicky",
+          "label": "Comes in Waves (cramping)",
+          "hpi": "colicky"
+        },
+        {
+          "value": "burning",
+          "label": "Burning",
+          "hpi": "burning"
+        },
+        {
+          "value": "dull",
+          "label": "Dull Ache",
+          "hpi": "dull"
+        },
+        {
+          "value": "boring",
+          "label": "Deep / Boring",
+          "hpi": "boring"
+        },
+        {
+          "value": "sharp",
+          "label": "Sharp",
+          "hpi": "sharp"
+        }
+      ]
+    },
+    "q_ap_radiation": {
+      "id": "q_ap_radiation",
+      "text": "Does the pain travel anywhere?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "to_back",
+          "label": "To the Back",
+          "hpi": "to the back"
+        },
+        {
+          "value": "to_right_shoulder",
+          "label": "To the Right Shoulder",
+          "hpi": "to the right shoulder"
+        },
+        {
+          "value": "to_groin",
+          "label": "To the Groin",
+          "hpi": "to the groin"
+        },
+        {
+          "value": "none",
+          "label": "Stays in One Place",
+          "hpi": "nowhere"
+        }
+      ]
+    },
+    "q_ap_severity": {
+      "id": "q_ap_severity",
+      "text": "How severe is the pain?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "mild",
+          "label": "Mild",
+          "hpi": "mild"
+        },
+        {
+          "value": "moderate",
+          "label": "Moderate",
+          "hpi": "moderate"
+        },
+        {
+          "value": "severe",
+          "label": "Severe",
+          "hpi": "severe"
+        }
+      ]
+    },
+    "q_ap_timing": {
+      "id": "q_ap_timing",
+      "text": "When is the pain worst?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "after_meals",
+          "label": "After Meals",
+          "hpi": "after meals"
+        },
+        {
+          "value": "fasting",
+          "label": "When Hungry / Fasting",
+          "hpi": "when fasting"
+        },
+        {
+          "value": "night",
+          "label": "At Night",
+          "hpi": "at night"
+        },
+        {
+          "value": "constant",
+          "label": "All the Time",
+          "hpi": "constantly"
+        }
+      ]
+    },
+    "q_ap_fatty": {
+      "id": "q_ap_fatty",
+      "text": "Is the pain worse after fatty or oily food?",
       "type": "yes_no",
       "options": []
     },
-    "q_heartburn": {
-      "id": "q_heartburn",
-      "text": "Do you experience burning behind the chest?",
+    "q_ap_relieved_food": {
+      "id": "q_ap_relieved_food",
+      "text": "Is the pain relieved by eating or by antacids?",
       "type": "yes_no",
       "options": []
     },
-    "q_jaundice": {
-      "id": "q_jaundice",
-      "text": "Have you noticed yellowing of the eyes or skin?",
-      "type": "yes_no",
-      "options": []
-    },
-    "q_fever": {
-      "id": "q_fever",
+    "q_ap_fever": {
+      "id": "q_ap_fever",
       "text": "Do you have fever?",
       "type": "yes_no",
       "options": []
     },
-    "q_weight_loss": {
-      "id": "q_weight_loss",
+    "q_ap_vomiting": {
+      "id": "q_ap_vomiting",
+      "text": "Have you been vomiting?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_ap_jaundice": {
+      "id": "q_ap_jaundice",
+      "text": "Have you noticed yellowing of the eyes or skin?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_dy_burning": {
+      "id": "q_dy_burning",
+      "text": "Do you get a burning feeling behind the breastbone?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_dy_regurgitation": {
+      "id": "q_dy_regurgitation",
+      "text": "Does sour fluid or food come back up into your throat?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_dy_relation": {
+      "id": "q_dy_relation",
+      "text": "When are the symptoms worst?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "after_meals",
+          "label": "After Meals",
+          "hpi": "after meals"
+        },
+        {
+          "value": "lying_down",
+          "label": "When Lying Down",
+          "hpi": "on lying down"
+        },
+        {
+          "value": "fasting",
+          "label": "When Hungry / Fasting",
+          "hpi": "when fasting"
+        }
+      ]
+    },
+    "q_dy_relieved_antacid": {
+      "id": "q_dy_relieved_antacid",
+      "text": "Do antacids relieve the symptoms?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_dy_bloating": {
+      "id": "q_dy_bloating",
+      "text": "Do you feel bloated or full quickly?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_dy_dysphagia": {
+      "id": "q_dy_dysphagia",
+      "text": "Do you have difficulty swallowing?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_dy_weight_loss": {
+      "id": "q_dy_weight_loss",
       "text": "Have you lost weight unintentionally?",
       "type": "yes_no",
       "options": []
     },
-    "q_black_stool": {
-      "id": "q_black_stool",
-      "text": "Have you passed black stools?",
+    "q_jy_dark_urine": {
+      "id": "q_jy_dark_urine",
+      "text": "Is your urine darker than usual?",
       "type": "yes_no",
       "options": []
     },
-    "q_diarrhea": {
-      "id": "q_diarrhea",
-      "text": "Do you have diarrhea?",
+    "q_jy_pale_stool": {
+      "id": "q_jy_pale_stool",
+      "text": "Are your stools pale or clay-coloured?",
       "type": "yes_no",
       "options": []
     },
-    "q_constipation": {
-      "id": "q_constipation",
-      "text": "Do you have constipation?",
+    "q_jy_itching": {
+      "id": "q_jy_itching",
+      "text": "Do you have itching of the skin?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_jy_pain": {
+      "id": "q_jy_pain",
+      "text": "Do you have abdominal pain along with the yellowing?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_jy_fever": {
+      "id": "q_jy_fever",
+      "text": "Do you have fever?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_jy_weight_loss": {
+      "id": "q_jy_weight_loss",
+      "text": "Have you lost weight unintentionally?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_jy_alcohol": {
+      "id": "q_jy_alcohol",
+      "text": "Do you drink alcohol regularly?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_bo_pattern": {
+      "id": "q_bo_pattern",
+      "text": "How have your bowels changed?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "diarrhea",
+          "label": "Loose / Frequent Stools",
+          "hpi": "diarrhoea"
+        },
+        {
+          "value": "constipation",
+          "label": "Hard / Infrequent Stools",
+          "hpi": "constipation"
+        },
+        {
+          "value": "alternating",
+          "label": "Alternating Loose and Hard",
+          "hpi": "alternating bowel habit"
+        }
+      ]
+    },
+    "q_bo_duration": {
+      "id": "q_bo_duration",
+      "text": "How long has this been going on?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "acute",
+          "label": "Less than 2 Weeks",
+          "hpi": "short"
+        },
+        {
+          "value": "chronic",
+          "label": "More than 4 Weeks",
+          "hpi": "prolonged"
+        }
+      ]
+    },
+    "q_bo_blood": {
+      "id": "q_bo_blood",
+      "text": "Is there blood in your stool?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_bo_mucus": {
+      "id": "q_bo_mucus",
+      "text": "Is there mucus in your stool?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_bo_nocturnal": {
+      "id": "q_bo_nocturnal",
+      "text": "Do the symptoms wake you from sleep at night?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_bo_weight_loss": {
+      "id": "q_bo_weight_loss",
+      "text": "Have you lost weight unintentionally?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_bo_fever": {
+      "id": "q_bo_fever",
+      "text": "Do you have fever?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_gb_type": {
+      "id": "q_gb_type",
+      "text": "How is the bleeding showing up?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "vomiting_blood",
+          "label": "Vomiting Blood",
+          "hpi": "haematemesis"
+        },
+        {
+          "value": "black_stool",
+          "label": "Black Tarry Stools",
+          "hpi": "melaena"
+        },
+        {
+          "value": "fresh_blood_stool",
+          "label": "Fresh Red Blood in Stool",
+          "hpi": "fresh rectal bleeding"
+        }
+      ]
+    },
+    "q_gb_amount": {
+      "id": "q_gb_amount",
+      "text": "How much blood have you noticed?",
+      "type": "single_choice",
+      "options": [
+        {
+          "value": "small",
+          "label": "A Small Amount",
+          "hpi": "small"
+        },
+        {
+          "value": "large",
+          "label": "A Large Amount",
+          "hpi": "large"
+        }
+      ]
+    },
+    "q_gb_dizzy": {
+      "id": "q_gb_dizzy",
+      "text": "Have you felt dizzy or light-headed?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_gb_nsaid": {
+      "id": "q_gb_nsaid",
+      "text": "Do you take painkillers such as ibuprofen or aspirin?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_gb_alcohol": {
+      "id": "q_gb_alcohol",
+      "text": "Do you drink alcohol regularly?",
+      "type": "yes_no",
+      "options": []
+    },
+    "q_gb_weight_loss": {
+      "id": "q_gb_weight_loss",
+      "text": "Have you lost weight unintentionally?",
       "type": "yes_no",
       "options": []
     }
   },
   "flows": {
     "abdominal_pain": {
-      "start": "q_location",
+      "start": "q_ap_site",
       "transitions": {
-        "q_location": {
-          "ruq": "q_fatty_food",
-          "epigastric": "q_heartburn",
-          "rlq": "q_fever",
-          "diffuse": "q_diarrhea"
+        "q_ap_site": {
+          "default": "q_ap_onset"
         },
-        "q_fatty_food": {
-          "yes": "q_jaundice",
-          "no": "q_fever"
+        "q_ap_onset": {
+          "default": "q_ap_character"
         },
-        "q_jaundice": {
-          "yes": "q_fever",
-          "no": "q_fever"
+        "q_ap_character": {
+          "default": "q_ap_radiation"
         },
-        "q_heartburn": {
-          "yes": "q_weight_loss",
-          "no": "q_black_stool"
+        "q_ap_radiation": {
+          "default": "q_ap_severity"
         },
-        "q_diarrhea": {
-          "yes": "q_weight_loss",
-          "no": "q_constipation"
+        "q_ap_severity": {
+          "default": "q_ap_timing"
+        },
+        "q_ap_timing": {
+          "default": "q_ap_fatty"
+        },
+        "q_ap_fatty": {
+          "default": "q_ap_relieved_food"
+        },
+        "q_ap_relieved_food": {
+          "default": "q_ap_fever"
+        },
+        "q_ap_fever": {
+          "default": "q_ap_vomiting"
+        },
+        "q_ap_vomiting": {
+          "default": "q_ap_jaundice"
+        }
+      }
+    },
+    "dyspepsia": {
+      "start": "q_dy_burning",
+      "transitions": {
+        "q_dy_burning": {
+          "default": "q_dy_regurgitation"
+        },
+        "q_dy_regurgitation": {
+          "default": "q_dy_relation"
+        },
+        "q_dy_relation": {
+          "default": "q_dy_relieved_antacid"
+        },
+        "q_dy_relieved_antacid": {
+          "default": "q_dy_bloating"
+        },
+        "q_dy_bloating": {
+          "default": "q_dy_dysphagia"
+        },
+        "q_dy_dysphagia": {
+          "default": "q_dy_weight_loss"
+        }
+      }
+    },
+    "jaundice": {
+      "start": "q_jy_dark_urine",
+      "transitions": {
+        "q_jy_dark_urine": {
+          "default": "q_jy_pale_stool"
+        },
+        "q_jy_pale_stool": {
+          "default": "q_jy_itching"
+        },
+        "q_jy_itching": {
+          "default": "q_jy_pain"
+        },
+        "q_jy_pain": {
+          "default": "q_jy_fever"
+        },
+        "q_jy_fever": {
+          "default": "q_jy_weight_loss"
+        },
+        "q_jy_weight_loss": {
+          "default": "q_jy_alcohol"
+        }
+      }
+    },
+    "altered_bowel": {
+      "start": "q_bo_pattern",
+      "transitions": {
+        "q_bo_pattern": {
+          "default": "q_bo_duration"
+        },
+        "q_bo_duration": {
+          "default": "q_bo_blood"
+        },
+        "q_bo_blood": {
+          "default": "q_bo_mucus"
+        },
+        "q_bo_mucus": {
+          "default": "q_bo_nocturnal"
+        },
+        "q_bo_nocturnal": {
+          "default": "q_bo_weight_loss"
+        },
+        "q_bo_weight_loss": {
+          "default": "q_bo_fever"
+        }
+      }
+    },
+    "gi_bleeding": {
+      "start": "q_gb_type",
+      "transitions": {
+        "q_gb_type": {
+          "default": "q_gb_amount"
+        },
+        "q_gb_amount": {
+          "default": "q_gb_dizzy"
+        },
+        "q_gb_dizzy": {
+          "default": "q_gb_nsaid"
+        },
+        "q_gb_nsaid": {
+          "default": "q_gb_alcohol"
+        },
+        "q_gb_alcohol": {
+          "default": "q_gb_weight_loss"
         }
       }
     }

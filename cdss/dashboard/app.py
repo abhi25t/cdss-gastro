@@ -6,12 +6,13 @@ from typing import Any
 from fastapi import Depends, FastAPI, Form, HTTPException, Request
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, Field
 
 from cdss import doctors
 from cdss.api.registry import PipelineRegistry
-from cdss.dashboard import auth
+from cdss.dashboard import auth, consultations
 from cdss.dashboard.source import get_source
-from cdss.dashboard.triage import triage
+from cdss.dashboard.triage import assess_detail, triage
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 COOKIE_NAME = "cdss_session"
@@ -28,6 +29,45 @@ def require_doctor(request: Request) -> str:
     if not slug:
         raise HTTPException(status_code=401, detail="Not logged in")
     return slug
+
+
+def _owned_submission(submission_id: str, doctor: str) -> dict[str, Any]:
+    """Fetch a submission and enforce ownership. Returns a flat 404 for both
+    missing and not-owned so a doctor can't enumerate other doctors' patients."""
+    sub = source.fetch_one(submission_id)
+    if not sub or str(sub.get("doctor_slug", "")).strip().lower() != doctor:
+        raise HTTPException(status_code=404, detail="Submission not found")
+    return sub
+
+
+class _SuggestionGroup(BaseModel):
+    offered: list[str] = Field(default_factory=list)
+    accepted: list[str] = Field(default_factory=list)
+
+
+class _Suggestions(BaseModel):
+    diagnoses: _SuggestionGroup = Field(default_factory=_SuggestionGroup)
+    tests: _SuggestionGroup = Field(default_factory=_SuggestionGroup)
+    medications: _SuggestionGroup = Field(default_factory=_SuggestionGroup)
+
+
+class _Note(BaseModel):
+    chief_complaint: str = ""
+    history_present_illness: str = ""
+    past_history: str = ""
+    current_medications: str = ""
+    allergies: str = ""
+    family_history: str = ""
+    findings: str = ""
+    provisional_diagnosis: list[str] = Field(default_factory=list)
+    tests: list[str] = Field(default_factory=list)
+    prescribed_medications: list[str] = Field(default_factory=list)
+    advice_followup: str = ""
+
+
+class _ConsultationBody(BaseModel):
+    note: _Note
+    suggestions: _Suggestions = Field(default_factory=_Suggestions)
 
 
 # ---- Auth routes -----------------------------------------------------------
@@ -85,6 +125,49 @@ def api_mark_seen(submission_id: str, doctor: str = Depends(require_doctor)) -> 
 def api_cleanup(doctor: str = Depends(require_doctor)) -> dict[str, Any]:
     deleted = source.cleanup(doctor_slug=doctor)
     return {"status": "ok", "deleted": deleted}
+
+
+# ---- Per-patient consultation page ----------------------------------------
+@app.get("/patient/{submission_id}", response_model=None)
+def patient_page(submission_id: str, request: Request) -> FileResponse | RedirectResponse:
+    slug = auth.read_token(request.cookies.get(COOKIE_NAME))
+    if not slug:
+        return RedirectResponse("/login")
+    _owned_submission(submission_id, slug)  # 404 if not this doctor's patient
+    return FileResponse(STATIC_DIR / "patient.html")
+
+
+@app.get("/api/patient/{submission_id}")
+def api_patient(submission_id: str, doctor: str = Depends(require_doctor)) -> dict[str, Any]:
+    sub = _owned_submission(submission_id, doctor)
+    return assess_detail(sub, registry)
+
+
+@app.post("/api/patient/{submission_id}/consultation")
+def api_save_consultation(
+    submission_id: str, body: _ConsultationBody, doctor: str = Depends(require_doctor)
+) -> dict[str, str]:
+    sub = _owned_submission(submission_id, doctor)
+    detail = assess_detail(sub, registry)
+    record = {
+        "submission_id": submission_id,
+        "doctor_slug": doctor,
+        "uhid": sub.get("uhid"),
+        "patient_age": sub.get("patient_age"),
+        "patient_sex": sub.get("patient_sex"),
+        "kg_version": sub.get("kg_version"),
+        "chief_complaint": body.note.chief_complaint or detail.get("chief_complaint"),
+        "note": body.note.model_dump(),
+        "suggestions": body.suggestions.model_dump(),
+        "symptom_features": detail.get("true_conditions", []),
+    }
+    consultation_id = consultations.save_consultation(record, path=consultations.DB_PATH)
+    # Saving a note implies the patient has been seen; remove from the queue.
+    try:
+        source.mark_seen(submission_id)
+    except Exception:  # noqa: BLE001 — never fail the save on a mark-seen hiccup
+        pass
+    return {"status": "ok", "consultation_id": consultation_id}
 
 
 @app.get("/", response_model=None)

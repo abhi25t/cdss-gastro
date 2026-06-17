@@ -6,7 +6,7 @@ from typing import Any
 
 from cdss.knowledge import KnowledgeGraph, validate
 from cdss.knowledge.models import DiagnosisResult, ValidationReport
-from cdss.recommendations import InvestigationEngine, TreatmentEngine
+from cdss.recommendations import InvestigationEngine, SummaryEngine, TreatmentEngine
 from cdss.rules import ConditionEngine, RedFlagEngine, ScoringEngine
 
 
@@ -19,13 +19,16 @@ class CDSSPipelineResult:
     diagnoses: list[DiagnosisResult]
     investigations: dict[str, list[str]]
     treatments: dict[str, list[str]]
+    # v3 symptom-first additions; None for older versions so the v1 contract is unchanged.
+    symptom_summary: dict[str, Any] | None = None
+    draft_hpi: str | None = None
 
     @property
     def true_conditions(self) -> list[str]:
         return [condition_id for condition_id, active in self.conditions.items() if active]
 
     def as_dict(self) -> dict[str, Any]:
-        return {
+        data = {
             "version": self.version,
             "validation": {
                 "valid": self.validation.is_valid,
@@ -40,6 +43,11 @@ class CDSSPipelineResult:
             "investigations": self.investigations,
             "treatments": self.treatments,
         }
+        if self.symptom_summary is not None:
+            data["symptom_summary"] = self.symptom_summary
+        if self.draft_hpi is not None:
+            data["draft_hpi"] = self.draft_hpi
+        return data
 
 
 class CDSSPipeline:
@@ -51,6 +59,7 @@ class CDSSPipeline:
         self.scoring_engine = ScoringEngine(kg)
         self.investigation_engine = InvestigationEngine(kg)
         self.treatment_engine = TreatmentEngine(kg)
+        self.summary_engine = SummaryEngine(kg)
 
     @classmethod
     def from_version(
@@ -70,6 +79,7 @@ class CDSSPipeline:
         diagnoses = self.scoring_engine.score(conditions)
         investigations = self.investigation_engine.recommend(diagnoses)
         treatments = self.treatment_engine.recommend(diagnoses)
+        symptom_summary, draft_hpi = self.summary_engine.summarize(answers)
 
         return CDSSPipelineResult(
             version=self.kg.version,
@@ -79,4 +89,6 @@ class CDSSPipeline:
             diagnoses=diagnoses,
             investigations=investigations,
             treatments=treatments,
+            symptom_summary=symptom_summary,
+            draft_hpi=draft_hpi,
         )

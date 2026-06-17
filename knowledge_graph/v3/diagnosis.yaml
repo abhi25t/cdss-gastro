@@ -1,0 +1,20 @@
+# Display names for the diagnoses referenced by the weighted rules. In v3 the scoring
+# is driven by rules.yaml (weighted, signed), not by supporting_conditions. DRAFT.
+diagnoses:
+  biliary_colic: {name: Biliary Colic}
+  acute_cholecystitis: {name: Acute Cholecystitis}
+  acute_pancreatitis: {name: Acute Pancreatitis}
+  peptic_ulcer_disease: {name: Peptic Ulcer Disease}
+  gerd: {name: GERD}
+  appendicitis: {name: Acute Appendicitis}
+  functional_dyspepsia: {name: Functional Dyspepsia}
+  choledocholithiasis: {name: Choledocholithiasis}
+  viral_hepatitis: {name: Viral Hepatitis}
+  pancreatic_head_malignancy: {name: Pancreatic Head Malignancy}
+  alcoholic_hepatitis: {name: Alcoholic Hepatitis}
+  acute_gastroenteritis: {name: Acute Gastroenteritis}
+  irritable_bowel_syndrome: {name: Irritable Bowel Syndrome}
+  inflammatory_bowel_disease: {name: Inflammatory Bowel Disease}
+  colorectal_cancer: {name: Colorectal Cancer}
+  esophageal_varices: {name: Esophageal Varices}
+  hemorrhoids: {name: Hemorrhoids}

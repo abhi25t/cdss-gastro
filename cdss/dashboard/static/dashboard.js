@@ -32,51 +32,77 @@
       return;
     }
     board.innerHTML = data.patients.map(card).join("");
-    board.querySelectorAll("[data-seen]").forEach((btn) => {
-      btn.addEventListener("click", () => markSeen(btn.getAttribute("data-seen")));
+    board.querySelectorAll("[data-href]").forEach((el) => {
+      el.addEventListener("click", () => { window.location = el.getAttribute("data-href"); });
     });
+    board.querySelectorAll("[data-seen]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();  // don't open the patient page when marking seen
+        markSeen(btn.getAttribute("data-seen"));
+      });
+    });
+    tickWaiting();
   }
 
   function card(p) {
     const seen = p.status === "seen";
-    const flags = (p.red_flags || []).map((f) => {
-      const cls = f.urgency === "immediate" ? "flag--immediate"
-        : f.urgency === "urgent" ? "flag--urgent" : "flag--other";
-      return `<span class="flag ${cls}">⚑ ${esc(f.flag)} · ${esc(f.urgency)}</span>`;
-    }).join("");
+    // Red flags no longer reorder the queue; show a non-reordering safety badge only.
+    const hasFlag = (p.red_flags || []).some((f) => f.urgency === "immediate" || f.urgency === "urgent");
+    const flagBadge = hasFlag ? `<span class="flag flag--immediate">⚑ red flag</span>` : "";
 
-    const evidence = (p.evidence || []).map((e) => `<span class="chip">${esc(e)}</span>`).join("");
-
-    const alts = (p.diagnoses || []).slice(1);
-    const altLine = alts.length
-      ? `<div class="alt-dx">Also: ${alts.map((d) => `${esc(d.diagnosis)} (${d.score})`).join(", ")}</div>`
-      : "";
-
-    const dxLine = p.top_diagnosis
-      ? `<div class="dx"><strong>${esc(p.top_diagnosis)}</strong><span class="score-pill">${p.top_score}</span></div>`
-      : `<div class="dx"><em>No diagnosis matched</em></div>`;
+    const symptom = p.main_symptom && p.main_symptom !== "—"
+      ? ` · <span class="symptom">${esc(p.main_symptom)}</span>` : "";
 
     const action = seen
       ? `<span class="seen-tag">✓ Seen</span>`
       : `<button class="seen-btn" data-seen="${esc(p.id)}">Mark seen</button>`;
 
     return `
-      <article class="patient ${seen ? "seen" : ""}" data-tier="${esc(p.risk_tier)}">
-        <div class="rank"><small>Rank</small>${p.position}</div>
+      <article class="patient ${seen ? "seen" : ""}" data-flag="${hasFlag ? "1" : "0"}"
+               data-href="/patient/${encodeURIComponent(p.id)}">
+        <div class="rank"><small>Queue</small>${p.position}</div>
         <div class="pinfo">
-          <h2>${esc(p.patient_name || "Unknown")} <span class="uhid">· ${esc(p.uhid || "no UHID")} · ${esc(p.kg_version)}</span></h2>
-          ${flags ? `<div class="flags">${flags}</div>` : ""}
-          ${dxLine}
-          ${evidence ? `<div class="evidence">${evidence}</div>` : ""}
-          ${altLine}
+          <h2>${esc(p.patient_name || "Unknown")} <span class="uhid">${demographics(p)}· ${esc(p.uhid || "no UHID")}</span></h2>
+          <div class="complaint"><strong>${esc(p.chief_complaint || "—")}</strong>${symptom}</div>
+          <div class="meta">
+            <span class="clock">🕒 ${fmtTime(p.created_at)}</span>
+            <span class="waiting" data-created="${esc(p.created_at || "")}">waiting ${p.waiting_minutes} min</span>
+            ${flagBadge}
+          </div>
           ${p.error ? `<div class="alt-dx">⚠ ${esc(p.error)}</div>` : ""}
         </div>
-        <div class="pactions">
-          <span class="tier-badge tier-${esc(p.risk_tier)}">${esc(p.risk_tier)}</span>
-          ${action}
-        </div>
+        <div class="pactions">${action}</div>
       </article>`;
   }
+
+  // "45y M · " when age/sex present, else "".
+  function demographics(p) {
+    const sex = { male: "M", female: "F", other: "O" }[p.patient_sex] || "";
+    const parts = [];
+    if (p.patient_age) parts.push(`${esc(p.patient_age)}y`);
+    if (sex) parts.push(sex);
+    return parts.length ? `· ${parts.join(" ")} ` : "";
+  }
+
+  function fmtTime(iso) {
+    if (!iso) return "—";
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? "—" : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+
+  function waitMins(iso) {
+    if (!iso) return 0;
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? 0 : Math.max(0, Math.floor((Date.now() - d.getTime()) / 60000));
+  }
+
+  // Tick the waiting time between polls so it doesn't look frozen.
+  function tickWaiting() {
+    document.querySelectorAll(".waiting").forEach((el) => {
+      el.textContent = `waiting ${waitMins(el.getAttribute("data-created"))} min`;
+    });
+  }
+  setInterval(tickWaiting, 30000);
 
   async function markSeen(id) {
     try {

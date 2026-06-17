@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consultation · CDSS</title>
+  <link rel="stylesheet" href="/dashboard.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand__dot"></span>
+      <div>
+        <h1 id="pName">Consultation</h1>
+        <p class="brand__sub" id="pMeta">Loading…</p>
+      </div>
+    </div>
+    <div class="controls">
+      <span id="saveStatus" class="status"></span>
+      <a href="/" class="btn btn--ghost">← Back to queue</a>
+      <button id="printBtn" class="btn btn--ghost">Print</button>
+      <button id="saveBtn" class="btn">Save consultation</button>
+    </div>
+  </header>
+
+  <main id="consult" class="consult">
+    <!-- LEFT: editable prescription / clinical note -->
+    <form id="note" class="note">
+      <div class="note-section"><label for="f_chief_complaint">Chief Complaint</label>
+        <textarea id="f_chief_complaint" rows="2"></textarea></div>
+      <div class="note-section"><label for="f_history_present_illness">History of Present Illness</label>
+        <textarea id="f_history_present_illness" rows="4"></textarea></div>
+      <div class="note-section"><label for="f_past_history">Past Medical / Surgical History</label>
+        <textarea id="f_past_history" rows="2"></textarea></div>
+      <div class="note-section"><label for="f_current_medications">Current Medications</label>
+        <textarea id="f_current_medications" rows="2"></textarea></div>
+      <div class="note-section"><label for="f_allergies">Allergies</label>
+        <textarea id="f_allergies" rows="1" placeholder="e.g. NKDA"></textarea></div>
+      <div class="note-section"><label for="f_family_history">Family History</label>
+        <textarea id="f_family_history" rows="2"></textarea></div>
+      <div class="note-section"><label for="f_findings">Findings</label>
+        <textarea id="f_findings" rows="3"></textarea></div>
+      <div class="note-section list"><label for="f_provisional_diagnosis">Provisional Diagnosis <span class="hint">(one per line)</span></label>
+        <textarea id="f_provisional_diagnosis" rows="3"></textarea></div>
+      <div class="note-section list"><label for="f_tests">Tests <span class="hint">(one per line)</span></label>
+        <textarea id="f_tests" rows="3"></textarea></div>
+      <div class="note-section list"><label for="f_prescribed_medications">Prescribed Medications <span class="hint">(one per line)</span></label>
+        <textarea id="f_prescribed_medications" rows="4"></textarea></div>
+      <div class="note-section"><label for="f_advice_followup">Advice / Follow-up</label>
+        <textarea id="f_advice_followup" rows="2"></textarea></div>
+    </form>
+
+    <!-- RIGHT: rules-based suggestion pills (click to add into the note) -->
+    <aside class="suggest" aria-label="Suggestions">
+      <p class="suggest-help">Click a suggestion to add it to the note. Click again to remove.</p>
+      <section><h3>Probable diagnoses</h3><div id="g_diagnoses" class="pills"></div></section>
+      <section><h3>Suggested tests</h3><div id="g_tests" class="pills"></div></section>
+      <section><h3>Suggested medications</h3><div id="g_medications" class="pills"></div></section>
+      <section id="redFlagBox" class="redflags" hidden><h3>Red flags</h3><div id="g_redflags" class="pills"></div></section>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    Decision support only — clinician confirms every diagnosis, test and medication.
+  </footer>
+
+  <script src="/patient.js"></script>
+</body>
+</html>

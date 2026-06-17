@@ -1,0 +1,98 @@
+# The organising spine of the v3 symptom-first model. Each chief complaint owns its
+# complete work-up (the questions a clinician would always ask) and the differential
+# it can lead to. DRAFT for physician review.
+symptoms:
+  abdominal_pain:
+    label: Abdominal Pain
+    chief_complaint_text: abdominal pain
+    flow: abdominal_pain
+    required_semiology: [site, onset, character, radiation, severity, timing]
+    workup:
+      - q_ap_site
+      - q_ap_onset
+      - q_ap_character
+      - q_ap_radiation
+      - q_ap_severity
+      - q_ap_timing
+      - q_ap_fatty
+      - q_ap_relieved_food
+      - q_ap_fever
+      - q_ap_vomiting
+      - q_ap_jaundice
+    differential:
+      - biliary_colic
+      - acute_cholecystitis
+      - acute_pancreatitis
+      - peptic_ulcer_disease
+      - gerd
+      - appendicitis
+
+  dyspepsia:
+    label: Indigestion / Heartburn
+    chief_complaint_text: indigestion and heartburn
+    flow: dyspepsia
+    workup:
+      - q_dy_burning
+      - q_dy_regurgitation
+      - q_dy_relation
+      - q_dy_relieved_antacid
+      - q_dy_bloating
+      - q_dy_dysphagia
+      - q_dy_weight_loss
+    differential:
+      - gerd
+      - peptic_ulcer_disease
+      - functional_dyspepsia
+
+  jaundice:
+    label: Jaundice
+    chief_complaint_text: yellowing of the eyes and skin
+    flow: jaundice
+    workup:
+      - q_jy_dark_urine
+      - q_jy_pale_stool
+      - q_jy_itching
+      - q_jy_pain
+      - q_jy_fever
+      - q_jy_weight_loss
+      - q_jy_alcohol
+    differential:
+      - choledocholithiasis
+      - viral_hepatitis
+      - pancreatic_head_malignancy
+      - alcoholic_hepatitis
+
+  altered_bowel:
+    label: Change in Bowel Habit
+    chief_complaint_text: a change in bowel habit
+    flow: altered_bowel
+    workup:
+      - q_bo_pattern
+      - q_bo_duration
+      - q_bo_blood
+      - q_bo_mucus
+      - q_bo_nocturnal
+      - q_bo_weight_loss
+      - q_bo_fever
+    differential:
+      - acute_gastroenteritis
+      - irritable_bowel_syndrome
+      - inflammatory_bowel_disease
+      - colorectal_cancer
+
+  gi_bleeding:
+    label: Gastrointestinal Bleeding
+    chief_complaint_text: gastrointestinal bleeding
+    flow: gi_bleeding
+    workup:
+      - q_gb_type
+      - q_gb_amount
+      - q_gb_dizzy
+      - q_gb_nsaid
+      - q_gb_alcohol
+      - q_gb_weight_loss
+    differential:
+      - peptic_ulcer_disease
+      - esophageal_varices
+      - hemorrhoids
+      - colorectal_cancer

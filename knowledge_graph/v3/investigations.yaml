@@ -1,0 +1,62 @@
+# Per-diagnosis recommended investigations (suggestion-panel content). DRAFT for review.
+investigations:
+  biliary_colic:
+    - Ultrasound Abdomen
+    - Liver Function Tests
+  acute_cholecystitis:
+    - CBC
+    - Liver Function Tests
+    - Ultrasound Abdomen
+  acute_pancreatitis:
+    - Serum Lipase
+    - CBC
+    - Contrast-enhanced CT Abdomen
+  peptic_ulcer_disease:
+    - Upper GI Endoscopy
+    - H. pylori Testing
+    - CBC
+  gerd:
+    - Clinical diagnosis / PPI trial
+    - Upper GI Endoscopy if alarm features
+  appendicitis:
+    - CBC
+    - Ultrasound / CT Abdomen
+  functional_dyspepsia:
+    - H. pylori Testing
+    - Upper GI Endoscopy if alarm features
+  choledocholithiasis:
+    - Liver Function Tests
+    - Ultrasound Abdomen
+    - MRCP
+  viral_hepatitis:
+    - Liver Function Tests
+    - Viral Hepatitis Serology
+  pancreatic_head_malignancy:
+    - Contrast-enhanced CT Abdomen
+    - CA 19-9
+    - Liver Function Tests
+  alcoholic_hepatitis:
+    - Liver Function Tests
+    - CBC
+    - Coagulation Profile
+  acute_gastroenteritis:
+    - Clinical diagnosis
+    - Stool Routine if persistent
+  irritable_bowel_syndrome:
+    - CBC
+    - Coeliac Serology
+    - Faecal Calprotectin
+  inflammatory_bowel_disease:
+    - Faecal Calprotectin
+    - Colonoscopy with biopsy
+    - CBC and CRP
+  colorectal_cancer:
+    - Colonoscopy with biopsy
+    - CT Abdomen and Pelvis
+    - CEA
+  esophageal_varices:
+    - Urgent Upper GI Endoscopy
+    - CBC and Coagulation Profile
+  hemorrhoids:
+    - Proctoscopy
+    - Digital Rectal Examination

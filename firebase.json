@@ -13,7 +13,7 @@
     ],
     "headers": [
       {
-        "source": "/@(index.html|kg-data.js|kg-data.json|app.js|doctors.js)",
+        "source": "/@(index.html|kg-data.js|kg-data.json|app.js|firebase-submit.js|doctors.js|styles.css)",
         "headers": [
           { "key": "Cache-Control", "value": "no-cache, max-age=0" }
         ]

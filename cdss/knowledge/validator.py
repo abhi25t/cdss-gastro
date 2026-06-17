@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import ast
 from collections import Counter
 
-from cdss.knowledge.models import KnowledgeGraph, ValidationReport, canonical_id
+from cdss.knowledge.models import Flow, KnowledgeGraph, ValidationReport, canonical_id
 
 VALIDATION_PROFILES = {"prototype", "clinical"}
 
@@ -106,7 +107,187 @@ def validate(kg: KnowledgeGraph, profile: str = "prototype") -> ValidationReport
 
     _check_recommendations(report, kg, "investigations", kg.investigations, profile)
     _check_recommendations(report, kg, "treatment_recommendations", kg.treatment_recommendations, profile)
+
+    if kg.symptoms:
+        _check_symptom_first(report, kg, clinical)
     return report
+
+
+def _check_symptom_first(report: ValidationReport, kg: KnowledgeGraph, clinical: bool) -> None:
+    """v3 symptom-first checks: every work-up question must be reachable in its flow,
+    every rule condition must be collectable somewhere, and every listed differential
+    diagnosis must be able to accumulate score on its symptom's pathway. Directly
+    prevents the historical 'diagnosis unreachable because a question is never asked' bug.
+    """
+    per_flow_reachable: dict[str, set[str]] = {}
+    global_reachable: set[str] = set()
+    for symptom in kg.symptoms.values():
+        flow = kg.flows.get(symptom.flow) if symptom.flow else None
+        reachable = _reachable_questions(flow)
+        per_flow_reachable[symptom.id] = reachable
+        global_reachable |= reachable
+
+    # 1. Work-up question reachability.
+    for symptom in kg.symptoms.values():
+        if not symptom.flow or symptom.flow not in kg.flows:
+            report.add(
+                "error",
+                "symptom_missing_flow",
+                f"Symptom '{symptom.id}' references missing flow '{symptom.flow}'",
+                f"symptoms.{symptom.id}.flow",
+            )
+            continue
+        reachable = per_flow_reachable[symptom.id]
+        for qid in symptom.workup:
+            if qid not in kg.questions:
+                report.add(
+                    "error",
+                    "missing_workup_question",
+                    f"Symptom '{symptom.id}' work-up references missing question '{qid}'",
+                    f"symptoms.{symptom.id}.workup",
+                )
+            elif qid not in reachable:
+                report.add(
+                    "error",
+                    "unreachable_workup_question",
+                    f"Symptom '{symptom.id}' work-up question '{qid}' is never asked in flow '{symptom.flow}'",
+                    f"symptoms.{symptom.id}.workup",
+                )
+
+    # 2. Every condition used by a rule must be collectable from some flow.
+    cond_cache: dict[str, set[str]] = {}
+    for rule in kg.rules:
+        for cond_id in rule.condition_refs:
+            if cond_id not in kg.conditions:
+                continue  # missing-condition already reported above
+            qset = _condition_questions(kg, cond_id, cond_cache)
+            if qset and not (qset & global_reachable):
+                report.add(
+                    "error" if clinical else "warning",
+                    "condition_not_collectable",
+                    f"Condition '{cond_id}' (used by rule '{rule.id}') needs question(s) "
+                    f"{sorted(qset)} that are unreachable in any symptom flow",
+                    f"conditions.{cond_id}",
+                )
+
+    # 3. Every differential diagnosis must be reachable on its symptom's pathway.
+    for symptom in kg.symptoms.values():
+        reachable = per_flow_reachable.get(symptom.id, set())
+        for diag in symptom.differential:
+            diag_id = canonical_id(diag)
+            if not _diagnosis_reachable(kg, diag_id, reachable, cond_cache):
+                report.add(
+                    "error" if clinical else "warning",
+                    "unreachable_diagnosis",
+                    f"Diagnosis '{diag}' in symptom '{symptom.id}' differential cannot accumulate "
+                    f"score from its flow (no positive rule with collectable conditions)",
+                    f"symptoms.{symptom.id}.differential",
+                )
+
+    # 4. Work-up completeness (semiology slots), only when the symptom declares requirements.
+    for symptom in kg.symptoms.values():
+        required = [str(slot).strip().lower() for slot in (symptom.raw.get("required_semiology") or [])]
+        if not required:
+            continue
+        present = {
+            str((kg.questions[q].raw or {}).get("semiology") or "").strip().lower()
+            for q in symptom.workup
+            if q in kg.questions
+        }
+        for slot in required:
+            if slot not in present:
+                report.add(
+                    "warning",
+                    "incomplete_workup",
+                    f"Symptom '{symptom.id}' work-up is missing semiology slot '{slot}'",
+                    f"symptoms.{symptom.id}.workup",
+                )
+
+    # 5. Rule hygiene for the new fields.
+    for rule in kg.rules:
+        if rule.direction not in {"positive", "negative"}:
+            report.add(
+                "error",
+                "invalid_rule_direction",
+                f"Rule '{rule.id}' has invalid direction '{rule.direction}' (expected positive|negative)",
+                f"rules.{rule.id}.direction",
+            )
+        if rule.specificity is not None and str(rule.specificity).strip().lower() not in {"low", "moderate", "high"}:
+            report.add(
+                "warning",
+                "invalid_rule_specificity",
+                f"Rule '{rule.id}' has invalid specificity '{rule.specificity}' (expected low|moderate|high)",
+                f"rules.{rule.id}.specificity",
+            )
+
+
+def _reachable_questions(flow: Flow | None) -> set[str]:
+    if flow is None or not flow.start:
+        return set()
+    reachable: set[str] = set()
+    queue = [flow.start]
+    while queue:
+        question_id = queue.pop()
+        if question_id in reachable:
+            continue
+        reachable.add(question_id)
+        for target in flow.transitions.get(question_id, {}).values():
+            if target not in reachable:
+                queue.append(target)
+    return reachable
+
+
+def _condition_questions(
+    kg: KnowledgeGraph,
+    condition_id: str,
+    cache: dict[str, set[str]],
+    _stack: frozenset[str] = frozenset(),
+) -> set[str]:
+    """Question ids a condition transitively depends on (conditions may reference
+    other conditions). Used to decide whether a condition is collectable from a flow."""
+    if condition_id in cache:
+        return cache[condition_id]
+    if condition_id in _stack:
+        return set()
+    condition = kg.conditions.get(condition_id)
+    if condition is None:
+        return set()
+    questions: set[str] = set()
+    for name in _expression_names(condition.expression):
+        if name in kg.questions:
+            questions.add(name)
+        elif name in kg.conditions and name != condition_id:
+            questions |= _condition_questions(kg, name, cache, _stack | {condition_id})
+    cache[condition_id] = questions
+    return questions
+
+
+def _expression_names(expression: str) -> set[str]:
+    try:
+        tree = ast.parse(expression, mode="eval")
+    except SyntaxError:
+        return {expression}
+    return {node.id for node in ast.walk(tree) if isinstance(node, ast.Name)}
+
+
+def _diagnosis_reachable(
+    kg: KnowledgeGraph,
+    diagnosis_id: str,
+    reachable_questions: set[str],
+    cond_cache: dict[str, set[str]],
+) -> bool:
+    for rule in kg.rules:
+        if _rule_diagnosis_id(rule.id, rule.diagnosis) != diagnosis_id or rule.is_negative:
+            continue
+        refs = rule.condition_refs
+        if not refs:
+            continue
+        if all(
+            not (qset := _condition_questions(kg, cond_id, cond_cache)) or (qset & reachable_questions)
+            for cond_id in refs
+        ):
+            return True
+    return False
 
 
 def _check_duplicate_ids(report: ValidationReport, kind: str, values: list[object]) -> None:

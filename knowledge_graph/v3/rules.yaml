@@ -1,0 +1,121 @@
+# Weighted, signed feature -> diagnosis map (the core v3 change). Each finding nudges
+# one or more diagnoses up (positive) or down (negative). `specificity` is an
+# explainability label; discriminating features carry larger weights. DRAFT for
+# physician review — weights are reference-informed starting points, not validated.
+rules:
+  # ---- Biliary colic ----
+  - {id: r_bc_ruq, diagnosis: biliary_colic, condition: ap_ruq, weight: 12, specificity: moderate}
+  - {id: r_bc_fatty, diagnosis: biliary_colic, condition: ap_fatty_trigger, weight: 15, specificity: high}
+  - {id: r_bc_colicky, diagnosis: biliary_colic, condition: ap_colicky, weight: 10, specificity: moderate}
+  - {id: r_bc_shoulder, diagnosis: biliary_colic, condition: ap_radiates_shoulder, weight: 8, specificity: moderate}
+
+  # ---- Acute cholecystitis (biliary colic + inflammation) ----
+  - {id: r_ac_ruq, diagnosis: acute_cholecystitis, condition: ap_ruq, weight: 10, specificity: moderate}
+  - {id: r_ac_fatty, diagnosis: acute_cholecystitis, condition: ap_fatty_trigger, weight: 10, specificity: moderate}
+  - {id: r_ac_fever, diagnosis: acute_cholecystitis, condition: ap_fever, weight: 18, specificity: high}
+  - {id: r_ac_shoulder, diagnosis: acute_cholecystitis, condition: ap_radiates_shoulder, weight: 6, specificity: low}
+  - {id: r_ac_vomiting, diagnosis: acute_cholecystitis, condition: ap_vomiting, weight: 5, specificity: low}
+
+  # ---- Acute pancreatitis ----
+  - {id: r_ap_epigastric, diagnosis: acute_pancreatitis, condition: ap_epigastric, weight: 8, specificity: low}
+  - {id: r_ap_back, diagnosis: acute_pancreatitis, condition: ap_radiates_back, weight: 20, specificity: high}
+  - {id: r_ap_boring, diagnosis: acute_pancreatitis, condition: ap_boring, weight: 10, specificity: moderate}
+  - {id: r_ap_severe, diagnosis: acute_pancreatitis, condition: ap_severe, weight: 8, specificity: low}
+  - {id: r_ap_vomiting, diagnosis: acute_pancreatitis, condition: ap_vomiting, weight: 6, specificity: low}
+  - {id: r_ap_relieved, diagnosis: acute_pancreatitis, condition: ap_relieved_by_food, weight: 10, direction: negative}
+
+  # ---- Peptic ulcer disease ----
+  - {id: r_pud_epigastric, diagnosis: peptic_ulcer_disease, condition: ap_epigastric, weight: 10, specificity: moderate}
+  - {id: r_pud_burning, diagnosis: peptic_ulcer_disease, condition: ap_burning, weight: 10, specificity: moderate}
+  - {id: r_pud_relieved, diagnosis: peptic_ulcer_disease, condition: ap_relieved_by_food, weight: 15, specificity: high}
+  - {id: r_pud_fasting, diagnosis: peptic_ulcer_disease, condition: ap_fasting, weight: 10, specificity: moderate}
+  - {id: r_pud_aftermeals, diagnosis: peptic_ulcer_disease, condition: ap_after_meals, weight: 5, direction: negative}
+  # PUD via dyspepsia presentation
+  - {id: r_pud_dy_fasting, diagnosis: peptic_ulcer_disease, condition: dy_fasting, weight: 10, specificity: moderate}
+  - {id: r_pud_dy_antacid, diagnosis: peptic_ulcer_disease, condition: dy_relieved_antacid, weight: 8, specificity: moderate}
+  - {id: r_pud_dy_burning, diagnosis: peptic_ulcer_disease, condition: dy_burning, weight: 5, specificity: low}
+  # PUD via GI bleeding presentation
+  - {id: r_pud_gb_melena, diagnosis: peptic_ulcer_disease, condition: gb_melena, weight: 12, specificity: moderate}
+  - {id: r_pud_gb_hematemesis, diagnosis: peptic_ulcer_disease, condition: gb_hematemesis, weight: 10, specificity: moderate}
+  - {id: r_pud_gb_nsaid, diagnosis: peptic_ulcer_disease, condition: gb_nsaid, weight: 14, specificity: high}
+
+  # ---- GERD ----
+  - {id: r_gerd_ap_epigastric, diagnosis: gerd, condition: ap_epigastric, weight: 6, specificity: low}
+  - {id: r_gerd_ap_burning, diagnosis: gerd, condition: ap_burning, weight: 12, specificity: moderate}
+  - {id: r_gerd_ap_aftermeals, diagnosis: gerd, condition: ap_after_meals, weight: 10, specificity: moderate}
+  # GERD via dyspepsia presentation
+  - {id: r_gerd_dy_burning, diagnosis: gerd, condition: dy_burning, weight: 14, specificity: high}
+  - {id: r_gerd_dy_regurg, diagnosis: gerd, condition: dy_regurgitation, weight: 12, specificity: high}
+  - {id: r_gerd_dy_lying, diagnosis: gerd, condition: dy_lying_down, weight: 10, specificity: moderate}
+  - {id: r_gerd_dy_antacid, diagnosis: gerd, condition: dy_relieved_antacid, weight: 6, specificity: low}
+
+  # ---- Appendicitis ----
+  - {id: r_app_rlq, diagnosis: appendicitis, condition: ap_rlq, weight: 18, specificity: high}
+  - {id: r_app_periumbilical, diagnosis: appendicitis, condition: ap_periumbilical, weight: 8, specificity: moderate}
+  - {id: r_app_fever, diagnosis: appendicitis, condition: ap_fever, weight: 8, specificity: moderate}
+  - {id: r_app_vomiting, diagnosis: appendicitis, condition: ap_vomiting, weight: 6, specificity: low}
+
+  # ---- Functional dyspepsia ----
+  - {id: r_fd_bloating, diagnosis: functional_dyspepsia, condition: dy_bloating, weight: 14, specificity: moderate}
+  - {id: r_fd_aftermeals, diagnosis: functional_dyspepsia, condition: dy_after_meals, weight: 8, specificity: low}
+  - {id: r_fd_no_weight, diagnosis: functional_dyspepsia, condition: dy_weight_loss, weight: 10, direction: negative}
+  - {id: r_fd_no_dysphagia, diagnosis: functional_dyspepsia, condition: dy_dysphagia, weight: 10, direction: negative}
+
+  # ---- Choledocholithiasis (obstructive, painful) ----
+  - {id: r_chol_pale, diagnosis: choledocholithiasis, condition: jy_pale_stool, weight: 12, specificity: moderate}
+  - {id: r_chol_pain, diagnosis: choledocholithiasis, condition: jy_pain, weight: 14, specificity: high}
+  - {id: r_chol_itch, diagnosis: choledocholithiasis, condition: jy_itching, weight: 8, specificity: low}
+  - {id: r_chol_fever, diagnosis: choledocholithiasis, condition: jy_fever, weight: 8, specificity: moderate}
+
+  # ---- Viral hepatitis ----
+  - {id: r_vh_fever, diagnosis: viral_hepatitis, condition: jy_fever, weight: 12, specificity: moderate}
+  - {id: r_vh_dark_urine, diagnosis: viral_hepatitis, condition: jy_dark_urine, weight: 6, specificity: low}
+  - {id: r_vh_pain, diagnosis: viral_hepatitis, condition: jy_pain, weight: 6, direction: negative}
+
+  # ---- Pancreatic head malignancy (painless, progressive) ----
+  - {id: r_pm_weight, diagnosis: pancreatic_head_malignancy, condition: jy_weight_loss, weight: 18, specificity: high}
+  - {id: r_pm_pale, diagnosis: pancreatic_head_malignancy, condition: jy_pale_stool, weight: 8, specificity: moderate}
+  - {id: r_pm_itch, diagnosis: pancreatic_head_malignancy, condition: jy_itching, weight: 8, specificity: moderate}
+  - {id: r_pm_painless, diagnosis: pancreatic_head_malignancy, condition: jy_pain, weight: 8, direction: negative}
+
+  # ---- Alcoholic hepatitis ----
+  - {id: r_ah_alcohol, diagnosis: alcoholic_hepatitis, condition: jy_alcohol, weight: 18, specificity: high}
+  - {id: r_ah_fever, diagnosis: alcoholic_hepatitis, condition: jy_fever, weight: 6, specificity: low}
+  - {id: r_ah_pain, diagnosis: alcoholic_hepatitis, condition: jy_pain, weight: 6, specificity: low}
+
+  # ---- Acute gastroenteritis ----
+  - {id: r_age_diarrhea, diagnosis: acute_gastroenteritis, condition: bo_diarrhea, weight: 10, specificity: low}
+  - {id: r_age_acute, diagnosis: acute_gastroenteritis, condition: bo_acute, weight: 12, specificity: moderate}
+  - {id: r_age_fever, diagnosis: acute_gastroenteritis, condition: bo_fever, weight: 8, specificity: low}
+  - {id: r_age_chronic, diagnosis: acute_gastroenteritis, condition: bo_chronic, weight: 12, direction: negative}
+
+  # ---- Irritable bowel syndrome ----
+  - {id: r_ibs_alternating, diagnosis: irritable_bowel_syndrome, condition: bo_alternating, weight: 12, specificity: moderate}
+  - {id: r_ibs_mucus, diagnosis: irritable_bowel_syndrome, condition: bo_mucus, weight: 8, specificity: low}
+  - {id: r_ibs_chronic, diagnosis: irritable_bowel_syndrome, condition: bo_chronic, weight: 8, specificity: low}
+  - {id: r_ibs_no_blood, diagnosis: irritable_bowel_syndrome, condition: bo_blood, weight: 12, direction: negative}
+  - {id: r_ibs_no_nocturnal, diagnosis: irritable_bowel_syndrome, condition: bo_nocturnal, weight: 8, direction: negative}
+
+  # ---- Inflammatory bowel disease ----
+  - {id: r_ibd_blood, diagnosis: inflammatory_bowel_disease, condition: bo_blood, weight: 14, specificity: high}
+  - {id: r_ibd_chronic, diagnosis: inflammatory_bowel_disease, condition: bo_chronic, weight: 8, specificity: low}
+  - {id: r_ibd_nocturnal, diagnosis: inflammatory_bowel_disease, condition: bo_nocturnal, weight: 10, specificity: moderate}
+  - {id: r_ibd_mucus, diagnosis: inflammatory_bowel_disease, condition: bo_mucus, weight: 6, specificity: low}
+
+  # ---- Colorectal cancer ----
+  - {id: r_crc_bo_blood, diagnosis: colorectal_cancer, condition: bo_blood, weight: 10, specificity: low}
+  - {id: r_crc_bo_weight, diagnosis: colorectal_cancer, condition: bo_weight_loss, weight: 18, specificity: high}
+  - {id: r_crc_bo_chronic, diagnosis: colorectal_cancer, condition: bo_chronic, weight: 6, specificity: low}
+  # CRC via GI bleeding presentation
+  - {id: r_crc_gb_fresh, diagnosis: colorectal_cancer, condition: gb_fresh_blood, weight: 8, specificity: low}
+  - {id: r_crc_gb_weight, diagnosis: colorectal_cancer, condition: gb_weight_loss, weight: 18, specificity: high}
+
+  # ---- Esophageal varices ----
+  - {id: r_ev_hematemesis, diagnosis: esophageal_varices, condition: gb_hematemesis, weight: 12, specificity: moderate}
+  - {id: r_ev_alcohol, diagnosis: esophageal_varices, condition: gb_alcohol, weight: 16, specificity: high}
+  - {id: r_ev_large, diagnosis: esophageal_varices, condition: gb_large, weight: 8, specificity: moderate}
+
+  # ---- Hemorrhoids ----
+  - {id: r_hem_fresh, diagnosis: hemorrhoids, condition: gb_fresh_blood, weight: 16, specificity: high}
+  - {id: r_hem_not_large, diagnosis: hemorrhoids, condition: gb_large, weight: 6, direction: negative}
+  - {id: r_hem_not_dizzy, diagnosis: hemorrhoids, condition: gb_dizzy, weight: 6, direction: negative}

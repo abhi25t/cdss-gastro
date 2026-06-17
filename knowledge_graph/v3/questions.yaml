@@ -1,0 +1,306 @@
+# v3 symptom-first questionnaire. DRAFT clinical content for physician review.
+# Each chief complaint owns a complete work-up (full semiology). Optional metadata
+# (`semiology`, `summary_template`, per-option `hpi`, `finding`) is read only by the
+# summary engine to build the structured summary + draft history of present illness.
+questions:
+  - id: q_main_complaint
+    text: What is your main problem today?
+    type: single_choice
+    options:
+      - {value: abdominal_pain, label: Abdominal Pain}
+      - {value: dyspepsia, label: Indigestion / Heartburn}
+      - {value: jaundice, label: Yellowing of Eyes or Skin}
+      - {value: altered_bowel, label: Change in Bowel Habit}
+      - {value: gi_bleeding, label: Blood in Vomit or Stool}
+
+  # ---- Abdominal pain (SOCRATES) ----
+  - id: q_ap_site
+    text: Where is the pain mainly located?
+    type: single_choice
+    group: abdominal_pain
+    semiology: site
+    summary_template: "located in the {answer}"
+    options:
+      - {value: epigastric, label: Upper Middle Abdomen, hpi: epigastrium}
+      - {value: ruq, label: Right Upper Abdomen, hpi: right upper quadrant}
+      - {value: rlq, label: Right Lower Abdomen, hpi: right lower quadrant}
+      - {value: luq, label: Left Upper Abdomen, hpi: left upper quadrant}
+      - {value: periumbilical, label: Around the Navel, hpi: periumbilical region}
+      - {value: diffuse, label: All Over the Abdomen, hpi: diffuse abdomen}
+
+  - id: q_ap_onset
+    text: How did the pain start?
+    type: single_choice
+    group: abdominal_pain
+    semiology: onset
+    summary_template: "of {answer}"
+    options:
+      - {value: sudden, label: Suddenly, hpi: sudden onset}
+      - {value: gradual, label: Gradually, hpi: gradual onset}
+
+  - id: q_ap_character
+    text: What does the pain feel like?
+    type: single_choice
+    group: abdominal_pain
+    semiology: character
+    summary_template: "{answer} in character"
+    options:
+      - {value: colicky, label: Comes in Waves (cramping), hpi: colicky}
+      - {value: burning, label: Burning, hpi: burning}
+      - {value: dull, label: Dull Ache, hpi: dull}
+      - {value: boring, label: Deep / Boring, hpi: boring}
+      - {value: sharp, label: Sharp, hpi: sharp}
+
+  - id: q_ap_radiation
+    text: Does the pain travel anywhere?
+    type: single_choice
+    group: abdominal_pain
+    semiology: radiation
+    summary_template: "radiating {answer}"
+    options:
+      - {value: to_back, label: To the Back, hpi: to the back}
+      - {value: to_right_shoulder, label: To the Right Shoulder, hpi: to the right shoulder}
+      - {value: to_groin, label: To the Groin, hpi: to the groin}
+      - {value: none, label: Stays in One Place, hpi: nowhere}
+
+  - id: q_ap_severity
+    text: How severe is the pain?
+    type: single_choice
+    group: abdominal_pain
+    semiology: severity
+    summary_template: "{answer} in severity"
+    options:
+      - {value: mild, label: Mild, hpi: mild}
+      - {value: moderate, label: Moderate, hpi: moderate}
+      - {value: severe, label: Severe, hpi: severe}
+
+  - id: q_ap_timing
+    text: When is the pain worst?
+    type: single_choice
+    group: abdominal_pain
+    semiology: timing
+    summary_template: "worst {answer}"
+    options:
+      - {value: after_meals, label: After Meals, hpi: after meals}
+      - {value: fasting, label: When Hungry / Fasting, hpi: when fasting}
+      - {value: night, label: At Night, hpi: at night}
+      - {value: constant, label: All the Time, hpi: constantly}
+
+  - id: q_ap_fatty
+    text: Is the pain worse after fatty or oily food?
+    type: yes_no
+    group: abdominal_pain
+    finding: aggravation by fatty meals
+
+  - id: q_ap_relieved_food
+    text: Is the pain relieved by eating or by antacids?
+    type: yes_no
+    group: abdominal_pain
+    finding: relief with food or antacids
+
+  - id: q_ap_fever
+    text: Do you have fever?
+    type: yes_no
+    group: abdominal_pain
+    finding: fever
+
+  - id: q_ap_vomiting
+    text: Have you been vomiting?
+    type: yes_no
+    group: abdominal_pain
+    finding: vomiting
+
+  - id: q_ap_jaundice
+    text: Have you noticed yellowing of the eyes or skin?
+    type: yes_no
+    group: abdominal_pain
+    finding: jaundice
+
+  # ---- Dyspepsia / reflux ----
+  - id: q_dy_burning
+    text: Do you get a burning feeling behind the breastbone?
+    type: yes_no
+    group: dyspepsia
+    finding: retrosternal burning
+
+  - id: q_dy_regurgitation
+    text: Does sour fluid or food come back up into your throat?
+    type: yes_no
+    group: dyspepsia
+    finding: acid regurgitation
+
+  - id: q_dy_relation
+    text: When are the symptoms worst?
+    type: single_choice
+    group: dyspepsia
+    semiology: timing
+    summary_template: "worst {answer}"
+    options:
+      - {value: after_meals, label: After Meals, hpi: after meals}
+      - {value: lying_down, label: When Lying Down, hpi: on lying down}
+      - {value: fasting, label: When Hungry / Fasting, hpi: when fasting}
+
+  - id: q_dy_relieved_antacid
+    text: Do antacids relieve the symptoms?
+    type: yes_no
+    group: dyspepsia
+    finding: relief with antacids
+
+  - id: q_dy_bloating
+    text: Do you feel bloated or full quickly?
+    type: yes_no
+    group: dyspepsia
+    finding: bloating and early satiety
+
+  - id: q_dy_dysphagia
+    text: Do you have difficulty swallowing?
+    type: yes_no
+    group: dyspepsia
+    finding: difficulty swallowing
+
+  - id: q_dy_weight_loss
+    text: Have you lost weight unintentionally?
+    type: yes_no
+    group: dyspepsia
+    finding: unintentional weight loss
+
+  # ---- Jaundice ----
+  - id: q_jy_dark_urine
+    text: Is your urine darker than usual?
+    type: yes_no
+    group: jaundice
+    finding: dark urine
+
+  - id: q_jy_pale_stool
+    text: Are your stools pale or clay-coloured?
+    type: yes_no
+    group: jaundice
+    finding: pale stools
+
+  - id: q_jy_itching
+    text: Do you have itching of the skin?
+    type: yes_no
+    group: jaundice
+    finding: itching
+
+  - id: q_jy_pain
+    text: Do you have abdominal pain along with the yellowing?
+    type: yes_no
+    group: jaundice
+    finding: abdominal pain
+
+  - id: q_jy_fever
+    text: Do you have fever?
+    type: yes_no
+    group: jaundice
+    finding: fever
+
+  - id: q_jy_weight_loss
+    text: Have you lost weight unintentionally?
+    type: yes_no
+    group: jaundice
+    finding: unintentional weight loss
+
+  - id: q_jy_alcohol
+    text: Do you drink alcohol regularly?
+    type: yes_no
+    group: jaundice
+    finding: regular alcohol use
+
+  # ---- Altered bowel habit ----
+  - id: q_bo_pattern
+    text: How have your bowels changed?
+    type: single_choice
+    group: altered_bowel
+    semiology: pattern
+    summary_template: "{answer}"
+    options:
+      - {value: diarrhea, label: Loose / Frequent Stools, hpi: diarrhoea}
+      - {value: constipation, label: Hard / Infrequent Stools, hpi: constipation}
+      - {value: alternating, label: Alternating Loose and Hard, hpi: alternating bowel habit}
+
+  - id: q_bo_duration
+    text: How long has this been going on?
+    type: single_choice
+    group: altered_bowel
+    semiology: onset
+    summary_template: "for a {answer} duration"
+    options:
+      - {value: acute, label: Less than 2 Weeks, hpi: short}
+      - {value: chronic, label: More than 4 Weeks, hpi: prolonged}
+
+  - id: q_bo_blood
+    text: Is there blood in your stool?
+    type: yes_no
+    group: altered_bowel
+    finding: blood in the stool
+
+  - id: q_bo_mucus
+    text: Is there mucus in your stool?
+    type: yes_no
+    group: altered_bowel
+    finding: mucus in the stool
+
+  - id: q_bo_nocturnal
+    text: Do the symptoms wake you from sleep at night?
+    type: yes_no
+    group: altered_bowel
+    finding: nocturnal symptoms
+
+  - id: q_bo_weight_loss
+    text: Have you lost weight unintentionally?
+    type: yes_no
+    group: altered_bowel
+    finding: unintentional weight loss
+
+  - id: q_bo_fever
+    text: Do you have fever?
+    type: yes_no
+    group: altered_bowel
+    finding: fever
+
+  # ---- GI bleeding ----
+  - id: q_gb_type
+    text: How is the bleeding showing up?
+    type: single_choice
+    group: gi_bleeding
+    semiology: character
+    summary_template: "as {answer}"
+    options:
+      - {value: vomiting_blood, label: Vomiting Blood, hpi: haematemesis}
+      - {value: black_stool, label: Black Tarry Stools, hpi: melaena}
+      - {value: fresh_blood_stool, label: Fresh Red Blood in Stool, hpi: fresh rectal bleeding}
+
+  - id: q_gb_amount
+    text: How much blood have you noticed?
+    type: single_choice
+    group: gi_bleeding
+    semiology: severity
+    summary_template: "{answer} in amount"
+    options:
+      - {value: small, label: A Small Amount, hpi: small}
+      - {value: large, label: A Large Amount, hpi: large}
+
+  - id: q_gb_dizzy
+    text: Have you felt dizzy or light-headed?
+    type: yes_no
+    group: gi_bleeding
+    finding: light-headedness
+
+  - id: q_gb_nsaid
+    text: Do you take painkillers such as ibuprofen or aspirin?
+    type: yes_no
+    group: gi_bleeding
+    finding: NSAID use
+
+  - id: q_gb_alcohol
+    text: Do you drink alcohol regularly?
+    type: yes_no
+    group: gi_bleeding
+    finding: regular alcohol use
+
+  - id: q_gb_weight_loss
+    text: Have you lost weight unintentionally?
+    type: yes_no
+    group: gi_bleeding
+    finding: unintentional weight loss

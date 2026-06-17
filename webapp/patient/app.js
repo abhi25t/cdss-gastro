@@ -26,6 +26,8 @@
     doctorName: "",
     uhid: "",
     patientName: "",
+    patientAge: "",
+    patientSex: "",
     patientEmail: "",
     answers: {},          // { question_id: value }  (yes_no -> "yes"/"no")
     current: null,        // current question id
@@ -86,6 +88,20 @@
                  placeholder="Full name" value="${escapeAttr(state.patientName)}" />
         </div>
         <div class="field">
+          <label for="patientAge">Age</label>
+          <input class="input" id="patientAge" inputmode="numeric" type="number" min="0" max="120"
+                 placeholder="Years" value="${escapeAttr(state.patientAge)}" />
+        </div>
+        <div class="field">
+          <label for="patientSex">Sex</label>
+          <select class="input" id="patientSex">
+            <option value=""${state.patientSex === "" ? " selected" : ""}>Select…</option>
+            <option value="male"${state.patientSex === "male" ? " selected" : ""}>Male</option>
+            <option value="female"${state.patientSex === "female" ? " selected" : ""}>Female</option>
+            <option value="other"${state.patientSex === "other" ? " selected" : ""}>Other</option>
+          </select>
+        </div>
+        <div class="field">
           <label for="patientEmail">Email <span class="subtle">(optional)</span></label>
           <input class="input" id="patientEmail" inputmode="email" autocomplete="email"
                  placeholder="you@example.com — for a confirmation" value="${escapeAttr(state.patientEmail)}" />
@@ -109,9 +125,13 @@
     `);
 
     const nameInput = document.getElementById("patientName");
+    const ageInput = document.getElementById("patientAge");
+    const sexInput = document.getElementById("patientSex");
     const emailInput = document.getElementById("patientEmail");
     const uhidInput = document.getElementById("uhid");
     nameInput.addEventListener("input", (e) => { state.patientName = e.target.value.trim(); });
+    ageInput.addEventListener("input", (e) => { state.patientAge = e.target.value.trim(); });
+    sexInput.addEventListener("change", (e) => { state.patientSex = e.target.value; });
     emailInput.addEventListener("input", (e) => { state.patientEmail = e.target.value.trim(); });
     uhidInput.addEventListener("input", (e) => { state.uhid = e.target.value.trim(); });
     document.getElementById("scanBtn").addEventListener("click", startScan);
@@ -120,6 +140,17 @@
       if (!state.patientName) {
         nameInput.focus();
         msg.textContent = "Please enter your name first.";
+        return;
+      }
+      const age = parseInt(state.patientAge, 10);
+      if (!state.patientAge || isNaN(age) || age < 0 || age > 120) {
+        ageInput.focus();
+        msg.textContent = "Please enter a valid age.";
+        return;
+      }
+      if (!state.patientSex) {
+        sexInput.focus();
+        msg.textContent = "Please select your sex.";
         return;
       }
       if (!state.uhid) {
@@ -191,6 +222,7 @@
         <p class="eyebrow">Review</p>
         <h1>Check your answers</h1>
         <p class="subtle">Name: <strong>${escapeHtml(state.patientName)}</strong></p>
+        <p class="subtle">Age / Sex: <strong>${escapeHtml(state.patientAge)} · ${escapeHtml(labelForSex(state.patientSex))}</strong></p>
         <p class="subtle">Hospital ID: <strong>${escapeHtml(state.uhid)}</strong></p>
         ${state.patientEmail ? `<p class="subtle">Email: <strong>${escapeHtml(state.patientEmail)}</strong></p>` : ""}
         <ul class="review-list">${rows}</ul>
@@ -250,6 +282,8 @@
       doctor_slug: state.doctorSlug,
       uhid: state.uhid,
       patient_name: state.patientName,
+      patient_age: state.patientAge,
+      patient_sex: state.patientSex,
       patient_email: state.patientEmail,
       kg_version: KG.version,
       answers: { ...state.answers },
@@ -337,6 +371,10 @@
       if (opt) return opt.label;
     }
     return String(value);
+  }
+
+  function labelForSex(value) {
+    return { male: "Male", female: "Female", other: "Other" }[value] || "—";
   }
 
   function escapeHtml(s) {

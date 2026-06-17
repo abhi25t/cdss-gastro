@@ -1,8 +1,9 @@
 # CDSS — Gastroenterology Clinical Decision Support
 
-A rule-based clinical decision support system for **gastroenterology triage**. It
-standardizes patient history-taking and produces **explainable** diagnostic
-suggestions so a physician can review and prioritise patients by risk.
+A rule-based clinical decision support system for **gastroenterology**. It
+standardizes patient history-taking around the **presenting symptom** and produces an
+**explainable ranked differential diagnosis** (plus suggested tests and treatments) for
+a physician to review.
 
 > ⚠️ **Decision support only — not a substitute for clinical judgement.** Every
 > output is intended for physician review. It does not diagnose or treat patients.
@@ -14,10 +15,12 @@ Patient → Dynamic Questionnaire → Structured Answers → Rule Engine →
 Differential Diagnosis → Recommended Investigations → Treatment Suggestions → Physician Review
 ```
 
-The motivating workflow: patients fill a questionnaire on their own phones in the
-waiting room before the doctor arrives; when the doctor sits down, they log in to a
-dashboard of *their* waiting patients **ranked by risk** (red flags first, then
-diagnosis score) and call the highest-risk patients first.
+The motivating workflow: patients fill a symptom questionnaire on their own phones in
+the waiting room before the doctor arrives; when the doctor sits down, they log in to a
+**first-come-first-serve queue** of *their* waiting patients (showing chief complaint and
+waiting time) and open each patient's **consultation page** — an editable note pre-filled
+from the patient's answers on the left, and clickable rules-based suggestions (ranked
+differential, tests, medications) on the right.
 
 **Multi-doctor.** Several gastroenterologists share the system. Each doctor has a
 short **slug** (e.g. `nitin`) that gives them their own check-in URL
@@ -37,7 +40,8 @@ Firebase Firestore  ── patients can only create; nobody can read from a brow
         │  read via service-account key (Admin SDK)
         ▼
 Hospital on-prem, intranet-only, always-on server:
-   • Python CDSS pipeline → risk-ranked triage dashboard (per-doctor login)
+   • Python CDSS pipeline → first-come-first-serve dashboard + consultation page (per-doctor login)
+   • completed notes saved on-prem (SQLite) as mining-ready data for a future learning loop
    • email listener → instant confirmation to patient (or receptionist if no email)
 ```
 
@@ -168,7 +172,7 @@ python3 webapp/make_poster.py --url https://<project>.web.app   # writes webapp/
 The web config in `firebase-config.js` is public by design (every Firebase web app
 ships it); data is protected by the create-only Firestore rules, not by hiding it.
 
-### 4. Doctor triage dashboard (per-doctor login)
+### 4. Doctor dashboard + consultation page (per-doctor login)
 
 ```bash
 # Local sample data (no Firebase needed — uses examples/patient_cases):
@@ -179,8 +183,14 @@ CDSS_SOURCE=sample python3 -m uvicorn cdss.dashboard.app:app --port 6300
 With a `serviceAccountKey.json` present (see SETUP_FIREBASE.md Part D), drop
 `CDSS_SOURCE=sample` and it reads live submissions from Firestore. Each doctor logs
 in (credentials in `doctors/<slug>.yaml`) and sees **only their own** patients. The
-board auto-refreshes and ranks patients by **red-flag urgency first, then diagnosis
-score** — so a red-flag patient is called before a higher-scoring but lower-risk one.
+board auto-refreshes and shows patients **first-come-first-serve** (arrival order, with
+waiting time). Clicking a patient opens a **consultation page**: a left-hand editable
+note pre-filled from the questionnaire (chief complaint, draft history of present
+illness, diagnosis, tests, meds, …) and right-hand clickable suggestion pills (ranked
+differential + tests + medications) that insert into the note. Saving stores the note
+on-prem in SQLite (`doctors/consultations.db`, git-ignored). The risk-scoring pipeline
+still runs (it feeds the suggestions and an optional red-flag badge); risk-ranking of the
+queue is kept in code but disabled per the doctors' request.
 
 ### 5. Email confirmation listener
 
@@ -227,16 +237,20 @@ python3 examples/run_cases.py
 ## Status & roadmap
 
 **Working:** engine, explainable scoring, REST API, patient web app, Firestore
-submission, the risk-ranked doctor dashboard, and **public Firebase Hosting + a
-waiting-room QR poster** — the single-doctor loop is live-tested.
+submission, the doctor dashboard, multi-doctor support (per-doctor slugs/QR codes,
+patient name + optional email, confirmation emails, per-doctor login), and **public
+Firebase Hosting + a waiting-room QR poster** — the single-doctor loop is live-tested.
 
-**In progress:** multi-doctor support — per-doctor slugs/QR codes, patient name +
-optional email, instant confirmation emails, and per-doctor dashboard login, all
-running on the hospital's on-prem intranet server.
+**New (symptom-first redesign):** a `v3` **symptom-first** knowledge graph (chief
+complaints with complete work-ups → weighted **ranked differential** with evidence
+for/against → structured summary + draft note), a **first-come-first-serve** queue, and a
+per-patient **consultation page** with rules-based suggestion pills. Completed notes are
+captured on-prem as mining-ready data for a future **Apriori/FP-Growth** learning loop.
+*The v3 clinical content is a draft for physician review.*
 
-**Next:** PHI hardening (end-of-day auto-delete, App Check — gated on real-patient
-testing), expanded clinical content (a real `v3` ontology), and optionally an AI
-consultation summary.
+**Next:** physician review of the v3 weights/content; PHI hardening (end-of-day
+auto-delete, App Check — gated on real-patient testing); the association-rule mining job;
+optionally an AI consultation summary.
 
 ## License / disclaimer
 

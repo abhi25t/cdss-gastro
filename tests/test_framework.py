@@ -68,11 +68,21 @@ class FrameworkTest(unittest.TestCase):
         self.assertIn("Proton pump inhibitor", TreatmentEngine(kg).recommend(diagnoses)["Peptic Ulcer Disease"])
 
     def test_all_versions_load_without_application_changes(self) -> None:
-        for version in ("v1", "v2", "v2.1"):
+        for version in ("v1", "v2", "v2.1", "v3"):
             with self.subTest(version=version):
                 kg = KnowledgeGraph.load(f"knowledge_graph/{version}")
                 self.assertGreater(len(kg.questions), 0)
                 self.assertIsInstance(validate(kg).as_dict(), dict)
+
+    def test_v1_output_has_no_v3_only_fields(self) -> None:
+        # Back-compat guard: the older /run contract must not gain v3 keys.
+        kg = KnowledgeGraph.load("knowledge_graph/v1")
+        result = CDSSPipeline(kg).run({"q_location": "ruq", "q_fatty_food": "yes", "q_fever": "yes"}).as_dict()
+        self.assertNotIn("symptom_summary", result)
+        self.assertNotIn("draft_hpi", result)
+        for diagnosis in result["diagnoses"]:
+            self.assertNotIn("confidence", diagnosis)
+            self.assertNotIn("evidence_against", diagnosis)
 
     def test_validation_cli_v1(self) -> None:
         result = subprocess.run(
@@ -124,7 +134,7 @@ class FrameworkTest(unittest.TestCase):
         self.assertIn("PASS v1_biliary_pain", result.stdout)
         self.assertIn("PASS v1_gi_bleeding", result.stdout)
         self.assertIn("PASS v2_1_gerd_generated", result.stdout)
-        self.assertIn("Summary: 3 passed, 0 failed", result.stdout)
+        self.assertIn("Summary: 4 passed, 0 failed", result.stdout)
 
     def test_run_cases_cli_json_named_case(self) -> None:
         result = subprocess.run(
@@ -278,23 +288,29 @@ class DashboardTest(unittest.TestCase):
         data = other.get("/api/triage").json()
         self.assertEqual(data["count"], 0)  # Krithi has no sample patients
 
-    def test_triage_ranks_red_flag_first(self) -> None:
+    def test_triage_orders_first_come_first_serve(self) -> None:
         data = self.client.get("/api/triage").json()
         self.assertEqual(data["source"], "SampleSource")
         self.assertEqual(data["doctor"], "nitin")
-        self.assertEqual(data["count"], 3)
+        self.assertEqual(data["count"], 4)
 
         patients = data["patients"]
-        # GI bleeding (immediate red flag) must be rank 1 / Critical.
-        self.assertEqual(patients[0]["position"], 1)
-        self.assertEqual(patients[0]["risk_tier"], "Critical")
-        self.assertEqual(patients[0]["uhid"], "DEMO-V1_GI_BLEEDING")
-        self.assertTrue(any(f["urgency"] == "immediate" for f in patients[0]["red_flags"]))
+        # Arrival order: positions are 1..N and created_at is non-decreasing.
+        self.assertEqual([p["position"] for p in patients], [1, 2, 3, 4])
+        timestamps = [p["created_at"] for p in patients]
+        self.assertEqual(timestamps, sorted(timestamps))
 
-        # Cholecystitis case (score 85, no red flag) outranks the GERD case.
-        tiers = [p["risk_tier"] for p in patients]
-        self.assertIn("High", tiers)
-        self.assertEqual(patients[-1]["risk_tier"], "Low")  # GERD case last
+        # The pipeline still runs: the GI-bleeding case keeps its immediate red flag,
+        # but it is NOT pushed to the front (risk no longer drives ordering).
+        gi = next(p for p in patients if p["uhid"] == "DEMO-V1_GI_BLEEDING")
+        self.assertTrue(any(f["urgency"] == "immediate" for f in gi["red_flags"]))
+        self.assertNotEqual(gi["position"], 1)
+
+        # Every card carries the new arrival-queue fields.
+        for patient in patients:
+            self.assertGreaterEqual(patient["waiting_minutes"], 0)
+            self.assertTrue(patient["chief_complaint"])
+            self.assertIn("main_symptom", patient)
 
     def test_mark_seen_hides_patient(self) -> None:
         before = self.client.get("/api/triage").json()
@@ -322,6 +338,76 @@ class DashboardTest(unittest.TestCase):
         resp = anon.get("/")
         self.assertEqual(resp.status_code, 307)
         self.assertEqual(resp.headers["location"], "/login")
+
+    def test_patient_detail_api_shape(self) -> None:
+        d = self.client.get("/api/patient/v1_biliary_pain").json()
+        for key in ("chief_complaint", "main_symptom", "draft_hpi", "answers",
+                    "answers_summary", "differential", "suggested_tests",
+                    "suggested_medications", "waiting_minutes", "patient_age", "patient_sex"):
+            self.assertIn(key, d)
+        self.assertEqual(d["differential"][0]["diagnosis"], "Acute Cholecystitis")
+        self.assertEqual(d["differential"][0]["score"], 85)
+        self.assertIn("Ultrasound Abdomen", d["suggested_tests"])
+        self.assertGreaterEqual(d["waiting_minutes"], 0)
+        self.assertTrue(d["answers_summary"])
+
+    def test_patient_detail_carries_age_sex(self) -> None:
+        d = self.client.get("/api/patient/v3_pancreatitis").json()
+        self.assertEqual(d["patient_age"], "54")
+        self.assertEqual(d["patient_sex"], "male")
+
+    def test_consultation_save_round_trip(self) -> None:
+        import tempfile
+        from cdss.dashboard import consultations
+        original = consultations.DB_PATH
+        consultations.DB_PATH = os.path.join(tempfile.mkdtemp(), "c.db")
+        try:
+            body = {
+                "note": {"chief_complaint": "Abdominal Pain",
+                         "provisional_diagnosis": ["Acute Cholecystitis"],
+                         "tests": ["Ultrasound Abdomen"],
+                         "prescribed_medications": ["IV fluids"]},
+                "suggestions": {
+                    "diagnoses": {"offered": ["Acute Cholecystitis", "Biliary Colic"],
+                                  "accepted": ["Acute Cholecystitis"]},
+                    "tests": {"offered": ["CBC", "Ultrasound Abdomen"], "accepted": ["Ultrasound Abdomen"]},
+                    "medications": {"offered": ["IV fluids"], "accepted": ["IV fluids"]}},
+            }
+            resp = self.client.post("/api/patient/v1_biliary_pain/consultation", json=body)
+            self.assertEqual(resp.status_code, 200)
+            cid = resp.json()["consultation_id"]
+            saved = consultations.load_consultation(cid, path=consultations.DB_PATH)
+            self.assertEqual(saved["final_diagnosis"], "Acute Cholecystitis")
+            # accepted vs ignored suggestion telemetry is captured for future mining.
+            flags = {(i["value"], i["accepted"]) for i in saved["items"] if i["source"] == "suggested"}
+            self.assertIn(("Acute Cholecystitis", 1), flags)
+            self.assertIn(("Biliary Colic", 0), flags)
+            # symptom features captured from the pipeline's true conditions
+            symptoms = {i["value"] for i in saved["items"] if i["kind"] == "symptom"}
+            self.assertIn("ruq_pain", symptoms)
+            # saving marks the patient seen (drops from the default queue)
+            self.assertNotIn("v1_biliary_pain", [p["id"] for p in self.client.get("/api/triage").json()["patients"]])
+        finally:
+            consultations.DB_PATH = original
+
+    def test_malformed_consultation_is_422(self) -> None:
+        self.assertEqual(
+            self.client.post("/api/patient/v1_biliary_pain/consultation", json={"bad": 1}).status_code, 422
+        )
+
+    def test_patient_ownership_enforced(self) -> None:
+        from cdss.dashboard import auth
+        other = TestClient(dashboard_app, follow_redirects=False)
+        other.cookies.set("cdss_session", auth.make_token("krithi"))
+        self.assertEqual(other.get("/api/patient/v1_biliary_pain").status_code, 404)
+        self.assertEqual(other.get("/patient/v1_biliary_pain").status_code, 404)
+        self.assertEqual(
+            other.post("/api/patient/v1_biliary_pain/consultation", json={"note": {}}).status_code, 404
+        )
+        # Anonymous: API 401, page redirects to login.
+        anon = TestClient(dashboard_app, follow_redirects=False)
+        self.assertEqual(anon.get("/api/patient/v1_biliary_pain").status_code, 401)
+        self.assertEqual(anon.get("/patient/v1_biliary_pain").status_code, 307)
 
 
 class AuthTest(unittest.TestCase):
@@ -367,6 +453,75 @@ class NotifyListenerTest(unittest.TestCase):
     def test_no_email_and_no_receptionist_is_skipped(self) -> None:
         plan = self._plan({"patient_name": "Ravi"}, {"email": "a@b.com", "password": "x"})
         self.assertEqual(plan.action, "skip")
+
+
+class V3SymptomFirstTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.kg = KnowledgeGraph.load("knowledge_graph/v3")
+        cls.pipeline = CDSSPipeline(cls.kg)
+
+    def test_v3_loads_and_validates_clinical(self) -> None:
+        self.assertTrue(self.kg.is_symptom_first)
+        self.assertIn("abdominal_pain", self.kg.symptoms)
+        report = validate(self.kg, profile="clinical")
+        self.assertTrue(report.is_valid, report.as_dict())
+
+    def test_v3_weighted_differential_ranks_and_is_explainable(self) -> None:
+        # Classic acute pancreatitis presentation.
+        result = self.pipeline.run({
+            "q_main_complaint": "abdominal_pain", "q_ap_site": "epigastric", "q_ap_onset": "sudden",
+            "q_ap_character": "boring", "q_ap_radiation": "to_back", "q_ap_severity": "severe",
+            "q_ap_timing": "constant", "q_ap_fatty": "no", "q_ap_relieved_food": "no",
+            "q_ap_fever": "no", "q_ap_vomiting": "yes", "q_ap_jaundice": "no",
+        }).as_dict()
+        diffs = result["diagnoses"]
+        self.assertEqual(diffs[0]["diagnosis"], "Acute Pancreatitis")
+        # Confidence is a normalised 0-100 across the differential and is ranked.
+        confidences = [d["confidence"] for d in diffs]
+        self.assertTrue(all(0 <= c <= 100 for c in confidences))
+        self.assertEqual(confidences, sorted(confidences, reverse=True))
+        self.assertIn("Radiation to the back", diffs[0]["supporting_evidence"])
+
+    def test_v3_negative_evidence_lowers_score(self) -> None:
+        # Relief by food argues FOR peptic ulcer but AGAINST pancreatitis.
+        result = self.pipeline.run({
+            "q_main_complaint": "abdominal_pain", "q_ap_site": "epigastric", "q_ap_onset": "gradual",
+            "q_ap_character": "burning", "q_ap_radiation": "none", "q_ap_severity": "mild",
+            "q_ap_timing": "fasting", "q_ap_fatty": "no", "q_ap_relieved_food": "yes",
+            "q_ap_fever": "no", "q_ap_vomiting": "no", "q_ap_jaundice": "no",
+        }).as_dict()
+        by_name = {d["diagnosis"]: d for d in result["diagnoses"]}
+        self.assertEqual(result["diagnoses"][0]["diagnosis"], "Peptic Ulcer Disease")
+        # Pancreatitis, if present, carries the negative finding as evidence-against.
+        if "Acute Pancreatitis" in by_name:
+            self.assertIn("Relieved by food/antacids", by_name["Acute Pancreatitis"].get("evidence_against", []))
+
+    def test_v3_structured_summary_and_hpi_are_deterministic(self) -> None:
+        result = self.pipeline.run({
+            "q_main_complaint": "abdominal_pain", "q_ap_site": "ruq", "q_ap_onset": "gradual",
+            "q_ap_character": "colicky", "q_ap_radiation": "to_right_shoulder", "q_ap_severity": "moderate",
+            "q_ap_timing": "after_meals", "q_ap_fatty": "yes", "q_ap_relieved_food": "no",
+            "q_ap_fever": "yes", "q_ap_vomiting": "no", "q_ap_jaundice": "no",
+        }).as_dict()
+        summary = result["symptom_summary"]
+        self.assertEqual(summary["chief_complaint"], "Abdominal Pain")
+        self.assertEqual(summary["findings"]["Site"], "right upper quadrant")
+        self.assertEqual(summary["findings"]["Radiation"], "to the right shoulder")
+        self.assertIn("fever", summary["findings"]["Associated symptoms"])
+        self.assertTrue(result["draft_hpi"].startswith("Patient presents with abdominal pain"))
+
+    def test_v3_reachability_validator_flags_unreachable_workup(self) -> None:
+        from pathlib import Path
+        from cdss.knowledge.models import Flow, Question, Symptom
+        broken = KnowledgeGraph(
+            version="vbroken", path=Path("."),
+            questions={"q_a": Question("q_a", "A", "yes_no"), "q_b": Question("q_b", "B", "yes_no")},
+            flows={"f": Flow(id="f", start="q_a", transitions={})},  # q_b never reached
+            symptoms={"s": Symptom(id="s", label="S", flow="f", workup=["q_a", "q_b"])},
+        )
+        codes = {issue.code for issue in validate(broken).issues}
+        self.assertIn("unreachable_workup_question", codes)
 
 
 if __name__ == "__main__":

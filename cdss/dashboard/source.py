@@ -2,12 +2,18 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_KEY_PATH = ROOT / "serviceAccountKey.json"
 PATIENT_CASES = ROOT / "examples" / "patient_cases"
+
+# Deterministic, staggered arrival times for sample cases (7 minutes apart) so the
+# first-come-first-serve queue and waiting-time display can be exercised without
+# Firebase. Real submissions get a server timestamp instead.
+_SAMPLE_BASE = datetime.fromisoformat("2026-06-12T08:00:00")
 
 
 class SubmissionSource(Protocol):
@@ -16,6 +22,7 @@ class SubmissionSource(Protocol):
     scopes results/cleanup to a single doctor (each doctor sees only their own)."""
 
     def fetch(self, include_seen: bool = False, doctor_slug: str | None = None) -> list[dict[str, Any]]: ...
+    def fetch_one(self, submission_id: str) -> dict[str, Any] | None: ...
     def mark_seen(self, submission_id: str) -> None: ...
     def cleanup(self, doctor_slug: str | None = None) -> int: ...
 
@@ -33,26 +40,42 @@ class SampleSource:
     def fetch(self, include_seen: bool = False, doctor_slug: str | None = None) -> list[dict[str, Any]]:
         want = doctor_slug.strip().lower() if doctor_slug else None
         out: list[dict[str, Any]] = []
-        for case_file in sorted(PATIENT_CASES.glob("*.json")):
+        for index, case_file in enumerate(sorted(PATIENT_CASES.glob("*.json"))):
+            record = self._record(case_file, index)
+            if want is not None and record["doctor_slug"] != want:
+                continue
+            if record["status"] == "seen" and not include_seen:
+                continue
+            out.append(record)
+        return out
+
+    def fetch_one(self, submission_id: str) -> dict[str, Any] | None:
+        for index, case_file in enumerate(sorted(PATIENT_CASES.glob("*.json"))):
             case = json.loads(case_file.read_text(encoding="utf-8"))
             sub_id = str(case.get("id") or case_file.stem)
-            slug = str(case.get("doctor_slug") or "nitin").strip().lower()
-            if want is not None and slug != want:
-                continue
-            status = "seen" if sub_id in self._seen else "waiting"
-            if status == "seen" and not include_seen:
-                continue
-            out.append({
-                "id": sub_id,
-                "doctor_slug": slug,
-                "uhid": f"DEMO-{sub_id.upper()}",
-                "patient_name": str(case.get("patient_name") or sub_id.replace("_", " ").title()),
-                "kg_version": str(case.get("kg_version") or "v1"),
-                "answers": dict(case.get("answers") or {}),
-                "submitted_at": "2026-06-12T08:15:00",
-                "status": status,
-            })
-        return out
+            if sub_id == submission_id:
+                return self._record(case_file, index)
+        return None
+
+    def _record(self, case_file: Path, index: int) -> dict[str, Any]:
+        case = json.loads(case_file.read_text(encoding="utf-8"))
+        sub_id = str(case.get("id") or case_file.stem)
+        slug = str(case.get("doctor_slug") or "nitin").strip().lower()
+        created_at = str(case.get("created_at") or (_SAMPLE_BASE + timedelta(minutes=7 * index)).isoformat())
+        return {
+            "id": sub_id,
+            "doctor_slug": slug,
+            "uhid": f"DEMO-{sub_id.upper()}",
+            "patient_name": str(case.get("patient_name") or sub_id.replace("_", " ").title()),
+            "patient_age": str(case.get("patient_age") or ""),
+            "patient_sex": str(case.get("patient_sex") or ""),
+            "patient_email": str(case.get("patient_email") or ""),
+            "kg_version": str(case.get("kg_version") or "v1"),
+            "answers": dict(case.get("answers") or {}),
+            "submitted_at": created_at,
+            "created_at": created_at,
+            "status": "seen" if sub_id in self._seen else "waiting",
+        }
 
     def mark_seen(self, submission_id: str) -> None:
         self._seen.add(submission_id)

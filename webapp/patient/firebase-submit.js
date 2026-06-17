@@ -29,6 +29,8 @@ if (!cfg || !cfg.apiKey || cfg.apiKey === "PASTE_API_KEY") {
         doctor_slug: payload.doctor_slug,    // which doctor this patient is here for
         uhid: payload.uhid,
         patient_name: payload.patient_name,
+        patient_age: payload.patient_age || "",
+        patient_sex: payload.patient_sex || "",
         patient_email: payload.patient_email || "",  // optional
         kg_version: payload.kg_version,
         answers: payload.answers,

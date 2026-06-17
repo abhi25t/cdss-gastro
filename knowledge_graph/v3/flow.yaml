@@ -1,0 +1,56 @@
+# v3 flows: one per chief complaint. q_main_complaint routes to a flow by its answer
+# value. Each flow walks the full work-up linearly (default transition → next question)
+# so the complete symptom characterisation is always collected.
+flows:
+  abdominal_pain:
+    start: q_ap_site
+    transitions:
+      q_ap_site: {default: q_ap_onset}
+      q_ap_onset: {default: q_ap_character}
+      q_ap_character: {default: q_ap_radiation}
+      q_ap_radiation: {default: q_ap_severity}
+      q_ap_severity: {default: q_ap_timing}
+      q_ap_timing: {default: q_ap_fatty}
+      q_ap_fatty: {default: q_ap_relieved_food}
+      q_ap_relieved_food: {default: q_ap_fever}
+      q_ap_fever: {default: q_ap_vomiting}
+      q_ap_vomiting: {default: q_ap_jaundice}
+
+  dyspepsia:
+    start: q_dy_burning
+    transitions:
+      q_dy_burning: {default: q_dy_regurgitation}
+      q_dy_regurgitation: {default: q_dy_relation}
+      q_dy_relation: {default: q_dy_relieved_antacid}
+      q_dy_relieved_antacid: {default: q_dy_bloating}
+      q_dy_bloating: {default: q_dy_dysphagia}
+      q_dy_dysphagia: {default: q_dy_weight_loss}
+
+  jaundice:
+    start: q_jy_dark_urine
+    transitions:
+      q_jy_dark_urine: {default: q_jy_pale_stool}
+      q_jy_pale_stool: {default: q_jy_itching}
+      q_jy_itching: {default: q_jy_pain}
+      q_jy_pain: {default: q_jy_fever}
+      q_jy_fever: {default: q_jy_weight_loss}
+      q_jy_weight_loss: {default: q_jy_alcohol}
+
+  altered_bowel:
+    start: q_bo_pattern
+    transitions:
+      q_bo_pattern: {default: q_bo_duration}
+      q_bo_duration: {default: q_bo_blood}
+      q_bo_blood: {default: q_bo_mucus}
+      q_bo_mucus: {default: q_bo_nocturnal}
+      q_bo_nocturnal: {default: q_bo_weight_loss}
+      q_bo_weight_loss: {default: q_bo_fever}
+
+  gi_bleeding:
+    start: q_gb_type
+    transitions:
+      q_gb_type: {default: q_gb_amount}
+      q_gb_amount: {default: q_gb_dizzy}
+      q_gb_dizzy: {default: q_gb_nsaid}
+      q_gb_nsaid: {default: q_gb_alcohol}
+      q_gb_alcohol: {default: q_gb_weight_loss}

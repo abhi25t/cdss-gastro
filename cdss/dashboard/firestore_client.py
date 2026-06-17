@@ -46,6 +46,15 @@ class FirestoreSubmissions:
             out.append(data)
         return out
 
+    def fetch_one(self, submission_id: str) -> dict[str, Any] | None:
+        doc = self._collection().document(submission_id).get()
+        if not doc.exists:
+            return None
+        data = doc.to_dict() or {}
+        data["id"] = doc.id
+        data["created_at"] = _to_iso(data.get("created_at"))
+        return data
+
     def mark_seen(self, submission_id: str) -> None:
         self._collection().document(submission_id).update({"status": "seen"})
 

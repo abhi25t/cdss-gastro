@@ -1,0 +1,43 @@
+{
+  "id": "v3_pancreatitis",
+  "name": "v3 acute pancreatitis (symptom-first)",
+  "kg_version": "v3",
+  "doctor_slug": "nitin",
+  "patient_name": "Ramesh Kulkarni",
+  "patient_age": "54",
+  "patient_sex": "male",
+  "answers": {
+    "q_main_complaint": "abdominal_pain",
+    "q_ap_site": "epigastric",
+    "q_ap_onset": "sudden",
+    "q_ap_character": "boring",
+    "q_ap_radiation": "to_back",
+    "q_ap_severity": "severe",
+    "q_ap_timing": "constant",
+    "q_ap_fatty": "no",
+    "q_ap_relieved_food": "no",
+    "q_ap_fever": "no",
+    "q_ap_vomiting": "yes",
+    "q_ap_jaundice": "no"
+  },
+  "expected": {
+    "top_diagnosis": "Acute Pancreatitis",
+    "min_top_score": 40,
+    "true_conditions": [
+      "ap_epigastric",
+      "ap_radiates_back",
+      "ap_boring"
+    ],
+    "red_flags": [],
+    "investigations": {
+      "Acute Pancreatitis": [
+        "Serum Lipase"
+      ]
+    },
+    "treatments": {
+      "Acute Pancreatitis": [
+        "Analgesia and antiemetics"
+      ]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+# Urgency alerts that cross-cut diagnoses (shown as a non-reordering safety badge on
+# the queue). DRAFT for review.
+red_flags:
+  - id: gi_haemorrhage_haematemesis
+    urgency: immediate
+    when: [gb_hematemesis]
+  - id: gi_haemorrhage_melaena
+    urgency: immediate
+    when: [gb_melena]
+  - id: haemodynamic_instability
+    urgency: immediate
+    when: [gb_dizzy]
+  - id: large_volume_gi_bleed
+    urgency: immediate
+    when: [gb_large]
+  - id: rectal_bleeding
+    urgency: urgent
+    when: [bo_blood]
+  - id: obstructive_jaundice
+    urgency: urgent
+    when: [jy_pale_stool]
+  - id: painless_jaundice_weight_loss
+    urgency: urgent
+    when: [jy_weight_loss]
+  - id: dysphagia_alarm
+    urgency: urgent
+    when: [dy_dysphagia]
+  - id: dyspepsia_weight_loss
+    urgency: urgent
+    when: [dy_weight_loss]
+  - id: bowel_change_weight_loss
+    urgency: urgent
+    when: [bo_weight_loss]

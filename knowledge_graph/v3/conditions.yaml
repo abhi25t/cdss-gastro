@@ -1,0 +1,64 @@
+# Discriminating clinical features derived from the answers. DRAFT for review.
+conditions:
+  # ---- Abdominal pain ----
+  ap_epigastric: {expression: "q_ap_site == 'epigastric'", label: Epigastric pain}
+  ap_ruq: {expression: "q_ap_site == 'ruq'", label: Right-upper-quadrant pain}
+  ap_rlq: {expression: "q_ap_site == 'rlq'", label: Right-lower-quadrant pain}
+  ap_periumbilical: {expression: "q_ap_site == 'periumbilical'", label: Periumbilical pain}
+  ap_sudden: {expression: "q_ap_onset == 'sudden'", label: Sudden onset}
+  ap_colicky: {expression: "q_ap_character == 'colicky'", label: Colicky pain}
+  ap_burning: {expression: "q_ap_character == 'burning'", label: Burning pain}
+  ap_boring: {expression: "q_ap_character == 'boring'", label: Boring pain}
+  ap_radiates_back: {expression: "q_ap_radiation == 'to_back'", label: Radiation to the back}
+  ap_radiates_shoulder: {expression: "q_ap_radiation == 'to_right_shoulder'", label: Radiation to right shoulder}
+  ap_radiates_groin: {expression: "q_ap_radiation == 'to_groin'", label: Radiation to the groin}
+  ap_severe: {expression: "q_ap_severity == 'severe'", label: Severe pain}
+  ap_after_meals: {expression: "q_ap_timing == 'after_meals'", label: Pain after meals}
+  ap_fasting: {expression: "q_ap_timing == 'fasting'", label: Pain when fasting}
+  ap_fatty_trigger: {expression: "q_ap_fatty == 'yes'", label: Worse after fatty food}
+  ap_relieved_by_food: {expression: "q_ap_relieved_food == 'yes'", label: Relieved by food/antacids}
+  ap_fever: {expression: "q_ap_fever == 'yes'", label: Fever}
+  ap_vomiting: {expression: "q_ap_vomiting == 'yes'", label: Vomiting}
+  ap_jaundice: {expression: "q_ap_jaundice == 'yes'", label: Jaundice}
+
+  # ---- Dyspepsia ----
+  dy_burning: {expression: "q_dy_burning == 'yes'", label: Retrosternal burning}
+  dy_regurgitation: {expression: "q_dy_regurgitation == 'yes'", label: Acid regurgitation}
+  dy_after_meals: {expression: "q_dy_relation == 'after_meals'", label: Worse after meals}
+  dy_lying_down: {expression: "q_dy_relation == 'lying_down'", label: Worse lying down}
+  dy_fasting: {expression: "q_dy_relation == 'fasting'", label: Worse when fasting}
+  dy_relieved_antacid: {expression: "q_dy_relieved_antacid == 'yes'", label: Relieved by antacids}
+  dy_bloating: {expression: "q_dy_bloating == 'yes'", label: Bloating / early satiety}
+  dy_dysphagia: {expression: "q_dy_dysphagia == 'yes'", label: Difficulty swallowing}
+  dy_weight_loss: {expression: "q_dy_weight_loss == 'yes'", label: Unintentional weight loss}
+
+  # ---- Jaundice ----
+  jy_dark_urine: {expression: "q_jy_dark_urine == 'yes'", label: Dark urine}
+  jy_pale_stool: {expression: "q_jy_pale_stool == 'yes'", label: Pale stools}
+  jy_itching: {expression: "q_jy_itching == 'yes'", label: Itching}
+  jy_pain: {expression: "q_jy_pain == 'yes'", label: Abdominal pain with jaundice}
+  jy_fever: {expression: "q_jy_fever == 'yes'", label: Fever}
+  jy_weight_loss: {expression: "q_jy_weight_loss == 'yes'", label: Unintentional weight loss}
+  jy_alcohol: {expression: "q_jy_alcohol == 'yes'", label: Regular alcohol use}
+
+  # ---- Altered bowel habit ----
+  bo_diarrhea: {expression: "q_bo_pattern == 'diarrhea'", label: Diarrhoea}
+  bo_constipation: {expression: "q_bo_pattern == 'constipation'", label: Constipation}
+  bo_alternating: {expression: "q_bo_pattern == 'alternating'", label: Alternating bowel habit}
+  bo_acute: {expression: "q_bo_duration == 'acute'", label: Acute (<2 weeks)}
+  bo_chronic: {expression: "q_bo_duration == 'chronic'", label: Chronic (>4 weeks)}
+  bo_blood: {expression: "q_bo_blood == 'yes'", label: Blood in stool}
+  bo_mucus: {expression: "q_bo_mucus == 'yes'", label: Mucus in stool}
+  bo_nocturnal: {expression: "q_bo_nocturnal == 'yes'", label: Nocturnal symptoms}
+  bo_weight_loss: {expression: "q_bo_weight_loss == 'yes'", label: Unintentional weight loss}
+  bo_fever: {expression: "q_bo_fever == 'yes'", label: Fever}
+
+  # ---- GI bleeding ----
+  gb_hematemesis: {expression: "q_gb_type == 'vomiting_blood'", label: Haematemesis}
+  gb_melena: {expression: "q_gb_type == 'black_stool'", label: Melaena}
+  gb_fresh_blood: {expression: "q_gb_type == 'fresh_blood_stool'", label: Fresh rectal bleeding}
+  gb_large: {expression: "q_gb_amount == 'large'", label: Large-volume bleed}
+  gb_dizzy: {expression: "q_gb_dizzy == 'yes'", label: Light-headedness}
+  gb_nsaid: {expression: "q_gb_nsaid == 'yes'", label: NSAID use}
+  gb_alcohol: {expression: "q_gb_alcohol == 'yes'", label: Regular alcohol use}
+  gb_weight_loss: {expression: "q_gb_weight_loss == 'yes'", label: Unintentional weight loss}
